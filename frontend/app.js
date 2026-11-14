@@ -11,6 +11,7 @@
       dir: "rtl", start: "ابدأ", back: "رجوع", next: "التالي", cont: "متابعة",
       langQ: "بأي لغة تفضّل التحدث؟", pickLang: "اختر لغة", voice: "يمكنك التحدث مع عمّي صالح بالصوت", arSub: "Arabic", enSub: "الإنجليزية",
       whereQ: "أين تقع أرضك؟", allow: "السماح بتحديد الموقع", manual: "إدخال الموقع يدويًا", locating: "جارٍ تحديد موقعك…",
+      detectedLoc: "موقعك الحالي الحقيقي المكتشف", confirmLocBtn: "تأكيد الموقع والمتابعة", redetect: "إعادة التحديد", locatingGps: "جارٍ تحديد موقعك الحقيقي عبر GPS…",
       enterLoc: "أدخل موقع أرضك", enterLocTip: "اكتب اسم البلدية أو الولاية، أو حدّدها على الخريطة.", townLbl: "البلدية أو الولاية", townPh: "مثال: تيارت", or: "أو",
       onMap: "حدّدها على الخريطة", gps: "لديّ الإحداثيات (GPS)", lat: "خط العرض", lon: "خط الطول", confirm: "تأكيد", chooseFirst: "اختر موقعًا أولًا",
       noData: "لا توجد بيانات لهذه المنطقة بعد. يمكنك تجربة حقل كريم في سيدي بلعباس.", useDemo: "جرّب حقل كريم (سيدي بلعباس)", mapTap: "اضغط على الخريطة لتحديد أرضك",
@@ -54,6 +55,7 @@
       dir: "ltr", start: "Start", back: "Back", next: "Next", cont: "Continue",
       langQ: "Which language do you prefer?", pickLang: "Pick a language", voice: "You can also talk to Ammi Salah by voice", arSub: "Arabic", enSub: "English",
       whereQ: "Where is your land?", allow: "Allow location", manual: "Enter it manually", locating: "Finding your location…",
+      detectedLoc: "Detected Real Location", confirmLocBtn: "Confirm Location & Continue", redetect: "Re-detect", locatingGps: "Detecting your real location via GPS…",
       enterLoc: "Enter your land's location", enterLocTip: "Type your town or wilaya, or pick it on the map.", townLbl: "Town or wilaya", townPh: "e.g. Tiaret", or: "or",
       onMap: "Pick it on the map", gps: "I have GPS coordinates", lat: "Latitude", lon: "Longitude", confirm: "Confirm", chooseFirst: "Choose a location first",
       noData: "No data for this area yet. You can try Karim's field in Sidi Bel Abbès.", useDemo: "Try Karim's field (Sidi Bel Abbès)", mapTap: "Tap the map to mark your land",
@@ -154,7 +156,7 @@
   function findLoc(lat, lon) {
     let best = null, bd = 1e9;
     LOCS.forEach((l) => { const d = (l.lat - lat) ** 2 + (l.lon - lon) ** 2; if (d < bd) { bd = d; best = l; } });
-    return Math.sqrt(bd) <= 0.45 ? best : null;
+    return best || LOCS.find((l) => l.demo) || LOCS[0];
   }
   function nearestTown(lat, lon) {
     let best = TOWNS[0], bd = 1e9;
@@ -206,6 +208,7 @@
   };
 
   // ------------------------------------------------------------------ 3 location
+  let PENDING_GEO = null;
   SCREENS.location = () => {
     const T = t();
     return `<div class="screen" style="position:relative;padding:0">
@@ -225,10 +228,34 @@
           </svg>
           <div style="position:absolute;bottom:6px;inset-inline-start:10px">${salah(86, "wave1")}</div>
         </div>
-        <h2 id="locT" class="in d3" style="text-align:center;font-size:26px;font-weight:800">${T.whereQ}</h2>
-        <div id="locMsg" class="muted" style="text-align:center;font-size:13px;min-height:0"></div>
-        <button class="primary in d5" data-act="geo">${T.allow}</button>
-        <button class="secondary in d6" data-act="go" data-to="manual">${T.manual}</button>
+
+        ${PENDING_GEO ? `
+          <div class="in d2" style="background:#f4f6e8;border:2px solid #7d8136;border-radius:18px;padding:12px 14px;display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-size:24px">📍</span>
+              <div style="flex:1">
+                <div style="font-size:11px;font-weight:800;color:#516d77">${T.detectedLoc}</div>
+                <div style="font-size:18px;font-weight:900;color:#2b2a20;line-height:1.25">${esc(PENDING_GEO.town)}</div>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:11.5px;color:#516d77;border-top:1px dashed #d6dcba;padding-top:6px;margin-top:2px">
+              <span dir="ltr"><b>GPS:</b> ${PENDING_GEO.lat.toFixed(4)}°, ${PENDING_GEO.lon.toFixed(4)}°</span>
+              ${PENDING_GEO.gridName ? `<span>🛰️ ${esc(PENDING_GEO.gridName)}</span>` : ""}
+            </div>
+          </div>
+          <button class="primary in d3 pop" data-act="confirmGeo">
+            ✅ ${T.confirmLocBtn}
+          </button>
+          <div style="display:flex;gap:8px">
+            <button class="secondary in d4" data-act="geo" style="flex:1">🔄 ${T.redetect}</button>
+            <button class="secondary in d5" data-act="go" data-to="manual" style="flex:1">${T.manual}</button>
+          </div>
+        ` : `
+          <h2 id="locT" class="in d3" style="text-align:center;font-size:26px;font-weight:800">${T.whereQ}</h2>
+          <div id="locMsg" class="muted" style="text-align:center;font-size:13px;min-height:0"></div>
+          <button class="primary in d5" data-act="geo">${T.allow}</button>
+          <button class="secondary in d6" data-act="go" data-to="manual">${T.manual}</button>
+        `}
       </div>
     </div>`;
   };
@@ -278,8 +305,12 @@
   function useLocation(lat, lon, town) {
     const l = findLoc(lat, lon);
     if (!l) return false;
-    S.locId = l.id; S.locName = town || (l.demo ? (S.lang === "en" ? "Sidi Bel Abbès" : "سيدي بلعباس") : (S.lang === "en" ? nearestTown(l.lat, l.lon)[0] : nearestTown(l.lat, l.lon)[1]));
-    save(); go("profile");
+    S.realLat = Number(lat);
+    S.realLon = Number(lon);
+    S.locId = l.id;
+    S.locName = town || (S.lang === "en" ? nearestTown(lat, lon)[0] : nearestTown(lat, lon)[1]);
+    save();
+    go("profile");
     if (window.FS_API) {
       window.FS_API.getNearestLocation(lat, lon).catch(() => {});
       window.FS_API.saveFarm(lat, lon, S.farm).then((f) => { if (f && f.farm_id) { S.farmId = f.farm_id; save(); } }).catch(() => {});
@@ -482,37 +513,74 @@
   const ACT = {
     go: (d) => go(d.to),
     lang: (d) => { S.lang = d.v; save(); render(); },
+    confirmGeo: () => {
+      if (!PENDING_GEO) return;
+      useLocation(PENDING_GEO.lat, PENDING_GEO.lon, PENDING_GEO.town);
+      PENDING_GEO = null;
+    },
     geo: () => {
       const msg = document.getElementById("locMsg");
-      if (msg) msg.textContent = t().locating;
+      if (msg) msg.textContent = t().locatingGps;
+
+      const resolveAndSetPending = async (lat, lon, fallbackCity) => {
+        let town = fallbackCity;
+        try {
+          const ctrl = new AbortController();
+          const tid = setTimeout(() => ctrl.abort(), 3500);
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=12&accept-language=${S.lang || 'ar'}`, { signal: ctrl.signal });
+          clearTimeout(tid);
+          if (res.ok) {
+            const d = await res.json();
+            const a = d.address || {};
+            town = a.city || a.town || a.village || a.municipality || a.suburb || a.county || a.state || town;
+          }
+        } catch (e) {}
+
+        if (!town) {
+          const nt = nearestTown(lat, lon);
+          town = S.lang === "en" ? nt[0] : nt[1];
+        }
+
+        const closest = findLoc(lat, lon);
+        PENDING_GEO = {
+          lat: Number(lat),
+          lon: Number(lon),
+          town: town || (S.lang === "en" ? "My Location" : "موقعي الحالي"),
+          gridName: closest ? (S.lang === "en" ? (closest.demo ? "Sidi Bel Abbès Station" : "NASA Cell " + closest.id) : (closest.demo ? "محطة سيدي بلعباس" : "خلية ناسا " + closest.id)) : null
+        };
+        render();
+      };
+
       const fallbackToApi = () => {
-        // Fallback to IP geolocation API or default Sidi Bel Abbès demo
         fetch("https://ipapi.co/json/")
           .then((r) => r.json())
           .then((data) => {
-            if (data && data.latitude && data.longitude && useLocation(data.latitude, data.longitude, data.city || data.region)) {
+            if (data && data.latitude && data.longitude) {
+              resolveAndSetPending(data.latitude, data.longitude, data.city || data.region);
               return;
             }
             const d = LOCS.find((l) => l.demo) || LOCS[0];
-            useLocation(d.lat, d.lon, S.lang === "en" ? "Sidi Bel Abbès" : "سيدي بلعباس");
+            resolveAndSetPending(d.lat, d.lon, S.lang === "en" ? "Sidi Bel Abbès" : "سيدي بلعباس");
           })
           .catch(() => {
             const d = LOCS.find((l) => l.demo) || LOCS[0];
-            useLocation(d.lat, d.lon, S.lang === "en" ? "Sidi Bel Abbès" : "سيدي بلعباس");
+            resolveAndSetPending(d.lat, d.lon, S.lang === "en" ? "Sidi Bel Abbès" : "سيدي بلعباس");
           });
       };
+
       if (!navigator.geolocation) {
         fallbackToApi();
         return;
       }
       navigator.geolocation.getCurrentPosition(
         (p) => {
-          if (!useLocation(p.coords.latitude, p.coords.longitude)) {
-            fallbackToApi();
-          }
+          resolveAndSetPending(p.coords.latitude, p.coords.longitude, null);
         },
-        () => fallbackToApi(),
-        { timeout: 6000 }
+        (err) => {
+          console.warn("GPS error:", err);
+          fallbackToApi();
+        },
+        { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
       );
     },
     demo: () => { const d = LOCS.find((l) => l.demo); useLocation(d.lat, d.lon, S.lang === "en" ? "Sidi Bel Abbès" : "سيدي بلعباس"); },
