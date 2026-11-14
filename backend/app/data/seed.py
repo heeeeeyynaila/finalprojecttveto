@@ -14,9 +14,11 @@ REFS = {
 CROPS = [  # id, name, arabic, kind
     ("wheat", "Durum/bread wheat", "القمح", "cereal"),
     ("barley", "Barley", "الشعير", "cereal"),
+    ("oat", "Oat", "الشوفان", "cereal"),
     ("chickpea", "Chickpea", "الحمص", "legume"),
     ("lentil", "Lentil", "العدس", "legume"),
     ("faba", "Faba bean", "الفول", "legume"),
+    ("vetch", "Vetch", "البيقية", "legume"),
     ("peas", "Dry pea", "البازلاء", "legume"),
     ("fallow", "Fallow", "بور", "fallow"),
 ]

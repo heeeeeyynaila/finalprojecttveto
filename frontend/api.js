@@ -79,7 +79,7 @@
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            rotation: Array.isArray(rotation) && rotation.length ? rotation : ["wheat"],
+            rotation: (Array.isArray(rotation) && rotation.length ? rotation : ["wheat"]).map(c => ["wheat", "barley", "oat", "chickpea", "lentil", "faba", "vetch", "peas", "fallow"].includes(c) ? c : "wheat"),
             score: score != null ? Number(score) : null,
             details: details || {}
           })
