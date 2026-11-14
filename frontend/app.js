@@ -484,9 +484,36 @@
     lang: (d) => { S.lang = d.v; save(); render(); },
     geo: () => {
       const msg = document.getElementById("locMsg");
-      if (!navigator.geolocation) return go("manual");
-      msg.textContent = t().locating;
-      navigator.geolocation.getCurrentPosition((p) => { if (!useLocation(p.coords.latitude, p.coords.longitude)) noDataMsg(msg); }, () => go("manual"), { timeout: 10000 });
+      if (msg) msg.textContent = t().locating;
+      const fallbackToApi = () => {
+        // Fallback to IP geolocation API or default Sidi Bel Abbès demo
+        fetch("https://ipapi.co/json/")
+          .then((r) => r.json())
+          .then((data) => {
+            if (data && data.latitude && data.longitude && useLocation(data.latitude, data.longitude, data.city || data.region)) {
+              return;
+            }
+            const d = LOCS.find((l) => l.demo) || LOCS[0];
+            useLocation(d.lat, d.lon, S.lang === "en" ? "Sidi Bel Abbès" : "سيدي بلعباس");
+          })
+          .catch(() => {
+            const d = LOCS.find((l) => l.demo) || LOCS[0];
+            useLocation(d.lat, d.lon, S.lang === "en" ? "Sidi Bel Abbès" : "سيدي بلعباس");
+          });
+      };
+      if (!navigator.geolocation) {
+        fallbackToApi();
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(
+        (p) => {
+          if (!useLocation(p.coords.latitude, p.coords.longitude)) {
+            fallbackToApi();
+          }
+        },
+        () => fallbackToApi(),
+        { timeout: 6000 }
+      );
     },
     demo: () => { const d = LOCS.find((l) => l.demo); useLocation(d.lat, d.lon, S.lang === "en" ? "Sidi Bel Abbès" : "سيدي بلعباس"); },
     town: (d) => { document.getElementById("town").value = d.name; document.getElementById("sugg").style.display = "none"; setPick(+d.lat, +d.lon, d.name); },

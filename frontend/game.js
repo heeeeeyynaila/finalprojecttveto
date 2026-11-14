@@ -72,7 +72,7 @@
   const LVLNAME = { ok: ["مناسب", "Suitable"], adj: ["مناسب مع تعديلات", "Suitable with adjustments"], high: ["مخاطرة عالية", "High risk"], na: ["معلومات غير كافية", "Not enough information"] };
   const lvlBadge = (lv) => `<span class="badge b-${lv === "ok" ? "ok" : lv === "adj" ? "adj" : lv === "high" ? "high" : "na"}">${L(LVLNAME[lv][0], LVLNAME[lv][1])}</span>`;
 
-  // ---------------------------------------------------------------- sound & voice
+  // ---------------------------------------------------------------- sound & calm ambient music
   let AC = null;
   function snd(type) {
     if (G().mute) return;
@@ -95,9 +95,57 @@
       if (type === "rain") noise(0, 1.2, 0.05);
     } catch (e) { }
   }
+
+  // Calm ambient synthesizer (relaxing pentatonic acoustic-like pads)
+  let bgMusicGain = null, bgMusicInterval = null;
+  function initCalmMusic() {
+    if (bgMusicGain) return;
+    try {
+      AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+      bgMusicGain = AC.createGain();
+      bgMusicGain.gain.setValueAtTime(0.035, AC.currentTime);
+      bgMusicGain.connect(AC.destination);
+    } catch (e) {}
+  }
+  function playCalmMusic() {
+    if (G().mute) return stopCalmMusic();
+    try {
+      initCalmMusic();
+      if (!AC || !bgMusicGain) return;
+      if (AC.state === "suspended") AC.resume();
+      if (bgMusicInterval) return;
+      const notes = [174.61, 220.00, 261.63, 293.66, 349.23, 392.00, 440.00, 523.25];
+      let step = 0;
+      const chord = () => {
+        if (G().mute || !bgMusicGain) return;
+        const now = AC.currentTime;
+        const b = (step * 2) % notes.length;
+        [notes[b], notes[(b + 2) % notes.length], notes[(b + 4) % notes.length]].forEach((freq, idx) => {
+          const osc = AC.createOscillator(), g = AC.createGain(), flt = AC.createBiquadFilter();
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(freq, now + idx * 0.3);
+          flt.type = "lowpass";
+          flt.frequency.setValueAtTime(550, now);
+          const dur = 4.2;
+          g.gain.setValueAtTime(0.0001, now + idx * 0.3);
+          g.gain.exponentialRampToValueAtTime(0.02, now + idx * 0.3 + 1.2);
+          g.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.3 + dur);
+          osc.connect(flt); flt.connect(g); g.connect(bgMusicGain);
+          osc.start(now + idx * 0.3); osc.stop(now + idx * 0.3 + dur + 0.1);
+        });
+        step++;
+      };
+      chord();
+      bgMusicInterval = setInterval(chord, 4600);
+    } catch (e) {}
+  }
+  function stopCalmMusic() {
+    if (bgMusicInterval) { clearInterval(bgMusicInterval); bgMusicInterval = null; }
+  }
+
   function speak(text) {
-    if (G().mute) return;
-    try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text.replace(/<[^>]+>/g, "")); u.lang = S().lang === "en" ? "en-GB" : "ar-SA"; u.rate = S().lang === "en" ? 1 : 0.95; speechSynthesis.speak(u); } catch (e) { }
+    try { if (window.speechSynthesis) speechSynthesis.cancel(); } catch (e) { }
+    // Talking effect removed as requested; calm ambient music used instead.
   }
 
   // ---------------------------------------------------------------- Ammi Salah with moods
@@ -108,13 +156,55 @@
     return s;
   }
 
-  // ---------------------------------------------------------------- level runtime
+  // ---------------------------------------------------------------- level runtime & 60s timer
   let LV = null;
   const LEVELS = {};
   const ORDER = ["1", "2", "3", "4", "5", "6", "7", "F", "8", "9", "10", "11"];
   const CHAPTER = { 1: "start", 2: "start", 3: "climate", 4: "climate", 5: "climate", 6: "climate", 7: "climate", F: "failure", 8: "soil", 9: "soil", 10: "soil", 11: "soil" };
+
+  let levelTimerInterval = null;
+  function stopLevelTimer() {
+    if (levelTimerInterval) { clearInterval(levelTimerInterval); levelTimerInterval = null; }
+  }
+  function startLevelTimer() {
+    stopLevelTimer();
+    LV.timeLeft = 60;
+    LV.totalTime = 60;
+    levelTimerInterval = setInterval(() => {
+      if (!LV || LV.done) return stopLevelTimer();
+      LV.timeLeft = Math.max(0, LV.timeLeft - 1);
+      const txt = document.getElementById("timer-txt");
+      const bar = document.getElementById("timer-bar");
+      const box = document.getElementById("timer-box");
+      const m = Math.floor(LV.timeLeft / 60);
+      const s = LV.timeLeft % 60;
+      if (txt) txt.textContent = (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
+      if (bar) bar.style.width = (LV.timeLeft / 60 * 100) + "%";
+      if (box) {
+        if (LV.timeLeft <= 15) box.classList.add("timer-urgent");
+        else box.classList.remove("timer-urgent");
+      }
+      // Dynamic farm visual changes across the 60s
+      const elapsed = 60 - LV.timeLeft;
+      const stressLvl = Math.min(3, Math.floor(elapsed / 15));
+      document.querySelectorAll(".b3d").forEach(b => { b.dataset.stress = stressLvl; });
+      if (LV.timeLeft === 0) {
+        stopLevelTimer();
+        say(L("انتهت الدقيقة! اشتدت الظروف وتغيّرت التربة، اتخذ قرارك الآن لحماية مزرعتك!", "One minute passed! Conditions intensified and the soil changed—make your decision now to protect your farm!"), "worried", "warn");
+      }
+    }, 1000);
+  }
+
   function startLevel(id) {
-    LV = { id, hints: 0, hintStage: 0, good: [], risky: [], missed: [], st: {}, done: false, axeAt: 0, axeN: 0 };
+    const g = G(), done = (x) => !!(g.levels[x] && g.levels[x].attempts && g.levels[x].attempts.length);
+    const i = ORDER.indexOf(id);
+    if (i > 0 && !done(ORDER[i - 1])) {
+      id = ORDER.find((x) => !done(x)) || "1";
+    }
+    stopLevelTimer();
+    LV = { id, hints: 0, hintStage: 0, good: [], risky: [], missed: [], st: {}, done: false, axeAt: 0, axeN: 0, timeLeft: 60, totalTime: 60, showNasa: false };
+    startLevelTimer();
+    if (!G().mute) playCalmMusic();
     if (window.THREE && A.SCREENS["l" + id + "x"]) return A.go("l" + id + "x");
     A.go("lvl");
   }
@@ -126,9 +216,13 @@
       <button class="iconbtn" data-act="g" data-a="leave" aria-label="${L("الخريطة", "Map")}"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M2 5l5-2 6 2 5-2v12l-5 2-6-2-5 2z M7 3v12 M13 5v12" stroke="#516d77" stroke-width="1.7" fill="none" stroke-linejoin="round"/></svg></button>
       <h1><small>${L("المستوى", "Level")} ${LV.id === "F" ? L("خاص", "special") : LV.id}</small>${nm}</h1>
       <button class="iconbtn" data-act="g" data-a="hint" aria-label="${L("اكشف السر", "Spill the tea")}" title="${L("اكشف السر", "Spill the tea")}"><svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M5 9h11v4a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5z M16 10h2a2 2 0 0 1 0 4h-2 M8 3c0 2 2 2 2 4 M12 3c0 2 2 2 2 4" stroke="#840000" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button>
-      <button class="iconbtn" data-act="g" data-a="mute" aria-label="${G().mute ? L("تشغيل الصوت", "Unmute") : L("كتم الصوت", "Mute")}">${G().mute
+      <button class="iconbtn" data-act="g" data-a="mute" aria-label="${G().mute ? L("تشغيل الموسيقى", "Unmute Music") : L("كتم الموسيقى", "Mute Music")}">${G().mute
         ? '<svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 8h3l4-3v10l-4-3H3z M13 7l5 6 M18 7l-5 6" stroke="#516d77" stroke-width="1.7" fill="none" stroke-linejoin="round"/></svg>'
         : '<svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 8h3l4-3v10l-4-3H3z M13 7a4 4 0 0 1 0 6 M15.5 5a7 7 0 0 1 0 10" stroke="#516d77" stroke-width="1.7" fill="none" stroke-linejoin="round"/></svg>'}</button>
+    </div>
+    <div class="timer-container in d1" id="timer-box">
+      <div class="timer-badge" id="timer-badge">⏱ <span id="timer-txt">01:00</span></div>
+      <div class="timer-track"><div class="timer-fill" id="timer-bar" style="width:100%"></div></div>
     </div>
     <div class="dock in d1"><div class="who" id="who">${salahM(80, "happy")}</div><div class="say tone-n" id="say" aria-live="polite"></div></div>`;
   }
@@ -158,26 +252,23 @@
     L("انتظر! قبل أن تفعل ذلك، هل راجعت تاريخ محاصيلك؟", "Wait! Before you do that, have you checked your crop history?")];
 
   // risk feedback card (mandatory after important decisions)
+  // risk feedback card (mandatory after important decisions)
   function risk(o, onContinue, onChange) {
-    const lvl = o.level, lvlTxt = { low: L("خطر منخفض", "Low risk"), moderate: L("خطر متوسط", "Moderate risk"), high: L("خطر مرتفع", "High risk") }[lvl];
-    const kind = o.kind === "game" ? `<span class="kindtag">${L("حدث افتراضي في اللعبة", "Hypothetical game event")}</span>` : `<span class="kindtag">${L("خطر علمي مبني على البيانات", "Data-based scientific risk")}</span>`;
-    const ov = document.createElement("div"); ov.className = "riskov fade"; ov.setAttribute("role", "dialog");
-    ov.innerHTML = `<div class="riskcard sheet">
-      <div style="display:flex;gap:10px;align-items:center">${`<span style="flex:none;width:64px;height:64px">${salahM(64, lvl === "high" ? "worried" : "happy")}</span>`}
-        <div style="flex:1"><span class="rlvl rl-${lvl}">${lvlTxt}</span> ${kind}<div style="font-size:16px;font-weight:800;margin-top:4px">${o.title}</div></div></div>
-      <div class="rrow"><b>${L("القرار", "Decision")}:</b> ${o.decision}</div>
-      <div class="rrow"><b>${L("لماذا يهم", "Why it matters")}:</b> ${o.why}</div>
-      <div class="rrow"><b>${L("العواقب المحتملة", "Possible consequences")}:</b> ${o.cons}</div>
-      <div class="rrow"><b>${L("كيف تخفّف الخطر", "How to reduce it")}:</b> ${o.mitig}</div>
-      <div style="display:flex;gap:8px;margin-top:6px">${onChange ? `<button class="secondary" data-r="change" style="flex:1">${L("أغيّر رأيي", "Change it")}</button>` : ""}<button class="primary" data-r="ok" style="flex:1">${o.okLabel || L("فهمت، أكمل", "Got it, continue")}</button></div></div>`;
-    document.body.appendChild(ov);
-    snd(lvl === "high" ? "bad" : lvl === "moderate" ? "tap" : "good");
-    speak(o.title + ". " + o.cons);
-    ov.addEventListener("click", (e) => {
-      const b = e.target.closest("[data-r]"); if (!b) return;
-      ov.remove(); try { speechSynthesis.cancel(); } catch (er) { }
-      if (b.dataset.r === "ok") { if (lvl !== "low") G().risks.push({ lvl: LV && LV.id, t: o.title, level: lvl }); onContinue && onContinue(); } else onChange && onChange();
-    });
+    const lvl = o.level || "moderate";
+    if (lvl !== "low") {
+      G().risks.push({
+        lvl: LV && LV.id,
+        t: o.title,
+        level: lvl,
+        why: o.why || "",
+        cons: o.cons || "",
+        mitig: o.mitig || "",
+        decision: o.decision || ""
+      });
+      A.save();
+    }
+    // Intermediate risk score cards withheld until the final report as requested
+    onContinue && onContinue();
   }
 
   // axe gag when the player leaves level 1 too early
@@ -215,54 +306,131 @@
     }
     A.save(); A.go("lvlResult");
   }
-  const star = (on, d) => `<svg viewBox="0 0 24 24" style="animation-delay:${d}s" aria-hidden="true"><path d="M12 2l3 6.6 7.2.8-5.4 4.9 1.5 7.1L12 17.8 5.7 21.4l1.5-7.1L1.8 9.4 9 8.6z" fill="${on ? "#d9a520" : "#e3e3bf"}" stroke="${on ? "#a37a12" : "#c9c99a"}" stroke-width="1"/></svg>`;
+
+  // Intermediate result screen: scoring and risk analysis hidden until final report; Ammi Salah comments preserved
   A.SCREENS.lvlResult = () => {
     const r = LV.result, def = LEVELS[LV.id], next = ORDER[ORDER.indexOf(LV.id) + 1];
-    const list = (arr, col) => arr.length ? arr.map((x) => `<div><span class="dot" style="background:${col}"></span><span>${x}</span></div>`).join("") : `<div class="muted">${L("لا شيء", "None")}</div>`;
     return `<div class="gscreen">
-      <div class="pop" style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px">
-        <div style="width:110px;height:110px">${salahM(110, r.learn >= 65 ? "happy" : "worried")}</div>
+      <div class="pop" style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:10px">
+        <div style="width:115px;height:115px">${salahM(115, "happy")}</div>
         <div style="font-size:14px;font-weight:800;color:var(--mute)">${L("المستوى", "Level")} ${LV.id === "F" ? "" : LV.id} · ${def.title()}</div>
-        <div class="bigscore count" id="cnt" data-to="${r.learn}">0</div><div style="font-size:12px;font-weight:700" class="muted">/ 100</div>
-        <div class="starrow">${[0, 1, 2].map((i) => star(i < r.stars, 0.6 + i * 0.25)).join("")}</div>
-        <div class="note">${L("نقطة القرار", "Decision score")}: ${r.score} · ${L("التلميحات", "Hints")}: ${LV.hints} ${LV.hints ? L("(−5 لكل تلميح، حد أقصى −15)", "(−5 each, max −15)") : L("(حلّ مستقل!)", "(solved independently!)")}</div>
+        <div style="font-size:22px;font-weight:900;color:var(--ink)">${L("تمت الخطوة بنجاح!", "Step Completed!")}</div>
       </div>
-      ${r.dims ? `<div class="panel2 in d2" style="display:flex;flex-direction:column;gap:6px">${Object.entries(r.dims).map(([k, v]) => `<div class="dimrow"><span style="width:120px">${k}</span><span class="pbar"><i style="width:${clamp(v)}%"></i></span><span dir="ltr" style="width:30px">${Math.round(v)}</span></div>`).join("")}</div>` : ""}
-      <div class="in d3"><b>${L("قرارات صحيحة", "Correct decisions")}</b><div class="rlist">${list(LV.good, "#7d8136")}</div></div>
-      <div class="in d4"><b>${L("قرارات فيها مخاطرة", "Risky decisions")}</b><div class="rlist">${list(LV.risky, "#c48a1c")}</div></div>
-      <div class="in d4"><b>${L("فرص ضائعة", "Missed opportunities")}</b><div class="rlist">${list(LV.missed, "#b8423a")}</div></div>
-      ${r.explain ? `<div class="panel2 in d5"><b>${L("ماذا نتعلّم؟", "What does it teach?")}</b><p style="margin:4px 0 0;font-size:13.5px;line-height:1.6">${r.explain}</p></div>` : ""}
-      ${r.improve ? `<div class="panel2 in d5"><b>${L("لتحسين نتيجتك", "To improve")}</b><p style="margin:4px 0 0;font-size:13.5px;line-height:1.6">${r.improve}</p></div>` : ""}
-      <div class="note">${L("نقطة اللعبة تقيس أداءك حسب قواعد اللعبة، وليست تقييمًا رسميًا لصمود مزرعتك.", "A game score measures performance against the game's rules, not a certified farm resilience rating.")}</div>
-      <div style="display:flex;gap:8px"><button class="secondary" data-act="g" data-a="retry">${L("أعد المحاولة", "Retry")}</button><button class="secondary" data-act="go" data-to="map">${L("الخريطة", "Map")}</button></div>
-      ${next ? `<button class="primary" data-act="g" data-a="start" data-id="${next}">${L("المستوى التالي", "Next level")} ${A.fwd()}</button>` : `<button class="primary" data-act="go" data-to="report">${L("تقرير صمود المزرعة", "Farm Resilience Report")} ${A.fwd()}</button>`}
+      
+      <div class="dock in d1" style="margin:8px 0;background:var(--paper);border-radius:18px;border:1.5px solid #d4dec4;padding:16px">
+        <div style="font-size:13px;font-weight:900;color:#516d77;margin-bottom:6px">🌾 ${L("تعليق عمّي صالح:", "Ammi Salah's comments:")}</div>
+        <div style="font-size:15px;line-height:1.65;color:#2b2a20;font-weight:600">
+          ${r.explain || L(`أحسنت يا ${pname()}! سجّلتُ قراراتك لهذا الموسم. خطوة جيدة إلى الأمام، وسنكتشف صمود المزرعة الشامل وتحليل المخاطر عند إكمال باقي التحديات.`, `Well done, ${pname()}! I recorded your decisions for this season. A solid step forward; your full farm resilience score and risk breakdown will be revealed once all challenges are completed.`)}
+        </div>
+      </div>
+
+      <div class="panel2 in d2" style="display:flex;align-items:center;gap:12px;background:#fbfbef;border:1.5px dashed #c9c99a;border-radius:16px;padding:12px 14px">
+        <span style="font-size:24px">🛡️</span>
+        <div style="font-size:12px;line-height:1.5;color:#516d77;font-weight:700">
+          ${L("نقاط التقييم، تفاصيل المخاطر، والأدلة العلمية محجوبة الآن، وستظهر بالتفصيل في تقرير صمود المزرعة النهائي بعد إنهاء كل التحديات.", "Scores, risk breakdowns, and evidence are withheld now, and will be displayed in full in the final Farm Resilience Report upon finishing all challenges.")}
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="secondary" data-act="go" data-to="map" style="flex:1">${L("الخريطة", "Challenges Map")}</button>
+        ${next ? `<button class="primary" data-act="g" data-a="start" data-id="${next}" style="flex:2">${L("التحدي التالي", "Next Challenge")} ${A.fwd()}</button>` : `<button class="primary" data-act="go" data-to="report" style="flex:2">${L("عرض التقرير النهائي", "View Final Report")} ${A.fwd()}</button>`}
+      </div>
     </div>`;
   };
   A.AFTER.lvlResult = () => {
-    const el = document.getElementById("cnt"), to = +el.dataset.to; let v = 0;
-    snd(LV.result.stars >= 2 ? "level" : "tap");
-    const iv = setInterval(() => { v = Math.min(to, v + Math.max(1, Math.round(to / 30))); el.textContent = v; if (v >= to) clearInterval(iv); }, 30);
-    speak(LV.result.stars >= 2 ? L(`أحسنت يا ${pname()}!`, `Well done, ${pname()}!`) : L(`لا بأس يا ${pname()}، كل محاولة تجعلك أذكى.`, `That's okay, ${pname()}. Every retry makes you smarter.`));
+    stopLevelTimer();
+    snd("good");
   };
 
-  // ---------------------------------------------------------------- generic level screen
+  // ---------------------------------------------------------------- generic level screen & NASA toggle
+  function renderNasaSection() {
+    const l = loc();
+    if (!l) return "";
+    return `<div class="nasa-section in d2">
+      <button type="button" class="nasa-toggle-btn" data-act="g" data-a="toggleNasa">
+        <span class="nasa-toggle-title">
+          <span>🛰️</span>
+          <span>${LV.showNasa ? L("إخفاء تقرير ناسا الحقيقي", "Hide Real NASA Report") : L("عرض تقرير ناسا الحقيقي للتربة والمناخ", "Show Real NASA Soil & Climate Report")}</span>
+        </span>
+        <span class="nasa-toggle-pill">${LV.showNasa ? "▲ " + L("إغلاق", "Close") : "▼ " + L("بيانات حية", "Live Data")}</span>
+      </button>
+      ${LV.showNasa ? `
+        <div class="nasa-drawer">
+          <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #dcdcb8;padding-bottom:6px">
+            <span style="font-size:12px;font-weight:800;color:#516d77">📍 ${esc(A.placeName())} (${l.cell.lat.toFixed(2)}°, ${l.cell.lon.toFixed(2)}°)</span>
+            <span style="font-size:11px;font-weight:700;color:#6b706a">⛰️ ${l.cell.elev || 450}m (${L("ارتفاع", "elevation")})</span>
+          </div>
+          <div class="nasa-drawer-grid">
+            <div class="nasa-cell-box">
+              <small>${L("متوسط أمطار الموسم (أكتوبر–ماي)", "Mean Season Rain (Oct–May)")}</small>
+              <b>${l.summary.rain_mean} mm</b>
+            </div>
+            <div class="nasa-cell-box">
+              <small>${L("أيام الحر عند الإزهار", "Hot Days at Flowering")}</small>
+              <b>${l.trends.hot_flowering ? l.trends.hot_flowering.late : 4} ${L("أيام", "days")}</b>
+            </div>
+            <div class="nasa-cell-box">
+              <small>${L("نوع التربة (SoilGrids)", "Soil Texture (SoilGrids)")}</small>
+              <b>${l.soil.texture === "clay loam" ? L("طميية طينية", "Clay loam") : l.soil.texture}</b>
+            </div>
+            <div class="nasa-cell-box">
+              <small>${L("سعة احتفاظ الماء (PAW100)", "Plant-Available Water (PAW100)")}</small>
+              <b>${l.soil.paw100} mm/m</b>
+            </div>
+          </div>
+          <div class="nasa-citation">
+            📊 <b>${L("المصدر العلمي:", "Scientific Sources:")}</b> NASA POWER 0.5° (1995–2025) · ISRIC SoilGrids 250m · NASADEM.
+          </div>
+        </div>
+      ` : ""}
+    </div>`;
+  }
+
   A.SCREENS.lvl = () => `<div class="gscreen">${head(LEVELS[LV.id])}<div id="lv" style="display:flex;flex-direction:column;gap:12px;flex:1"></div></div>`;
-  A.AFTER.lvl = () => { const d = LEVELS[LV.id]; d.init && d.init(); draw(); setTimeout(() => say(d.intro(), "happy", "n"), 450); };
-  const draw = () => { const el = document.getElementById("lv"); if (el) { el.innerHTML = LEVELS[LV.id].view(); LEVELS[LV.id].after && LEVELS[LV.id].after(); if (!el.dataset.first) { el.dataset.first = 1; setTimeout(() => el.classList.add("settled"), 900); } } };
+  A.AFTER.lvl = () => { const d = LEVELS[LV.id]; d.init && d.init(); draw(); setTimeout(() => say(d.intro(), "happy", "n"), 450); if (!G().mute) playCalmMusic(); };
+  const draw = () => {
+    const el = document.getElementById("lv");
+    if (el) {
+      let content = LEVELS[LV.id].view();
+      const nasaHtml = renderNasaSection();
+      if (content.includes('</div>')) {
+        const idx = content.indexOf('</div>') + 6;
+        content = content.slice(0, idx) + nasaHtml + content.slice(idx);
+      } else {
+        content = nasaHtml + content;
+      }
+      el.innerHTML = content;
+      LEVELS[LV.id].after && LEVELS[LV.id].after();
+      if (!el.dataset.first) { el.dataset.first = 1; setTimeout(() => el.classList.add("settled"), 900); }
+    }
+  };
 
   A.ACT.g = (d) => {
     const a = d.a;
     if (a === "start") return startLevel(d.id);
-    if (a === "mute") { G().mute = !G().mute; A.save(); try { speechSynthesis.cancel(); } catch (e) { } return A.render(); }
-    if (a === "replay") return speak(lastSay);
+    if (a === "mute") {
+      G().mute = !G().mute;
+      A.save();
+      if (G().mute) stopCalmMusic();
+      else playCalmMusic();
+      return A.render();
+    }
+    if (a === "replay") return say(lastSay, "happy", "n", true);
     if (a === "hint") return hint();
     if (a === "retry") return startLevel(LV.id);
+    if (a === "toggleNasa") {
+      LV.showNasa = !LV.showNasa;
+      draw();
+      return;
+    }
     if (a === "leave") {
       const def = LEVELS[LV.id];
-      if (def.mustFinish && !LV.done) return axe();
-      try { speechSynthesis.cancel(); } catch (e) { } return A.go("map");
+      if (def && def.mustFinish && !LV.done) return axe();
+      stopLevelTimer();
+      return A.go("map");
     }
     snd("tap");
+    if (!G().mute && !bgMusicInterval) playCalmMusic();
     LEVELS[LV.id].on(a, d);
   };
 
@@ -1119,32 +1287,42 @@
   // ---------------------------------------------------------------- map
   const LTITLE = (id) => LEVELS[id].title();
   A.SCREENS.map = () => {
-    const g = G(), done = (id) => !!(g.levels[id] && g.levels[id].attempts.length);
+    const g = G(), done = (id) => !!(g.levels[id] && g.levels[id].attempts && g.levels[id].attempts.length);
     const unlocked = (id) => { const i = ORDER.indexOf(id); return i === 0 || done(ORDER[i - 1]); };
     const nextId = ORDER.find((id) => !done(id));
+    const allDone = ORDER.every(done);
     const chapters = { start: L("البداية", "Getting started"), climate: L("تحديات المناخ", "Climate challenges"), failure: L("فصل خاص", "Special chapter"), soil: L("تحديات التربة", "Soil challenges") };
     let cur = "", html = "";
     ORDER.forEach((id, k) => {
       if (CHAPTER[id] !== cur) { cur = CHAPTER[id]; html += `<div class="chap">${chapters[cur]}</div>`; }
-      const rec = g.levels[id], ok = unlocked(id), st = rec ? rec.stars || 0 : 0;
-      html += `<button class="node zig ${ok ? "" : "locked"} ${done(id) ? "done" : ""} ${id === nextId ? "next" : ""} in" style="animation-delay:${k * 0.05}s" ${ok ? `data-act="g" data-a="start" data-id="${id}"` : 'aria-disabled="true"'}>
-        <span class="num">${ok ? (id === "F" ? "!" : id) : '<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><rect x="4" y="8" width="10" height="8" rx="2" fill="#fbfbef"/><path d="M6 8V6a3 3 0 0 1 6 0v2" stroke="#fbfbef" stroke-width="2" fill="none"/></svg>'}</span>
-        <span style="flex:1"><b>${LTITLE(id)}</b><small>${rec ? L(`أفضل نتيجة ${rec.best} · ${rec.attempts.length} محاولة`, `Best ${rec.best} · ${rec.attempts.length} attempt(s)`) : ok ? L("جاهز", "Ready") : L("مغلق", "Locked")}</small></span>
-        <span class="stars">${[0, 1, 2].map((i) => `<span class="${i < st ? "" : "off"}">★</span>`).join("")}</span></button>`;
+      const isDone = done(id), isUnlocked = unlocked(id), rec = g.levels[id];
+      let statusLabel = L("مغلق", "Locked");
+      let icon = '<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><rect x="4" y="8" width="10" height="8" rx="2" fill="#fbfbef"/><path d="M6 8V6a3 3 0 0 1 6 0v2" stroke="#fbfbef" stroke-width="2" fill="none"/></svg>';
+      if (isDone) {
+        statusLabel = L("✓ تم الإنجاز", "✓ Completed");
+        icon = (id === "F" ? "!" : id);
+      } else if (isUnlocked) {
+        statusLabel = L("جاهز للبدء", "Ready to play");
+        icon = (id === "F" ? "!" : id);
+      }
+      html += `<button class="node zig ${isUnlocked ? "" : "locked"} ${isDone ? "done" : ""} ${id === nextId ? "next" : ""} in" style="animation-delay:${k * 0.05}s" ${isUnlocked ? `data-act="g" data-a="start" data-id="${id}"` : 'aria-disabled="true"'}>
+        <span class="num">${icon}</span>
+        <span style="flex:1"><b>${LTITLE(id)}</b><small>${statusLabel}</small></span>
+        ${allDone && rec ? `<span class="stars">${[0, 1, 2].map((i) => `<span class="${i < (rec.stars || 0) ? "" : "off"}">★</span>`).join("")}</span>` : ""}
+      </button>`;
     });
-    const allDone = ORDER.every(done);
     return `<div class="gscreen">
       <div class="ghead in"><button class="iconbtn" data-act="go" data-to="hub" aria-label="${L("رجوع", "Back")}">${S().lang === "en" ? '<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M11 4l-5 5 5 5" stroke="#516d77" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>' : '<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M7 4l5 5-5 5" stroke="#516d77" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>'}</button>
         <h1><small>${esc(A.placeName())} · ${esc(pname())}</small>${L("مغامرة المزرعة", "The farm adventure")}</h1></div>
-      <div class="dock in d1"><div class="who">${salahM(80, "happy")}</div><div class="say tone-n">${L("مزرعتك لها مستقبل يجب حمايته. في المواسم القادمة ستواجه قرارات صعبة حول المحاصيل والماء والمناخ والتربة. كل قرار يغيّر رحلة مزرعتك. هل تستطيع إبقاءها منتجة وصامدة؟", "Your farm has a future to protect. Over the coming seasons you will face difficult decisions about crops, water, climate and soil. Every decision changes your farm's journey. Can you keep it productive and resilient?")}</div></div>
+      <div class="dock in d1"><div class="who">${salahM(80, "happy")}</div><div class="say tone-n">${L("كل مستوى مقفل حتى تكمل المستوى الذي قبله. أتمم كل التحديات لتكتشف تقرير صمود مزرعتك الشامل!", "Each level is locked until you complete the one before it. Finish all challenges to unlock your comprehensive Farm Resilience Report!")}</div></div>
       <div class="mapw">${html}</div>
-      <button class="primary" ${allDone ? 'data-act="go" data-to="report"' : "disabled"}>${L("تقرير صمود المزرعة", "Farm Resilience Report")}${allDone ? " " + A.fwd() : ""}</button>
-      <div class="note">${L("البيانات: ناسا POWER 1995–2025 لنقطة واحدة قرب حقلك، SoilGrids، NASADEM. نقطة واحدة لا تمثّل كل أجزاء مزرعة كبيرة.", "Data: NASA POWER 1995–2025 for one point near your field, SoilGrids, NASADEM. One point does not represent every part of a large farm.")}</div>
+      <button class="primary" ${allDone ? 'data-act="go" data-to="report"' : "disabled"} style="${allDone ? "" : "opacity:0.6;cursor:not-allowed"}">${L("تقرير صمود المزرعة", "Farm Resilience Report")}${allDone ? " " + A.fwd() : " 🔒"}</button>
+      <div class="note">${L("البيانات: ناسا POWER 1995–2025 لنقطة واحدة قرب حقلك، SoilGrids، NASADEM.", "Data: NASA POWER 1995–2025 for one point near your field, SoilGrids, NASADEM.")}</div>
     </div>`;
   };
-  A.AFTER.map = () => { speak(L("مزرعتك لها مستقبل يجب حمايته. هل تستطيع إبقاءها منتجة وصامدة؟", "Your farm has a future to protect. Can you keep it productive and resilient?")); };
+  A.AFTER.map = () => { if (!G().mute) playCalmMusic(); };
 
-  // ---------------------------------------------------------------- final report
+  // ---------------------------------------------------------------- final report (Reveals all scores, risks & evidence)
   A.SCREENS.report = () => {
     const g = G(), l = loc(), recs = ORDER.map((id) => ({ id, r: g.levels[id] })).filter((x) => x.r);
     const overall = recs.length ? Math.round(recs.reduce((s, x) => s + x.r.best, 0) / recs.length) : 0;
@@ -1152,27 +1330,41 @@
     const evS = (seq) => { const fm = farmE(); const ev = E.evaluate(l, { seq: seq.map((k) => CK[k] || "fallow_grazed"), sowing: "normal", residue: "grazed", irrigation: fm.water }, fm); return E.total(ev.scores, [...new Set((S().farm.prios || []).map((p) => A.PK[p] || (E.PRIORITIES.includes(p) ? p : null)).filter(Boolean))].slice(0, 3)); };
     const tr = l.trends;
     const vul = [];
-    if (tr.onset.p < 0.05) vul.push(L(`مطر البذر يتأخر ${Math.round(tr.onset.per_decade)} يومًا كل عقد (دال إحصائيًا).`, `Sowing rain arrives ${Math.round(tr.onset.per_decade)} days later per decade (significant).`));
-    if (tr.et0.p < 0.05) vul.push(L(`حاجة المحاصيل للماء ترتفع ${Math.round(tr.et0.per_decade)} ملم كل عقد.`, `Crop water demand rises ${Math.round(tr.et0.per_decade)} mm per decade.`));
-    if (tr.hot_flowering.per_decade > 0) vul.push(L(`أيام الحر عند الإزهار: ${tr.hot_flowering.early} ← ${tr.hot_flowering.late}.`, `Hot days at flowering: ${tr.hot_flowering.early} → ${tr.hot_flowering.late}.`));
-    vul.push(L(`أجف 3 مواسم: ${l.summary.driest.map((i) => DATA.seasons[i]).join("، ")}.`, `3 driest seasons: ${l.summary.driest.map((i) => DATA.seasons[i]).join(", ")}.`));
-    const risks = g.risks.slice(-5).map((r) => `${r.t} (${r.level === "high" ? L("مرتفع", "high") : L("متوسط", "moderate")})`);
+    if (tr.onset && tr.onset.p < 0.05) vul.push(L(`مطر البذر يتأخر ${Math.round(tr.onset.per_decade)} يومًا كل عقد (دال إحصائيًا).`, `Sowing rain arrives ${Math.round(tr.onset.per_decade)} days later per decade (significant).`));
+    if (tr.et0 && tr.et0.p < 0.05) vul.push(L(`حاجة المحاصيل للماء ترتفع ${Math.round(tr.et0.per_decade)} ملم كل عقد.`, `Crop water demand rises ${Math.round(tr.et0.per_decade)} mm per decade.`));
+    if (tr.hot_flowering && tr.hot_flowering.per_decade > 0) vul.push(L(`أيام الحر عند الإزهار: ${tr.hot_flowering.early} ← ${tr.hot_flowering.late}.`, `Hot days at flowering: ${tr.hot_flowering.early} → ${tr.hot_flowering.late}.`));
+    if (l.summary && l.summary.driest) vul.push(L(`أجف 3 مواسم: ${l.summary.driest.map((i) => DATA.seasons[i]).join("، ")}.`, `3 driest seasons: ${l.summary.driest.map((i) => DATA.seasons[i]).join(", ")}.`));
+
+    // Full risks analysis with evidence & consequences
+    const allRisks = (g.risks || []).slice(-8);
+
     return `<div class="gscreen">
       <div class="ghead in"><button class="iconbtn" data-act="go" data-to="map" aria-label="${L("الخريطة", "Map")}"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M2 5l5-2 6 2 5-2v12l-5 2-6-2-5 2z" stroke="#516d77" stroke-width="1.7" fill="none"/></svg></button><h1><small>${esc(pname())} · ${esc(A.placeName())}</small>${L("تقرير صمود المزرعة", "Farm Resilience Report")}</h1></div>
-      <div class="panel2 pop" style="display:flex;align-items:center;gap:14px"><div style="width:90px;height:90px">${salahM(90, overall >= 65 ? "happy" : "worried")}</div><div><div class="note">${L("النتيجة الإجمالية", "Overall score")}</div><div class="bigscore" style="font-size:52px">${overall}</div><div class="note">${recs.length}/${ORDER.length} ${L("مستويات", "levels")}</div></div></div>
-      <div class="panel2 in d2" style="display:flex;flex-direction:column;gap:5px"><b>${L("الأداء حسب المستوى", "Level-by-level")}</b>${recs.map((x) => `<div class="dimrow"><span style="width:150px;font-size:12px">${LTITLE(x.id)}</span><span class="pbar"><i style="width:${x.r.best}%"></i></span><span dir="ltr">${x.r.best}</span></div>`).join("")}</div>
-      <div class="panel2 in d3"><b>${L("نقاط ضعف مزرعتك (بيانات ناسا)", "Your farm's main vulnerabilities (NASA data)")}</b><ul style="margin:4px 0 0;padding-inline-start:18px;font-size:13px;line-height:1.6">${vul.map((v) => `<li>${v}</li>`).join("")}</ul></div>
-      <div class="panel2 in d3"><b>${L("أهم المخاطر التي اخترتها", "Most important risks you took")}</b><ul style="margin:4px 0 0;padding-inline-start:18px;font-size:13px;line-height:1.6">${risks.length ? risks.map((r) => `<li>${r}</li>`).join("") : `<li>${L("لا شيء", "None")}</li>`}</ul></div>
-      <div class="panel2 in d4"><b>${L("استراتيجيتك: البداية مقابل النهاية", "Your strategy: start vs end")}</b>
-        <div class="result" style="margin-top:6px"><span style="flex:1">${L("البداية", "Start")}: ${initSeq.map(cname).join(A.arrow())}</span><b>${evS(initSeq)}</b></div>
-        <div class="result" style="margin-top:6px"><span style="flex:1">${L("النهاية", "End")}: ${finSeq.map(cname).join(A.arrow())}</span><b style="color:#7d8136">${evS(finSeq)}</b></div>
-        <div class="note">${L("النقطة /100 من المحرك حسب أولوياتك على 30 موسمًا.", "Engine score /100 for your priorities over 30 seasons.")}</div></div>
-      <div class="panel2 in d5"><b>${L("اقتراحات للتحسين", "Suggested improvements")}</b><ul style="margin:4px 0 0;padding-inline-start:18px;font-size:13px;line-height:1.6">
+      <div class="panel2 pop" style="display:flex;align-items:center;gap:14px"><div style="width:90px;height:90px">${salahM(90, overall >= 65 ? "happy" : "worried")}</div><div><div class="note">${L("النتيجة الإجمالية لصمود المزرعة", "Overall Resilience Score")}</div><div class="bigscore" style="font-size:52px">${overall}</div><div class="note">${recs.length}/${ORDER.length} ${L("مستويات مكتملة", "completed levels")}</div></div></div>
+      <div class="panel2 in d2" style="display:flex;flex-direction:column;gap:5px"><b>📊 ${L("تقييم الأداء حسب المستوى", "Level-by-level resilience scores")}</b>${recs.map((x) => `<div class="dimrow"><span style="width:150px;font-size:12px">${LTITLE(x.id)}</span><span class="pbar"><i style="width:${x.r.best}%"></i></span><span dir="ltr">${x.r.best}/100</span></div>`).join("")}</div>
+      <div class="panel2 in d3"><b>🔍 ${L("تحليل المخاطر والأدلة العلمية لقراراتك", "Full Risk Analysis & Evidence")}</b>
+        ${allRisks.length ? `<div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">${allRisks.map(r => `
+          <div style="background:#fff;border:1px solid #dcdcb8;border-radius:12px;padding:10px;font-size:12.5px;line-height:1.5">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <b>${r.t}</b>
+              <span class="rlvl rl-${r.level || 'moderate'}" style="font-size:10.5px">${r.level === 'high' ? L('خطر مرتفع', 'High Risk') : L('خطر متوسط', 'Moderate Risk')}</span>
+            </div>
+            ${r.cons ? `<div style="margin-top:3px;color:#516d77"><b>${L("العواقب:", "Consequences:")}</b> ${r.cons}</div>` : ""}
+            ${r.mitig ? `<div style="margin-top:2px;color:#2c3f45"><b>${L("كيف تخفف الخطر:", "Mitigation:")}</b> ${r.mitig}</div>` : ""}
+          </div>
+        `).join("")}</div>` : `<p style="font-size:12.5px;color:#516d77;margin:4px 0">${L("لم تُسجّل أي مخاطر حرجة أثناء التحديات.", "No critical risks registered.")}</p>`}
+      </div>
+      <div class="panel2 in d3"><b>🛰️ ${L("نقاط ضعف مزرعتك المناخية (بيانات ناسا POWER 1995–2025)", "Climate vulnerabilities (NASA POWER 1995–2025)")}</b><ul style="margin:4px 0 0;padding-inline-start:18px;font-size:13px;line-height:1.6">${vul.map((v) => `<li>${v}</li>`).join("")}</ul></div>
+      <div class="panel2 in d4"><b>🌾 ${L("استراتيجيتك الزراعية: البداية مقابل النهاية", "Your farming strategy: start vs end")}</b>
+        <div class="result" style="margin-top:6px"><span style="flex:1">${L("الدورة المبدئية", "Initial")}: ${initSeq.map(cname).join(A.arrow())}</span><b>${evS(initSeq)}</b></div>
+        <div class="result" style="margin-top:6px"><span style="flex:1">${L("الدورة المقترحة", "Final")}: ${finSeq.map(cname).join(A.arrow())}</span><b style="color:#7d8136">${evS(finSeq)}</b></div>
+        <div class="note">${L("التقييم من 100 محسوب حسب أولوياتك على 30 موسمًا حقيقيًا.", "Score /100 calculated against your farm priorities over 30 real NASA seasons.")}</div></div>
+      <div class="panel2 in d5"><b>🌱 ${L("توصيات عمّي صالح العلمية للتحسين", "Ammi Salah's scientific recommendations")}</b><ul style="margin:4px 0 0;padding-inline-start:18px;font-size:13px;line-height:1.6">
         <li>${L("نوّع العائلات (حبوب ← بقوليات) لتكسر الأمراض وتساعد إدارة الآزوت.", "Alternate families (cereal ↔ legume) to break disease and help nitrogen.")}</li>
         <li>${L("اترك البقايا وغطِّ التربة في الخريف ضد المطر الغزير.", "Keep residue and cover the soil in autumn against heavy rain.")}</li>
         <li>${L("راقب موعد مطر البذر وابذر مبكرًا عندما يسمح ذلك لتتجنّب حر ماي.", "Watch the sowing-rain date and sow early when possible to avoid May heat.")}</li>
         <li>${L("حلّل التربة (pH، الملوحة، المادة العضوية، الفوسفور والبوتاسيوم) لتأكيد التقديرات.", "Test the soil (pH, salinity, organic matter, P and K) to confirm the estimates.")}</li></ul></div>
-      <div class="note">${L("نقطة اللعبة تقيس أداءك حسب قواعد اللعبة، وليست تقييمًا رسميًا لصمود مزرعتك. البيانات: ناسا POWER 1995–2025، SoilGrids، NASADEM، FAO-56/33.", "A game score measures performance against the game's rules, not a certified farm resilience rating. Data: NASA POWER 1995–2025, SoilGrids, NASADEM, FAO-56/33.")}</div>
+      <div class="note">${L("البيانات: ناسا POWER 1995–2025، SoilGrids، NASADEM، FAO-56/33.", "Data: NASA POWER 1995–2025, SoilGrids, NASADEM, FAO-56/33.")}</div>
       <button class="primary" data-act="go" data-to="map">${L("العودة للخريطة", "Back to the map")}</button>
     </div>`;
   };

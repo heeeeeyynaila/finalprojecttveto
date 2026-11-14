@@ -205,4 +205,201 @@
 .cmpt th{text-align:start;font-weight:800;color:#3f565e;padding:4px}.cmpt td{padding:6px;border-radius:8px;background:#f5f5e4;font-weight:700}
 .cmpt td.win{background:#dfe3b0;color:#3e4318}
 .ccard.picked{border-color:#840000;box-shadow:0 0 0 3px rgba(132,0,0,.25),0 4px 0 #e3e3bf}
+
+/* ===================== 60-Second Level Timer ===================== */
+.timer-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fbfbef;
+  border: 1.5px solid var(--line, #e3e3bf);
+  border-radius: 14px;
+  padding: 6px 12px;
+  margin: 4px 0 6px 0;
+  box-shadow: 0 2px 5px rgba(0,0,0,.04);
+}
+.timer-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 800;
+  font-size: 13.5px;
+  color: #516d77;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.timer-track {
+  flex: 1;
+  height: 8px;
+  background: #e9e9d0;
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+}
+.timer-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #7d8136, #9ca047);
+  border-radius: 999px;
+  transition: width 1s linear;
+}
+.timer-urgent .timer-fill {
+  background: linear-gradient(90deg, #b8423a, #e08a3a);
+}
+.timer-urgent .timer-badge {
+  color: #b8423a;
+  animation: pulseTimer 1s infinite;
+}
+@keyframes pulseTimer {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.04); }
+}
+
+/* ===================== Dynamic Farm Changes over 1 Minute ===================== */
+.b3d {
+  transition: filter 1s ease, box-shadow 1s ease;
+}
+.b3d .sun3 {
+  transition: transform 1s ease, box-shadow 1s ease, filter 1s ease;
+}
+.b3d[data-stress="1"] .sun3 {
+  transform: scale(1.12);
+  filter: drop-shadow(0 0 14px #f28b38);
+}
+.b3d[data-stress="2"] .sun3 {
+  transform: scale(1.24);
+  filter: drop-shadow(0 0 22px #e25822);
+}
+.b3d[data-stress="3"] .sun3 {
+  transform: scale(1.38);
+  filter: drop-shadow(0 0 32px #d83b01);
+}
+.b3d[data-stress="1"] {
+  filter: saturate(0.92) contrast(1.05);
+}
+.b3d[data-stress="2"] {
+  filter: saturate(0.82) contrast(1.12) brightness(1.04);
+}
+.b3d[data-stress="3"] {
+  filter: saturate(0.72) contrast(1.18) brightness(1.08);
+}
+.b3d[data-stress="2"] .haze3 {
+  opacity: 0.65;
+}
+.b3d[data-stress="3"] .haze3 {
+  opacity: 0.95;
+}
+
+/* ===================== Real NASA Data Drawer & Toggle ===================== */
+.nasa-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 6px 0 10px 0;
+  width: 100%;
+}
+.nasa-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 14px;
+  background: linear-gradient(180deg, #fbfbef, #f3f5e5);
+  border: 1.5px solid #516d77;
+  border-radius: 14px;
+  color: #2b2a20;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 3px 0 #516d7740;
+  transition: all 0.2s ease;
+}
+.nasa-toggle-btn:hover {
+  background: #edf1dc;
+  border-color: #3f565e;
+}
+.nasa-toggle-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #516d7740;
+}
+.nasa-toggle-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.nasa-toggle-pill {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #516d77;
+  color: #fbfbef;
+}
+.nasa-drawer {
+  background: #fbfbef;
+  border: 1.5px solid #c9c99a;
+  border-radius: 18px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+  animation: slideDown .25s ease-out;
+}
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.nasa-drawer-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+.nasa-cell-box {
+  background: #eef0d6;
+  border-radius: 12px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.nasa-cell-box small {
+  font-size: 11px;
+  font-weight: 700;
+  color: #516d77;
+  line-height: 1.25;
+}
+.nasa-cell-box b {
+  font-size: 15px;
+  font-weight: 900;
+  color: #2b2a20;
+}
+.nasa-citation {
+  font-size: 11px;
+  line-height: 1.5;
+  color: #6b706a;
+  border-top: 1px dashed #dcdcb8;
+  padding-top: 8px;
+}
+
+/* ===================== Scrollable Questions Area ===================== */
+#lv {
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  max-height: calc(844px - 145px);
+  padding-bottom: 30px;
+  padding-inline-end: 2px;
+}
+#lv::-webkit-scrollbar {
+  width: 6px;
+}
+#lv::-webkit-scrollbar-track {
+  background: transparent;
+}
+#lv::-webkit-scrollbar-thumb {
+  background: #c9c99a;
+  border-radius: 3px;
+}
+
 @media (prefers-reduced-motion:reduce){.b3d .world,.gbar,.gline,.texbar i,.cloud3,.rain3 i,.haze3,.sun3{animation:none!important}.gline{stroke-dashoffset:0}}
