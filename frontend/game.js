@@ -630,7 +630,7 @@
     view() {
       const st = LV.st, prev0 = lastCrop();
       const prevFor = (i) => (i === 0 ? prev0 : st.plan[0] || prev0);
-      const cards = CROPS.map((k) => { const su = suitability(k, prevFor(st.active)); return `<button class="ccard" data-act="g" data-a="open" data-v="${k}"><div class="art">${cropArt(k)}</div><b>${cname(k)}</b><small>${E.CROPS[CK[k]].family === "cereal" ? L("حبوب", "Cereal") : E.CROPS[CK[k]].family === "legume" ? L("بقوليات", "Legume") : L("خليط", "Mix")} · ${L("الماء الكافي", "Water met")} ${pct(su.st.ws)}</small>${lvlBadge(su.level)}</button>`; }).join("");
+      const cards = CROPS.map((k) => { return `<button class="ccard" data-act="g" data-a="open" data-v="${k}"><div class="art">${cropArt(k)}</div><b>${cname(k)}</b><small>${E.CROPS[CK[k]].family === "cereal" ? L("حبوب", "Cereal") : E.CROPS[CK[k]].family === "legume" ? L("بقوليات", "Legume") : L("خليط", "Mix")}</small></button>`; }).join("");
       return `<div class="slotbar in d2">${[0, 1].map((i) => `<button class="slotc ${st.plan[i] ? "full" : ""} ${st.active === i ? "active" : ""}" data-act="g" data-a="slot" data-i="${i}"><span>${L("الموسم", "Season")} ${i + 1}</span><b style="font-size:15px">${st.plan[i] ? cname(st.plan[i]) : L("اختر محصولًا", "Pick a crop")}</b></button>`).join("")}</div>
         <div class="note in d2">${L("قبل ذلك", "Before")}: ${cname(prev0)} · ${L("التقييم على 30 موسمًا من بيانات ناسا لموقعك", "Rated over 30 NASA seasons at your location")}</div>
         <div class="cgrid stagger">${cards}</div>
@@ -644,7 +644,7 @@
       const fact = (t, v, na) => `<div class="fact ${na ? "na" : ""}">${t}<b>${v}</b></div>`;
       const why = { water: L("قد يحتاج ماءً أكثر مما يوفّره مطرك وتربتك عادة.", "It may need more water than your rain and soil usually provide."), heat: L("إزهاره يقع غالبًا في أيام حارة في موقعك.", "Its flowering often meets hot days at your location."), rotation: L(`من نفس عائلة ${cname(prev)}: خطر تراكم الأمراض.`, `Same family as ${cname(prev).toLowerCase()}: disease build-up risk.`), broomrape: L("بقولي بعد بقولي: خطر الهالوك (Orobanche).", "Legume after legume: broomrape (Orobanche) risk."), salt: L("حساس للملوحة.", "Sensitive to salinity."), system: L("النتائج مصمّمة للحقل المفتوح فقط.", "Results are designed for open fields only.") };
       return `<div class="riskcard sheet" role="dialog">
-        <div style="display:flex;gap:10px;align-items:center"><div style="width:120px;border-radius:14px;overflow:hidden;background:linear-gradient(#dfe7e9,#eef0d6)">${cropArt(k)}</div><div style="flex:1"><div style="font-size:20px;font-weight:900">${cname(k)}</div>${lvlBadge(su.level)}</div></div>
+        <div style="display:flex;gap:10px;align-items:center"><div style="width:120px;border-radius:14px;overflow:hidden;background:linear-gradient(#dfe7e9,#eef0d6)">${cropArt(k)}</div><div style="flex:1"><div style="font-size:20px;font-weight:900">${cname(k)}</div></div></div>
         <div class="facts">
           ${fact(L("العائلة", "Family"), fam)}
           ${fact(L("موسم النمو", "Growing season"), `${mName(c.sow)} → ${mName(harvestM)}`)}
@@ -1498,7 +1498,6 @@
         <div class="facts" style="margin-top:8px"><div class="fact">${L("القوام", "Texture")}<b>${so.texture}</b></div><div class="fact">pH<b>${so.ph}</b></div><div class="fact">${L("الكربون العضوي", "Organic carbon")}<b>${so.soc} g/kg</b></div><div class="fact">CEC<b>${so.cec} cmol/kg</b></div></div>
         <div class="note">${L("قيم تقديرية لخلية 250 م، وليست تحليلًا لحقلك. الملوحة غير متوفرة في بياناتنا.", "Estimates for a 250 m cell, not a test of your field. Salinity is not in our data.")}</div></div>
       <div class="panel2 in d5"><b>${L("مؤشر FAO GAEZ v4", "FAO GAEZ v4 benchmark")}</b><p style="margin:4px 0 0;font-size:13.5px;line-height:1.6">${L(`المردود الممكن للقمح المطري (مدخلات عالية): حوالي ${l.gaez_wheat} كغ/هكتار في هذه الخلية.`, `Attainable rainfed wheat yield (high inputs): about ${l.gaez_wheat} kg/ha in this cell.`)}</p></div>
-      <div class="note">${L("نقطة واحدة لا تمثّل كل أجزاء مزرعة كبيرة. البيانات المرصودة (ناسا) منفصلة عن السيناريوهات الافتراضية في اللعبة.", "One point does not represent every part of a large farm. Observed NASA data is kept separate from the game's hypothetical scenarios.")}</div>
       <button class="primary" data-act="go" data-to="map">${L("جاهز؟ ابدأ اللعبة", "Ready? Start the game")} ${A.fwd()}</button>
     </div>`;
   };
@@ -1510,30 +1509,28 @@
   // ---------------------------------------------------------------- CROP CHARACTERISTICS
   let CF = { fam: "all", cmp: [] };
   A.SCREENS.crops = () => {
-    const prev = lastCrop(), fam = (k) => E.CROPS[CK[k]].family;
-    const list = CROPS.filter((k) => CF.fam === "all" || fam(k) === CF.fam).map((k) => ({ k, su: suitability(k, prev) })).sort((a, b) => b.su.st.ws - a.su.st.ws);
-    const cmp = CF.cmp.length === 2 ? (() => { const [a, b] = CF.cmp, ca = E.CROPS[CK[a]], cb = E.CROPS[CK[b]], sa = suitability(a, prev), sb = suitability(b, prev);
+    const fam = (k) => E.CROPS[CK[k]].family;
+    const list = CROPS.filter((k) => CF.fam === "all" || fam(k) === CF.fam);
+    const cmp = CF.on && CF.cmp.length === 2 ? (() => { const [a, b] = CF.cmp, ca = E.CROPS[CK[a]], cb = E.CROPS[CK[b]], sa = cropStats(a), sb = cropStats(b);
       const row = (t, x, y, better) => `<tr><th>${t}</th><td class="${better === 0 ? "win" : ""}">${x}</td><td class="${better === 1 ? "win" : ""}">${y}</td></tr>`;
       return `<div class="panel2 pop"><b>${L("مقارنة", "Comparison")}</b><table class="cmpt"><tr><th></th><th>${cname(a)}</th><th>${cname(b)}</th></tr>
-        ${row(L("الماء الكافي", "Water met"), pct(sa.st.ws), pct(sb.st.ws), sa.st.ws > sb.st.ws ? 0 : 1)}
-        ${row(L("في سنوات الجفاف", "In dry years"), pct(sa.st.dry), pct(sb.st.dry), sa.st.dry > sb.st.dry ? 0 : 1)}
+        ${row(L("الماء الكافي", "Water met"), pct(sa.ws), pct(sb.ws), sa.ws > sb.ws ? 0 : 1)}
+        ${row(L("في سنوات الجفاف", "In dry years"), pct(sa.dry), pct(sb.dry), sa.dry > sb.dry ? 0 : 1)}
         ${row(L("حاجة الماء", "Water need"), demandMm(a) + " " + L("ملم", "mm"), demandMm(b) + " " + L("ملم", "mm"), demandMm(a) < demandMm(b) ? 0 : 1)}
         ${row(L("عمق الجذور", "Root depth"), ca.root + " cm", cb.root + " cm", ca.root > cb.root ? 0 : 1)}
         ${row("Ky", ca.ky, cb.ky, ca.ky < cb.ky ? 0 : 1)}
-        ${row(L("تثبيت الآزوت", "N fixation"), ca.n ? "✓" : "—", cb.n ? "✓" : "—", ca.n > cb.n ? 0 : cb.n > ca.n ? 1 : -1)}
-        ${row(L("الملاءمة", "Suitability"), L(LVLNAME[sa.level][0], LVLNAME[sa.level][1]), L(LVLNAME[sb.level][0], LVLNAME[sb.level][1]), -1)}</table>
+        ${row(L("تثبيت الآزوت", "N fixation"), ca.n ? "✓" : "—", cb.n ? "✓" : "—", ca.n > cb.n ? 0 : cb.n > ca.n ? 1 : -1)}</table>
         <div class="note">${L("الخلية المظللة = الأفضل في هذا المعيار.", "Shaded cell = better on that criterion.")}</div></div>`; })() : "";
     return `<div class="gscreen">
-      <div class="ghead in">${A.backBtn("hub").replace('class="back"', 'class="iconbtn"')}<h1><small>${L(`بعد ${cname(prev)} · ${esc(A.placeName())}`, `After ${cname(prev).toLowerCase()} · ${esc(A.placeName())}`)}</small>${L("خصائص المحاصيل", "Crop characteristics")}</h1></div>
+      <div class="ghead in">${A.backBtn("hub").replace('class="back"', 'class="iconbtn"')}<h1><small>${esc(A.placeName())}</small>${L("خصائص المحاصيل", "Crop characteristics")}</h1></div>
       <div class="dock in d1"><div class="who">${salahM(80, "happy")}</div><div class="say tone-n">${L("افتح أي بطاقة لترى خصائصه العلمية. فعّل \"قارن\" واختر محصولين لتقارن بينهما.", "Open any card to see its scientific traits. Turn on \"Compare\" and pick two crops to put them side by side.")}</div></div>
       <div class="chiprow in d2">${[["all", L("الكل", "All")], ["cereal", L("حبوب", "Cereals")], ["legume", L("بقوليات", "Legumes")]].map((o) => `<button class="chip ${CF.fam === o[0] ? "on" : ""}" data-act="cf" data-v="${o[0]}">${o[1]}</button>`).join("")}<button class="chip ${CF.on ? "on" : ""}" data-act="cfc">${CF.on ? '<span class="ck"></span>' : ""}${L("قارن", "Compare")} ${CF.on ? CF.cmp.length + "/2" : ""}</button></div>
       ${cmp}
-      <div class="cgrid stagger">${list.map(({ k, su }) => `<button class="ccard tilt ${CF.cmp.includes(k) ? "picked" : ""}" data-act="cropOpen" data-v="${k}"><div class="art">${cropArt(k)}</div><b>${cname(k)}</b><small>${fam(k) === "cereal" ? L("حبوب", "Cereal") : L("بقوليات", "Legume")} · ${L("الماء الكافي", "Water met")} ${pct(su.st.ws)}</small>${lvlBadge(su.level)}</button>`).join("")}</div>
-      <div class="note">${L("الترتيب حسب نسبة الماء الكافي من المطر على 30 موسمًا. المصادر: FAO-56، FAO-33/66، ناسا POWER.", "Sorted by share of water needs met by rain over 30 seasons. Sources: FAO-56, FAO-33/66, NASA POWER.")}</div>
+      <div class="cgrid stagger">${list.map((k) => `<button class="ccard tilt ${CF.on && CF.cmp.includes(k) ? "picked" : ""}" data-act="cropOpen" data-v="${k}"><div class="art">${cropArt(k)}</div><b>${cname(k)}</b><small>${fam(k) === "cereal" ? L("حبوب", "Cereal") : L("بقوليات", "Legume")}</small></button>`).join("")}</div>
       <button class="primary" data-act="go" data-to="map">${L("جرّبها في اللعبة", "Try them in the game")} ${A.fwd()}</button>
     </div>`;
   };
-  A.ACT.cf = (d) => { CF.fam = d.v; A.render(); };
+  A.ACT.cf = (d) => { CF.fam = d.v; CF.cmp = []; A.render(); };
   A.ACT.cfc = () => { CF.on = !CF.on; CF.cmp = []; A.render(); };
   A.ACT.cropOpen = (d) => {
     const k = d.v;

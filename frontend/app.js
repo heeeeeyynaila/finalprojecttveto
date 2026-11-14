@@ -105,9 +105,15 @@
     farm: { area: 5, system: null, soil: null, irrig: null, water: null, history: ["unknown", "unknown", "unknown"], current: null, intent: null, focus: null, prios: [] },
     rots: [null, ["wheat", "lentil"], ["barley", "vetch"]],
   };
+  // Always clear previous session data on load/refresh so every refresh starts completely fresh
+  try {
+    localStorage.removeItem("fieldshift");
+    localStorage.removeItem("fs_farm_id");
+    sessionStorage.removeItem("fieldshift");
+    sessionStorage.removeItem("fs_farm_id");
+  } catch (e) { }
   let S = JSON.parse(JSON.stringify(DEF));
-  try { const saved = JSON.parse(localStorage.getItem("fieldshift")); if (saved && saved.farm) S = Object.assign(S, saved); } catch (e) { }
-  const save = () => { try { localStorage.setItem("fieldshift", JSON.stringify(S)); } catch (e) { } };
+  const save = () => { /* In-memory session state */ };
   let PREV = { scale: null, lvl: null, soil: null };
 
   const ICON = {
