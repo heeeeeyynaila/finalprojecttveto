@@ -92,7 +92,10 @@
       this.cloudMat = mat;
     }
     setWeather(w) { // day | harvest | dry | storm | dusk
-      const sky = { day: ["#9ec3d0", "#f1efd6", 0xe9ead2, 1.08], harvest: ["#e9c98a", "#f8efd2", 0xf4e6c4, 1.12], dry: ["#e8c48e", "#f6ecd2", 0xf0e0c0, 1.18], storm: ["#6f7f86", "#b9c2bf", 0xa9b2b0, 0.82], dusk: ["#b78f7a", "#e9dcc4", 0xd8c9b0, 0.9] }[w] || [];
+      const sky = { day: ["#9ec3d0", "#f1efd6", 0xe9ead2, 1.08], harvest: ["#e9c98a", "#f8efd2", 0xf4e6c4, 1.12], dry: ["#e8c48e", "#f6ecd2", 0xf0e0c0, 1.18], storm: ["#6f7f86", "#b9c2bf", 0xa9b2b0, 0.82], dusk: ["#b78f7a", "#e9dcc4", 0xd8c9b0, 0.9], heat: ["#e59a58", "#f6d8ae", 0xf0cfa0, 1.22], salt: ["#c3d3d8", "#f2f2e8", 0xe6e9e2, 1.1], soil: ["#b7ad92", "#ece5cf", 0xe0d8c0, 1.0] }[w] || ["#9ec3d0", "#f1efd6", 0xe9ead2, 1.08];
+      this.weather = w;
+      this.sunDisc.material.color.setHex(w === "heat" || w === "dry" ? 0xffb35a : 0xffe2a0); this.sunDisc.scale.setScalar(w === "heat" ? 2.2 : w === "dry" ? 1.6 : 1); this.sunDisc.visible = w !== "storm";
+      this.sun.intensity = w === "storm" ? 1.2 : w === "heat" ? 3.0 : 2.4;
       this.scene.background = skyTex(sky[0], sky[1]); this.scene.fog.color.setHex(sky[2]); this.renderer.toneMappingExposure = sky[3];
       this.cloudMat.color.setHex(w === "storm" ? 0x75828a : 0xffffff);
     }
@@ -136,12 +139,12 @@
       for (let k = 0; k < n; k++) this.pos[k * 3 + 1] = -99;
       world.updaters.push((dt) => this.step(dt));
     }
-    emit(x, y, z, count, color, spread = 1, up = 3, grav = 9, life = 1.2) {
+    emit(x, y, z, count, color, spread = 1, up = 3, grav = 9, life = 1.2, vx = 0, vz = 0) {
       const c = new THREE.Color(color);
       for (let k = 0; k < count; k++) {
         const i = this.i = (this.i + 1) % this.n;
         this.pos.set([x + (Math.random() - 0.5) * spread, y, z + (Math.random() - 0.5) * spread], i * 3);
-        this.vel.set([(Math.random() - 0.5) * spread * 3, up * (0.5 + Math.random()), (Math.random() - 0.5) * spread * 3], i * 3);
+        this.vel.set([(Math.random() - 0.5) * spread * 3 + vx, up * (0.5 + Math.random()), (Math.random() - 0.5) * spread * 3 + vz], i * 3);
         const v = 0.85 + Math.random() * 0.3; this.col.set([c.r * v, c.g * v, c.b * v], i * 3); this.life[i] = life * (0.6 + Math.random() * 0.6); this.grav[i] = grav;
       }
     }
@@ -605,6 +608,7 @@
   };
 
   window.__X3 = () => RT;
+  window.FS3D = { World, Particles, Salah, house, tank, sheep, std, PAL, SOILC, HEADC, CEREAL, ICON, bubble, RM };
   function cleanup() {
     if (!RT) return; try { RT.w.dispose(); } catch (e) { } RT = null; window.__say3 = null; document.body.classList.remove("x3on");
   }
