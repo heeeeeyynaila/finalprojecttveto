@@ -1,0 +1,8 @@
+fastapi>=0.110
+uvicorn>=0.27
+httpx>=0.27
+numpy>=1.26
+pytest>=8.0
+# optional, only for the slow NASA jobs (need Earthdata login):
+# earthaccess
+# cdsapi

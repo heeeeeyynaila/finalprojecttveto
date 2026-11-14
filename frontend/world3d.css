@@ -1,0 +1,645 @@
+/* ===== Field Shift 3D game layer ===== */
+body.x3on {
+    padding: 0 !important
+}
+
+body.x3on #app {
+    width: 100% !important;
+    max-width: none !important;
+    height: 100% !important;
+    max-height: none !important;
+    min-height: 100% !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    margin: 0 !important
+}
+
+.x3 {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    overflow: hidden;
+    background: #e9ead2;
+    font-family: Cairo, system-ui, sans-serif;
+    color: #2b2a20;
+    user-select: none;
+    -webkit-user-select: none
+}
+
+.x3 canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    touch-action: none;
+    outline: none;
+    cursor: grab
+}
+
+.x3 canvas:active {
+    cursor: grabbing
+}
+
+.x3vign {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse at 50% 45%, transparent 55%, rgba(43, 42, 32, .22) 100%)
+}
+
+.x3 button {
+    font-family: inherit;
+    cursor: pointer
+}
+
+/* top bar */
+.x3top {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    pointer-events: none
+}
+
+.x3top>* {
+    pointer-events: auto
+}
+
+.x3b {
+    height: 46px;
+    min-width: 46px;
+    border: 0;
+    border-radius: 16px;
+    background: rgba(251, 251, 239, .94);
+    color: #516d77;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 18px;
+    font-weight: 800;
+    box-shadow: 0 4px 0 #c9c99a, 0 8px 18px -8px rgba(0, 0, 0, .35);
+    backdrop-filter: blur(6px)
+}
+
+.x3b:active {
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 #c9c99a
+}
+
+.x3tea {
+    background: linear-gradient(180deg, #a51a1a, #840000);
+    color: #fbfbef;
+    padding: 0 14px;
+    box-shadow: 0 4px 0 #4a0000, 0 8px 18px -6px rgba(132, 0, 0, .6);
+    animation: x3TeaGlow 2.6s ease-in-out infinite
+}
+
+.x3tea span {
+    font-size: 14px
+}
+
+@keyframes x3TeaGlow {
+    50% {
+        box-shadow: 0 4px 0 #4a0000, 0 0 0 6px rgba(232, 232, 188, .55)
+    }
+}
+
+.x3title {
+    flex: 1;
+    min-width: 0;
+    background: rgba(251, 251, 239, .94);
+    border-radius: 16px;
+    padding: 4px 14px;
+    box-shadow: 0 4px 0 #c9c99a;
+    backdrop-filter: blur(6px)
+}
+
+.x3title small {
+    display: block;
+    font-size: 11px;
+    font-weight: 800;
+    color: #840000
+}
+
+.x3title b {
+    font-size: 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block
+}
+
+/* mission tracker */
+.x3mission {
+    pointer-events: none;
+    position: absolute;
+    top: 66px;
+    inset-inline-start: 10px;
+    background: rgba(43, 58, 63, .82);
+    color: #fbfbef;
+    border-radius: 16px;
+    padding: 8px 12px;
+    font-size: 12.5px;
+    font-weight: 700;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    max-width: min(260px, 62vw);
+    backdrop-filter: blur(6px);
+    box-shadow: 0 8px 20px -10px rgba(0, 0, 0, .5)
+}
+
+.x3mission>b {
+    font-size: 10.5px;
+    letter-spacing: .06em;
+    color: #e8e8bc;
+    text-transform: uppercase
+}
+
+.x3mi {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    opacity: .55;
+    transition: opacity .3s
+}
+
+.x3mi.cur {
+    opacity: 1
+}
+
+.x3mi.ok {
+    opacity: .9
+}
+
+.x3mi .ck {
+    flex: none;
+    width: 17px;
+    height: 17px;
+    border-radius: 50%;
+    border: 2px solid #e8e8bc;
+    display: grid;
+    place-items: center;
+    font-size: 11px;
+    font-weight: 900
+}
+
+.x3mi.ok .ck {
+    background: #9ca047;
+    border-color: #9ca047;
+    animation: x3Pop .4s
+}
+
+.x3mi.cur .ck {
+    border-color: #ffe9a8;
+    box-shadow: 0 0 0 3px rgba(255, 233, 168, .35)
+}
+
+.x3mi.ok {
+    text-decoration: line-through;
+    text-decoration-color: rgba(232, 232, 188, .6)
+}
+
+@keyframes x3Pop {
+    50% {
+        transform: scale(1.35)
+    }
+}
+
+/* speech bubble anchored over Salah */
+.x3bub {
+    position: absolute;
+    left: 0;
+    top: 0;
+    max-width: min(320px, 80vw);
+    background: #fbfbef;
+    border-radius: 18px;
+    padding: 10px 40px 10px 14px;
+    font-size: 14.5px;
+    line-height: 1.55;
+    font-weight: 600;
+    box-shadow: 0 10px 24px -10px rgba(0, 0, 0, .45);
+    opacity: 0;
+    transform: scale(.6);
+    transform-origin: 50% 100%;
+    pointer-events: none;
+    transition: left .12s linear, top .12s linear
+}
+
+[dir=rtl] .x3bub {
+    padding: 10px 14px 10px 40px
+}
+
+.x3bub.show {
+    animation: x3Bub .35s cubic-bezier(.2, 1.4, .4, 1) forwards
+}
+
+@keyframes x3Bub {
+    to {
+        opacity: 1;
+        transform: scale(1)
+    }
+}
+
+.x3bub::after {
+    content: "";
+    position: absolute;
+    bottom: -9px;
+    left: 50%;
+    margin-left: -9px;
+    border: 9px solid transparent;
+    border-top-color: #fbfbef;
+    border-bottom: 0
+}
+
+.x3bub.tone-bad,
+.x3bub.tone-warn {
+    background: #fff1e6
+}
+
+.x3bub.tone-bad::after,
+.x3bub.tone-warn::after {
+    border-top-color: #fff1e6
+}
+
+.x3bub.tone-hint {
+    background: #f4f0d2;
+    border: 2px solid #d9a520
+}
+
+.x3bub.tone-hint::after {
+    border-top-color: #d9a520
+}
+
+.x3bub.tone-good {
+    background: #eef3d6
+}
+
+.x3bub.tone-good::after {
+    border-top-color: #eef3d6
+}
+
+.x3tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 900;
+    border-radius: 999px;
+    padding: 1px 9px;
+    margin-bottom: 3px
+}
+
+.t-hint {
+    background: #d9a520;
+    color: #2b2a20
+}
+
+.t-warn {
+    background: #840000;
+    color: #fbfbef
+}
+
+.t-good {
+    background: #7d8136;
+    color: #fbfbef
+}
+
+.t-info {
+    background: #516d77;
+    color: #fbfbef
+}
+
+.x3rep {
+    pointer-events: auto;
+    position: absolute;
+    top: 8px;
+    inset-inline-end: 8px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 0;
+    background: #e8e8bc;
+    font-size: 13px
+}
+
+/* hotspot labels */
+.x3label {
+    position: fixed;
+    left: 0;
+    top: 0;
+    border: 0;
+    border-radius: 999px;
+    background: #840000;
+    color: #fbfbef;
+    font-weight: 800;
+    font-size: 13px;
+    padding: 6px 12px;
+    box-shadow: 0 4px 0 #4a0000;
+    white-space: nowrap;
+    animation: x3Bob 1.6s ease-in-out infinite
+}
+
+.x3label.seen {
+    display: none
+}
+
+@keyframes x3Bob {
+    50% {
+        margin-top: -5px
+    }
+}
+
+/* combo */
+.x3combo {
+    position: absolute;
+    left: 50%;
+    top: 38%;
+    transform: translate(-50%, -50%) scale(.5);
+    font-size: 44px;
+    font-weight: 900;
+    color: #fbfbef;
+    -webkit-text-stroke: 2px #840000;
+    text-shadow: 0 5px 0 #840000;
+    opacity: 0;
+    pointer-events: none
+}
+
+.x3combo.show {
+    animation: x3Combo .7s cubic-bezier(.2, 1.4, .4, 1) forwards
+}
+
+.x3combo.big {
+    font-size: 34px
+}
+
+@keyframes x3Combo {
+    30% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.15)
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -90%) scale(1)
+    }
+}
+
+/* bottom: progress, tool belt, panels */
+.x3bottom {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    pointer-events: none;
+    padding: 0 10px
+}
+
+.x3bottom>* {
+    pointer-events: auto
+}
+
+.x3prog {
+    position: relative;
+    width: min(420px, 92vw);
+    height: 16px;
+    border-radius: 999px;
+    background: rgba(43, 58, 63, .6);
+    overflow: hidden;
+    box-shadow: 0 0 0 3px rgba(251, 251, 239, .85)
+}
+
+.x3prog i {
+    position: absolute;
+    inset: 0 auto 0 0;
+    background: linear-gradient(90deg, #e0b44a, #9ca047);
+    border-radius: 999px;
+    transition: width .3s
+}
+
+[dir=rtl] .x3prog i {
+    inset: 0 0 0 auto
+}
+
+.x3prog span {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-size: 11px;
+    font-weight: 900;
+    color: #fbfbef;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, .5)
+}
+
+.x3tools {
+    display: flex;
+    gap: 8px;
+    background: rgba(43, 58, 63, .82);
+    padding: 8px;
+    border-radius: 22px;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 10px 24px -10px rgba(0, 0, 0, .5)
+}
+
+.x3tools.rise {
+    animation: x3Rise .5s cubic-bezier(.2, 1.3, .4, 1)
+}
+
+@keyframes x3Rise {
+    from {
+        transform: translateY(120px);
+        opacity: 0
+    }
+}
+
+.x3tools.pulse {
+    animation: x3Pulse .6s ease 2
+}
+
+@keyframes x3Pulse {
+    50% {
+        box-shadow: 0 0 0 6px #ffe9a8
+    }
+}
+
+.x3tool {
+    width: 62px;
+    height: 64px;
+    border: 0;
+    border-radius: 16px;
+    background: #fbfbef;
+    color: #516d77;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    font-size: 11px;
+    font-weight: 800;
+    box-shadow: 0 4px 0 #c9c99a
+}
+
+.x3tool.on {
+    background: #9ca047;
+    color: #fbfbef;
+    box-shadow: 0 4px 0 #656a2b;
+    transform: translateY(-4px)
+}
+
+.x3tool:active {
+    transform: translateY(2px)
+}
+
+.x3panel {
+    display: none
+}
+
+.x3panel.show,
+.x3panel:has(.x3go) {
+    display: block
+}
+
+.x3q {
+    text-align: center;
+    font-weight: 900;
+    font-size: 16px;
+    color: #fbfbef;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, .5);
+    margin-bottom: 8px
+}
+
+.x3choices {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    width: min(520px, 94vw)
+}
+
+@media (max-width:520px) {
+    .x3choices {
+        grid-template-columns: repeat(2, 1fr)
+    }
+}
+
+.x3choice {
+    border: 0;
+    border-radius: 18px;
+    background: #fbfbef;
+    padding: 10px 6px;
+    font-weight: 800;
+    font-size: 13px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    box-shadow: 0 5px 0 #c9c99a;
+    animation: x3Rise .45s cubic-bezier(.2, 1.3, .4, 1) backwards
+}
+
+.x3choice:nth-child(2) {
+    animation-delay: .06s
+}
+
+.x3choice:nth-child(3) {
+    animation-delay: .12s
+}
+
+.x3choice:nth-child(4) {
+    animation-delay: .18s
+}
+
+.x3choice .e {
+    font-size: 28px
+}
+
+.x3choice:active {
+    transform: translateY(3px);
+    box-shadow: 0 2px 0 #c9c99a
+}
+
+.x3go {
+    border: 0;
+    border-radius: 20px;
+    background: linear-gradient(180deg, #a51a1a, #840000);
+    color: #fbfbef;
+    font-weight: 900;
+    font-size: 18px;
+    padding: 14px 34px;
+    box-shadow: 0 6px 0 #4a0000, 0 12px 24px -8px rgba(132, 0, 0, .6);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    animation: x3Rise .5s cubic-bezier(.2, 1.3, .4, 1)
+}
+
+.x3go svg path {
+    stroke: #fbfbef
+}
+
+/* camera buttons */
+.x3cam {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 8px
+}
+
+.x3cam button {
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 14px;
+    background: rgba(251, 251, 239, .9);
+    color: #516d77;
+    font-size: 20px;
+    font-weight: 900;
+    box-shadow: 0 3px 0 #c9c99a
+}
+
+@media (min-width:900px) {
+    .x3mission {
+        font-size: 14px;
+        max-width: 300px
+    }
+
+    .x3bub {
+        font-size: 15.5px;
+        max-width: 380px
+    }
+
+    .x3tool {
+        width: 74px;
+        height: 72px;
+        font-size: 12px
+    }
+}
+
+@media (prefers-reduced-motion:reduce) {
+
+    .x3tea,
+    .x3label,
+    .x3bub.show,
+    .x3combo.show,
+    .x3tools.rise,
+    .x3choice,
+    .x3go {
+        animation: none !important;
+        opacity: 1;
+        transform: none
+    }
+}
+
+.x3 [hidden] {
+    display: none !important
+}

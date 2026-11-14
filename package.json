@@ -1,0 +1,13 @@
+{
+  "name": "field-shift",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Field Shift – Adapting Farms with NASA Data (NASA Space Apps Challenge 2026)",
+  "scripts": {
+    "start": "npm --prefix frontend start",
+    "dev": "npm --prefix frontend run dev",
+    "frontend:dev": "npm --prefix frontend run dev",
+    "backend:dev": "cd backend && uvicorn app.main:app --reload",
+    "backend:test": "cd backend && py -3 -m pytest -q"
+  }
+}
