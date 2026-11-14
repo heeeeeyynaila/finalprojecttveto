@@ -176,10 +176,16 @@
       const txt = document.getElementById("timer-txt");
       const bar = document.getElementById("timer-bar");
       const box = document.getElementById("timer-box");
+      const pill = document.getElementById("timer-pill");
       const m = Math.floor(LV.timeLeft / 60);
       const s = LV.timeLeft % 60;
-      if (txt) txt.textContent = (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
+      const str = (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
+      if (txt) txt.textContent = str;
       if (bar) bar.style.width = (LV.timeLeft / 60 * 100) + "%";
+      if (pill) {
+        if (LV.timeLeft <= 15) pill.classList.add("urgent");
+        else pill.classList.remove("urgent");
+      }
       if (box) {
         if (LV.timeLeft <= 15) box.classList.add("timer-urgent");
         else box.classList.remove("timer-urgent");
@@ -212,19 +218,24 @@
 
   function head(def) {
     const nm = def.title();
-    return `<div class="ghead in">
-      <button class="iconbtn" data-act="g" data-a="leave" aria-label="${L("الخريطة", "Map")}"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M2 5l5-2 6 2 5-2v12l-5 2-6-2-5 2z M7 3v12 M13 5v12" stroke="#516d77" stroke-width="1.7" fill="none" stroke-linejoin="round"/></svg></button>
-      <h1><small>${L("المستوى", "Level")} ${LV.id === "F" ? L("خاص", "special") : LV.id}</small>${nm}</h1>
-      <button class="iconbtn" data-act="g" data-a="hint" aria-label="${L("اكشف السر", "Spill the tea")}" title="${L("اكشف السر", "Spill the tea")}"><svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M5 9h11v4a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5z M16 10h2a2 2 0 0 1 0 4h-2 M8 3c0 2 2 2 2 4 M12 3c0 2 2 2 2 4" stroke="#840000" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button>
-      <button class="iconbtn" data-act="g" data-a="mute" aria-label="${G().mute ? L("تشغيل الموسيقى", "Unmute Music") : L("كتم الموسيقى", "Mute Music")}">${G().mute
-        ? '<svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 8h3l4-3v10l-4-3H3z M13 7l5 6 M18 7l-5 6" stroke="#516d77" stroke-width="1.7" fill="none" stroke-linejoin="round"/></svg>'
-        : '<svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 8h3l4-3v10l-4-3H3z M13 7a4 4 0 0 1 0 6 M15.5 5a7 7 0 0 1 0 10" stroke="#516d77" stroke-width="1.7" fill="none" stroke-linejoin="round"/></svg>'}</button>
+    return `<div class="plug-head in">
+      <button class="iconbtn mini" data-act="g" data-a="leave" aria-label="${L("الخريطة", "Map")}"><svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M2 5l5-2 6 2 5-2v12l-5 2-6-2-5 2z M7 3v12 M13 5v12" stroke="#516d77" stroke-width="2" fill="none" stroke-linejoin="round"/></svg></button>
+      <div class="plug-title">
+        <b>${nm}</b>
+        <span class="timer-pill" id="timer-pill">⏱ <span id="timer-txt">01:00</span></span>
+      </div>
+      <div class="plug-tools">
+        <button type="button" class="nasapill" data-act="g" data-a="toggleNasa" title="${L("بيانات ناسا", "NASA Data")}">📊 ${L("رصد ناسا", "NASA")}</button>
+        <button class="iconbtn mini" data-act="g" data-a="hint" aria-label="${L("تلميح", "Hint")}" title="${L("تلميح", "Hint")}"><svg width="18" height="18" viewBox="0 0 22 22" aria-hidden="true"><path d="M5 9h11v4a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5z M16 10h2a2 2 0 0 1 0 4h-2 M8 3c0 2 2 2 2 4 M12 3c0 2 2 2 2 4" stroke="#840000" stroke-width="2" fill="none" stroke-linecap="round"/></svg></button>
+        <button class="iconbtn mini" data-act="g" data-a="mute" aria-label="${G().mute ? L("تشغيل الموسيقى", "Unmute Music") : L("كتم الموسيقى", "Mute Music")}">${G().mute
+          ? '<svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 8h3l4-3v10l-4-3H3z M13 7l5 6 M18 7l-5 6" stroke="#516d77" stroke-width="2" fill="none" stroke-linejoin="round"/></svg>'
+          : '<svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 8h3l4-3v10l-4-3H3z M13 7a4 4 0 0 1 0 6 M15.5 5a7 7 0 0 1 0 10" stroke="#516d77" stroke-width="2" fill="none" stroke-linejoin="round"/></svg>'}</button>
+      </div>
     </div>
-    <div class="timer-container in d1" id="timer-box">
-      <div class="timer-badge" id="timer-badge">⏱ <span id="timer-txt">01:00</span></div>
-      <div class="timer-track"><div class="timer-fill" id="timer-bar" style="width:100%"></div></div>
-    </div>
-    <div class="dock in d1"><div class="who" id="who">${salahM(80, "happy")}</div><div class="say tone-n" id="say" aria-live="polite"></div></div>`;
+    <div class="plug-salah in d1">
+      <div class="who-mini" id="who">${salahM(28, "happy")}</div>
+      <div class="say-mini tone-n" id="say" aria-live="polite"></div>
+    </div>`;
   }
   let lastSay = "";
   function say(text, mood = "happy", tone = "n", silent) {
@@ -232,10 +243,11 @@
     if (window.__say3) return window.__say3(text, mood, tone, silent);
     const who = document.getElementById("who"), el = document.getElementById("say");
     if (!who || !el) return;
-    who.innerHTML = salahM(80, mood) + (mood === "angry" ? '<span class="steam">~</span>' : "");
-    who.className = "who mood-" + mood; void who.offsetWidth;
-    el.className = "say msg tone-" + tone;
-    el.innerHTML = `<div>${text}</div><div class="acts"><button data-act="g" data-a="replay">${L("إعادة", "Replay")}</button></div>`;
+    const isMini = who.classList.contains("who-mini") || (who.parentElement && who.parentElement.classList.contains("plug-salah"));
+    who.innerHTML = salahM(isMini ? 28 : 80, mood) + (mood === "angry" ? '<span class="steam">~</span>' : "");
+    who.className = (isMini ? "who-mini" : "who") + " mood-" + mood; void who.offsetWidth;
+    el.className = (isMini ? "say-mini" : "say") + " msg tone-" + tone;
+    el.innerHTML = text;
     if (!silent) speak(text);
   }
   function hint() {
@@ -343,66 +355,102 @@
   };
 
   // ---------------------------------------------------------------- generic level screen & NASA toggle
-  function renderNasaSection() {
+  function renderNasaModal() {
     const l = loc();
     if (!l) return "";
-    return `<div class="nasa-section in d2">
-      <button type="button" class="nasa-toggle-btn" data-act="g" data-a="toggleNasa">
-        <span class="nasa-toggle-title">
-          <span>🛰️</span>
-          <span>${LV.showNasa ? L("إخفاء تقرير ناسا الحقيقي", "Hide Real NASA Report") : L("عرض تقرير ناسا الحقيقي للتربة والمناخ", "Show Real NASA Soil & Climate Report")}</span>
-        </span>
-        <span class="nasa-toggle-pill">${LV.showNasa ? "▲ " + L("إغلاق", "Close") : "▼ " + L("بيانات حية", "Live Data")}</span>
-      </button>
-      ${LV.showNasa ? `
-        <div class="nasa-drawer">
-          <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #dcdcb8;padding-bottom:6px">
-            <span style="font-size:12px;font-weight:800;color:#516d77">📍 ${esc(A.placeName())} (${l.cell.lat.toFixed(2)}°, ${l.cell.lon.toFixed(2)}°)</span>
-            <span style="font-size:11px;font-weight:700;color:#6b706a">⛰️ ${l.cell.elev || 450}m (${L("ارتفاع", "elevation")})</span>
+    return `<div class="riskov fade" id="nasaModal" style="display:${LV.showNasa ? "flex" : "none"}">
+      <div class="sheet pop" style="max-height:85vh;overflow-y:auto;display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1.5px solid #dcdcb8;padding-bottom:8px">
+          <span style="font-weight:900;font-size:15px;color:#516d77">📊 ${L("تقرير رصد ناسا الحقيقي للموقع", "Real NASA Observation Report")}</span>
+          <button type="button" class="secondary" style="width:auto;min-height:32px;padding:3px 10px;font-size:12px" data-act="g" data-a="toggleNasa">❌ ${L("إخفاء", "Hide")}</button>
+        </div>
+        <div style="font-size:12px;color:var(--mute)">📍 ${esc(A.placeName())} (${l.lat ? l.lat.toFixed(2) : ""}°, ${l.lon ? l.lon.toFixed(2) : ""}°) · ⛰️ ${Math.round(l.elev || 450)}m (${L("الارتفاع", "elevation")})</div>
+        <div class="nasa-drawer-grid">
+          <div class="nasa-cell-box">
+            <small>${L("متوسط أمطار الموسم (أكتوبر–ماي)", "Mean Season Rain (Oct–May)")}</small>
+            <b>${l.summary.rain_mean} mm</b>
           </div>
-          <div class="nasa-drawer-grid">
-            <div class="nasa-cell-box">
-              <small>${L("متوسط أمطار الموسم (أكتوبر–ماي)", "Mean Season Rain (Oct–May)")}</small>
-              <b>${l.summary.rain_mean} mm</b>
-            </div>
-            <div class="nasa-cell-box">
-              <small>${L("أيام الحر عند الإزهار", "Hot Days at Flowering")}</small>
-              <b>${l.trends.hot_flowering ? l.trends.hot_flowering.late : 4} ${L("أيام", "days")}</b>
-            </div>
-            <div class="nasa-cell-box">
-              <small>${L("نوع التربة (SoilGrids)", "Soil Texture (SoilGrids)")}</small>
-              <b>${l.soil.texture === "clay loam" ? L("طميية طينية", "Clay loam") : l.soil.texture}</b>
-            </div>
-            <div class="nasa-cell-box">
-              <small>${L("سعة احتفاظ الماء (PAW100)", "Plant-Available Water (PAW100)")}</small>
-              <b>${l.soil.paw100} mm/m</b>
-            </div>
+          <div class="nasa-cell-box">
+            <small>${L("أيام الحر عند الإزهار", "Hot Days at Flowering")}</small>
+            <b>${l.trends && l.trends.hot_flowering ? l.trends.hot_flowering.late : 4} ${L("أيام", "days")}</b>
           </div>
-          <div class="nasa-citation">
-            📊 <b>${L("المصدر العلمي:", "Scientific Sources:")}</b> NASA POWER 0.5° (1995–2025) · ISRIC SoilGrids 250m · NASADEM.
+          <div class="nasa-cell-box">
+            <small>${L("نوع التربة (SoilGrids)", "Soil Texture (SoilGrids)")}</small>
+            <b>${l.soil.texture === "clay loam" ? L("طميية طينية", "Clay loam") : l.soil.texture}</b>
+          </div>
+          <div class="nasa-cell-box">
+            <small>${L("سعة احتفاظ الماء (PAW100)", "Plant-Available Water (PAW100)")}</small>
+            <b>${l.soil.paw100} mm/m</b>
           </div>
         </div>
-      ` : ""}
+        <div class="nasa-citation">
+          📊 <b>${L("المصدر العلمي:", "Scientific Sources:")}</b> NASA POWER 0.5° (1995–2025) · ISRIC SoilGrids 250m · NASADEM.
+        </div>
+        <button type="button" class="primary" style="margin-top:6px;min-height:42px" data-act="g" data-a="toggleNasa">${L("إخفاء والعودة للعبة", "Hide & Return to Game")}</button>
+      </div>
     </div>`;
   }
 
-  A.SCREENS.lvl = () => `<div class="gscreen">${head(LEVELS[LV.id])}<div id="lv" style="display:flex;flex-direction:column;gap:12px;flex:1"></div></div>`;
+  A.SCREENS.lvl = () => `<div class="gscreen plugged">${head(LEVELS[LV.id])}<div id="lv" style="display:flex;flex-direction:column;gap:6px;flex:1;min-height:0;overflow:hidden"></div>${renderNasaModal()}</div>`;
   A.AFTER.lvl = () => { const d = LEVELS[LV.id]; d.init && d.init(); draw(); setTimeout(() => say(d.intro(), "happy", "n"), 450); if (!G().mute) playCalmMusic(); };
   const draw = () => {
     const el = document.getElementById("lv");
-    if (el) {
-      let content = LEVELS[LV.id].view();
-      const nasaHtml = renderNasaSection();
-      if (content.includes('</div>')) {
-        const idx = content.indexOf('</div>') + 6;
-        content = content.slice(0, idx) + nasaHtml + content.slice(idx);
-      } else {
-        content = nasaHtml + content;
-      }
-      el.innerHTML = content;
-      LEVELS[LV.id].after && LEVELS[LV.id].after();
-      if (!el.dataset.first) { el.dataset.first = 1; setTimeout(() => el.classList.add("settled"), 900); }
+    if (!el) return;
+    let content = LEVELS[LV.id].view();
+    
+    // Separate primary action button into fixed plug-foot
+    let footHtml = "";
+    const btnRegex = /<button class="primary[^"]*"[^>]*>[\s\S]*?<\/button>\s*$/;
+    const btnMatch = content.match(btnRegex);
+    if (btnMatch) {
+      footHtml = `<div class="plug-foot">${btnMatch[0]}</div>`;
+      content = content.slice(0, btnMatch.index);
     }
+    
+    // Separate the 3D board from the control deck
+    const b3dIdx = content.indexOf('<div class="b3d');
+    if (b3dIdx !== -1) {
+      let depth = 0, b3dEnd = -1;
+      for (let pos = b3dIdx; pos < content.length; ) {
+        const nextOpen = content.indexOf('<div', pos + 1);
+        const nextClose = content.indexOf('</div>', pos + 1);
+        if (nextClose === -1) break;
+        if (nextOpen !== -1 && nextOpen < nextClose) {
+          depth++;
+          pos = nextOpen;
+        } else {
+          if (depth === 0) {
+            b3dEnd = nextClose + 6;
+            break;
+          }
+          depth--;
+          pos = nextClose;
+        }
+      }
+      if (b3dEnd !== -1) {
+        let start = b3dIdx;
+        const prefix = content.slice(0, b3dIdx);
+        const wrapMatch = prefix.match(/<div class="in [^"]*">\s*$/);
+        if (wrapMatch) {
+          start = wrapMatch.index;
+          const closeWrap = content.indexOf('</div>', b3dEnd);
+          if (closeWrap !== -1 && closeWrap - b3dEnd < 15) b3dEnd = closeWrap + 6;
+        }
+        const boardHtml = `<div class="plug-board in d2">${content.slice(b3dIdx, b3dEnd)}</div>`;
+        const deckHtml = `<div class="plug-deck in d3">${content.slice(0, start) + content.slice(b3dEnd)}</div>`;
+        el.innerHTML = boardHtml + deckHtml + footHtml;
+      } else {
+        el.innerHTML = `<div class="plug-deck in d2">${content}</div>${footHtml}`;
+      }
+    } else {
+      el.innerHTML = `<div class="plug-deck in d2">${content}</div>${footHtml}`;
+    }
+    
+    const modalEl = document.getElementById("nasaModal");
+    if (modalEl) modalEl.style.display = LV.showNasa ? "flex" : "none";
+    
+    LEVELS[LV.id].after && LEVELS[LV.id].after();
+    if (!el.dataset.first) { el.dataset.first = 1; setTimeout(() => el.classList.add("settled"), 900); }
   };
 
   A.ACT.g = (d) => {
@@ -428,6 +476,19 @@
       if (def && def.mustFinish && !LV.done) return axe();
       stopLevelTimer();
       return A.go("map");
+    }
+    if (a === "tile") {
+      const tileEl = document.querySelector(`.t3[data-i="${d.i}"]`);
+      if (tileEl) {
+        tileEl.classList.remove("pop-anim");
+        void tileEl.offsetWidth;
+        tileEl.classList.add("pop-anim");
+      }
+      snd("tap");
+      if (LEVELS[LV.id] && LEVELS[LV.id].on) {
+        LEVELS[LV.id].on("tile", d);
+      }
+      return;
     }
     snd("tap");
     if (!G().mute && !bgMusicInterval) playCalmMusic();
@@ -533,7 +594,7 @@
       const hl = typeof health === "function" ? health(i, c, r) : health;
       return { fill: mixC(soilCol(), "#c9b38a", Math.max(0, 0.6 - hl) * 0.8), flat: (o.flat ? o.flat(i, c, r) : "") + (hl < 0.35 ? FLAT.cracks : "") + (o.noIrrig ? "" : irrigFlat(c, r)),
         deco: (crop ? plantDeco(typeof crop === "function" ? crop(i, c, r) : crop, 4, "", hl) : "") + (o.noIrrig ? "" : irrigDeco(c, r)) + (o.deco ? o.deco(i, c, r) : ""), label: o.label || "" };
-    }, Object.assign({ extras: farmExtras(cols, rows), act: "noop" }, o));
+    }, Object.assign({ extras: farmExtras(cols, rows), act: "g", action: "tile" }, o));
   }
   A.ACT.noop = () => { };
   const cropArt = (k, w = 120) => {
@@ -665,6 +726,14 @@
     },
     on(a, d) {
       const st = LV.st;
+      if (a === "tile") {
+        const i = +d.i;
+        const currentCrop = st.plan[st.active] || lastCrop();
+        snd("good");
+        say(L(`القطعة ${i + 1}: زرعت ${cname(currentCrop)} على الحقل مباشرة! 🌱`, `Plot ${i + 1}: planted ${cname(currentCrop)} directly on the field! 🌱`), "happy", "good");
+        draw();
+        return;
+      }
       if (a === "slot") { st.active = +d.i; draw(); return; }
       if (a === "open") {
         const k = d.v, ov = document.createElement("div"); ov.className = "riskov fade"; ov.innerHTML = this.detail(k); document.body.appendChild(ov);
@@ -775,6 +844,15 @@
     },
     on(a, d) {
       const st = LV.st, used = Object.values(st.alloc).reduce((x, y) => x + y, 0);
+      if (a === "tile") {
+        const i = +d.i;
+        st.watered = st.watered || {};
+        st.watered[i] = !st.watered[i];
+        snd("good");
+        say(st.watered[i] ? L("سقيت هذه القطعة مباشرة! رطوبة التربة ترتفع.", "Directly watered this plot! Soil moisture rises.") : L("أوقفت السقي عن هذه القطعة.", "Stopped watering this plot."), "happy", "good");
+        draw();
+        return;
+      }
       if (a === "tok") {
         const m = +d.m, rec = st.mulch ? st.mul : st.base, mo = rec.months[m];
         if (used >= st.tokens) { if (st.alloc[m]) { st.alloc[m]--; if (!st.alloc[m]) delete st.alloc[m]; } else say(L("انتهت حصصك! اضغط على شهر فيه حصة لإزالتها.", "You're out of shares! Tap a month with a share to remove it."), "worried", "warn"); draw(); return; }
@@ -844,6 +922,13 @@
     },
     on(a, d) {
       const st = LV.st;
+      if (a === "tile") {
+        st.mist = !st.mist;
+        snd("good");
+        say(st.mist ? L("رذاذ تبريد خفيف على الحقل يخفّف حرارة الظهيرة!", "Cooling mist spray on the field eases midday heat!") : L("أوقفت رذاذ التبريد.", "Turned off cooling mist."), "happy", "good");
+        draw();
+        return;
+      }
       if (a === "crop" || a === "sow" || a === "water") {
         const before = this.run(st);
         if (a === "crop") st.crop = d.v; if (a === "sow") st.sowing = d.v; if (a === "water") st.water = !st.water;
@@ -966,6 +1051,17 @@
     },
     on(a, d) {
       const st = LV.st, i = +d.i;
+      if (a === "tile") {
+        const r = Math.min(3, Math.floor(i / 4));
+        const cycle = [null, "manure", "drip", "n"];
+        const cur = cycle.indexOf(st.inp[r]);
+        st.inp[r] = cycle[(cur + 1) % cycle.length];
+        snd("tap");
+        const names = { manure: L("سماد عضوي", "manure"), drip: L("ري بالتنقيط", "drip"), n: L("سماد آزوتي", "N fertilizer") };
+        say(st.inp[r] ? L(`الموسم ${r + 1}: أضفت ${names[st.inp[r]]}.`, `Season ${r + 1}: added ${names[st.inp[r]]}.`) : L(`الموسم ${r + 1}: بدون مدخلات إضافية.`, `Season ${r + 1}: no extra inputs.`), "happy", "n");
+        draw();
+        return;
+      }
       if (a === "open") { st.open = st.open === i ? null : i; draw(); return; }
       if (a === "crop") { st.seq[i] = d.v; st.open = null; if (i > 0 && E.CROPS[CK[st.seq[i - 1]]].family === E.CROPS[CK[d.v]].family) say(L("لم نزرع هذه العائلة هنا للتو؟ فكّر في فوائد تنويع دورتك.", "Didn't we just grow that family here? Think about diversifying your rotation."), "worried", "warn"); draw(); return; }
       if (a === "inp") {
@@ -1016,6 +1112,11 @@
     },
     on(a, d) {
       const st = LV.st, p = st.pick;
+      if (a === "tile") {
+        snd("tap");
+        if (st.round < 3) return this.on("play", d);
+        return;
+      }
       if (a === "crop") { p.crop = d.v; if (E.CROPS[CK[d.v]].family === E.CROPS[CK[st.prev]].family) say(L(`${cname(st.prev)} قبله… نفس العائلة؟ همم.`, `${cname(st.prev)} before it… same family? Hmm.`), "worried", "warn"); draw(); return; }
       if (a === "sow") { p.sowing = d.v; draw(); return; }
       if (a === "water") { p.water = !p.water; draw(); return; }
@@ -1076,9 +1177,12 @@
       LV.st = { crop, prev, s, rec, ev, sel: {}, phase: "investigate", fix: { crop: crop === "barley" ? "chickpea" : "barley", sowing: "early", residue: "kept" } };
     },
     scene(dead) {
-      if (dead) return board3d(4, 3, (i) => ({ fill: "#a98a62", flat: FLAT.cracks, deco: `<g>${[...Array(4)].map((_, k) => `<g class="wilt" style="animation-delay:${(i * 0.08 + k * 0.05).toFixed(2)}s"><path d="M${-12 + k * 8} 0 v-14" stroke="#8a7a4a" stroke-width="1.6"/><ellipse cx="${-12 + k * 8}" cy="-16" rx="2" ry="4" fill="#a99060"/></g>`).join("")}</g>` }), { env: "dead", act: "noop", extras: farmExtras(4, 3), label: L("حقل جاف ومحاصيل ميتة", "Dry field with dead crops"), badge: `${cname(LV.st.crop)} · ${pct(LV.st.rec.yieldIdx)}` });
+      if (dead) return board3d(4, 3, (i) => {
+        const rev = LV.st.revived && LV.st.revived[i];
+        return { fill: rev ? "#7a5638" : "#a98a62", flat: rev ? "" : FLAT.cracks, deco: rev ? plantDeco("lentil", 4, "grow") : `<g>${[...Array(4)].map((_, k) => `<g class="wilt" style="animation-delay:${(i * 0.08 + k * 0.05).toFixed(2)}s"><path d="M${-12 + k * 8} 0 v-14" stroke="#8a7a4a" stroke-width="1.6"/><ellipse cx="${-12 + k * 8}" cy="-16" rx="2" ry="4" fill="#a99060"/></g>`).join("")}</g>` };
+      }, { env: "dead", act: "g", action: "tile", height: 165, extras: farmExtras(4, 3), label: L("حقل جاف ومحاصيل ميتة", "Dry field with dead crops"), badge: `${cname(LV.st.crop)} · ${pct(LV.st.rec.yieldIdx)}` });
       const r2 = seasonRun(LV.st.fix.crop, LV.st.s, { prev: LV.st.prev, sowing: LV.st.fix.sowing, residue: LV.st.fix.residue });
-      return fieldBoard(LV.st.fix.crop, Math.min(1, r2.yieldIdx * 1.4), { env: r2.yieldIdx > 0.4 ? "day" : "drought", flat: () => (LV.st.fix.residue === "kept" ? FLAT.straw : ""), label: L("الحقل بعد خطة التعافي", "The field after the recovery plan"), badge: `${cname(LV.st.fix.crop)} · ${pct(r2.yieldIdx)}` });
+      return fieldBoard(LV.st.fix.crop, Math.min(1, r2.yieldIdx * 1.4), { env: r2.yieldIdx > 0.4 ? "day" : "drought", height: 165, act: "g", action: "tile", flat: () => (LV.st.fix.residue === "kept" ? FLAT.straw : ""), label: L("الحقل بعد خطة التعافي", "The field after the recovery plan"), badge: `${cname(LV.st.fix.crop)} · ${pct(r2.yieldIdx)}` });
     },
     view() {
       const st = LV.st;
@@ -1098,6 +1202,7 @@
     },
     on(a, d) {
       const st = LV.st;
+      if (a === "tile") { const i = +d.i; st.revived = st.revived || {}; st.revived[i] = true; snd("good"); say(L("أنبتّ برعمًا أخضر جديدًا في هذه القطعة! 🌱", "Sprouted a new green shoot in this plot! 🌱"), "happy", "good"); draw(); return; }
       if (a === "sel") { st.sel[d.v] = !st.sel[d.v]; draw(); return; }
       if (a === "conclude") {
         let right = 0, wrong = 0; st.ev.forEach((e) => { const s = !!st.sel[e.k]; if (e.unknown) { if (s) { wrong++; riskyLog(L("الآفات: لا دليل عليها في البيانات.", "Pests: no evidence in the data.")); } } else if (s && e.ok) { right++; goodLog(L(`${e.t}: سبب مدعوم بالأدلة.`, `${e.t}: supported by evidence.`)); } else if (s && !e.ok) { wrong++; riskyLog(L(`${e.t}: الأدلة لا تدعمه هنا.`, `${e.t}: not supported by the evidence here.`)); } else if (!s && e.ok) missLog(L(`فاتك سبب: ${e.t}.`, `You missed a cause: ${e.t}.`)); });
@@ -1202,6 +1307,13 @@
     },
     on(a, d) {
       const st = LV.st, before = this.ev(st).scores.erosion;
+      if (a === "tile") {
+        st.residue = st.residue === "kept" ? "grazed" : "kept";
+        snd("tap");
+        say(st.residue === "kept" ? L("تركت التبن لحماية التربة من الانجراف!", "Kept residue to shield soil from runoff!") : L("رعت الأغنام التبن.", "Sheep grazed residue."), "happy", "n");
+        draw();
+        return;
+      }
       if (a === "res") st.residue = d.v; if (a === "till") st.till = d.v === "1"; if (a === "cover") st.cover = d.v === "1";
       if (a === "res" || a === "till" || a === "cover") { const after = this.ev(st).scores.erosion; say(after > before ? L(`الحماية ارتفعت إلى ${after}. التربة تشكرك!`, `Protection rose to ${after}. The soil thanks you!`) : after < before ? L(`الحماية انخفضت إلى ${after}. التربة صارت مكشوفة أكثر.`, `Protection fell to ${after}. More soil is exposed.`) : L("لا تغيير.", "No change."), after >= before ? "happy" : "worried", after > before ? "good" : after < before ? "warn" : "n"); if (a === "res" && d.v === "removed") risk({ level: "high", kind: "science", title: L("إزالة كل البقايا", "Removing all residue"), decision: L("إزالة البقايا", "Removing residue"), why: L("أمطار الخريف الغزيرة تسقط قبل نمو المحصول.", "Heavy autumn rain falls before the crop grows."), cons: L("تربة عارية تنجرف على الانحدار.", "Bare soil washes away on the slope."), mitig: L("اترك ثلث البقايا على الأقل.", "Leave at least a third of the residue.") }); draw(); return; }
       if (a === "end") {
@@ -1235,6 +1347,15 @@
     },
     on(a, d) {
       const st = LV.st;
+      if (a === "tile") {
+        if (!st.sel.includes("residue")) st.sel.push("residue");
+        else if (!st.sel.includes("cover")) st.sel.push("cover");
+        else st.sel = st.sel.filter(x => x !== "burn");
+        snd("tap");
+        say(L("تطبيق ممارسات حماية المادة العضوية على القطعة!", "Applying organic matter conservation to plot!"), "happy", "good");
+        draw();
+        return;
+      }
       if (a === "sel") { const i = st.sel.indexOf(d.v); if (i >= 0) st.sel.splice(i, 1); else if (st.sel.length < 3) { st.sel.push(d.v); const p = this.P().find((x) => x[0] === d.v); if (p[2] < 0) say(d.v === "burn" ? L("حرق؟! المادة العضوية تتحوّل دخانًا يا صديقي.", "Burning?! Your organic matter turns into smoke, my friend.") : L("دخل اليوم… وتربة أفقر غدًا.", "Income today… poorer soil tomorrow."), "angry", "bad"); else say(L(`${p[1]}: إيجابي، لكن ${p[3]}.`, `${p[1]}: positive, but ${p[3]}.`), "happy", "good"); } draw(); return; }
       if (a === "end") {
         const P = this.P(), sum = st.sel.reduce((x, k) => x + P.find((p) => p[0] === k)[2], 0);
@@ -1269,6 +1390,17 @@
     after() { const r = document.querySelector("[data-ec]"); if (r) r.addEventListener("change", () => { LV.st.ec = +r.value; draw(); }); },
     on(a, d) {
       const st = LV.st;
+      if (a === "tile") {
+        const i = +d.i, c = i % 3;
+        const crops = ["barley", "oat", "vetch", "wheat"];
+        const curIdx = crops.indexOf(st.plots[c] || "barley");
+        st.plots[c] = crops[(curIdx + 1) % crops.length];
+        snd("good");
+        const y = this.yieldAt(st.plots[c], st.ec);
+        say(L(`القطعة ${c + 1}: ${cname(st.plots[c])} (المردود المتوقع: ${pct(y)})`, `Plot ${c + 1}: ${cname(st.plots[c])} (expected yield: ${pct(y)})`), y > 0.6 ? "happy" : "worried", y > 0.6 ? "good" : "warn");
+        draw();
+        return;
+      }
       if (a === "plot") { st.plots[+d.i] = d.v; const th = E.SALT[CK[d.v]][0]; if (st.ec > th) say(L(`${cname(d.v)} يبدأ بالتضرّر فوق ${th} dS/m تقريبًا. انتبه!`, `${cname(d.v)} starts to suffer above about ${th} dS/m. Careful!`), "worried", "warn"); else say(L(`${cname(d.v)} يتحمّل هذه الملوحة.`, `${cname(d.v)} tolerates this salinity.`), "happy", "good"); draw(); return; }
       if (a === "mg") { const i = st.mg.indexOf(d.v); if (i >= 0) st.mg.splice(i, 1); else { st.mg.push(d.v); if (d.v === "more") risk({ level: "high", kind: "science", title: L("سقي أكثر بماء مالح", "More irrigation with salty water"), decision: L("زيادة السقي بنفس الماء", "Watering more with the same water"), why: L("كل سقية تضيف أملاحًا.", "Each watering adds salts."), cons: L("بدون صرف جيد تتراكم الأملاح في منطقة الجذور.", "Without good drainage salts build up in the root zone."), mitig: L("الغسيل يعمل فقط مع صرف جيد وماء أقل ملوحة.", "Leaching only works with good drainage and less salty water.") }); } draw(); return; }
       if (a === "end") {
@@ -1373,32 +1505,32 @@
   const NBAG = '<g class="grow"><rect x="-8" y="-18" width="16" height="18" rx="3" fill="#e8e8bc" stroke="#516d77"/><text x="0" y="-6" text-anchor="middle" font-size="9" font-weight="900" fill="#516d77">N</text></g>';
   const SCENE = {
     2: () => { const st = LV.st, k = st.plan[st.active] || st.plan[0];
-      return fieldBoard(k || null, 1, { env: "day", rows: 2, height: 175, flat: () => (k ? "" : FLAT.straw), badge: k ? `${L("الموسم", "Season")} ${st.plan[st.active] ? st.active + 1 : 1} · ${cname(k)}` : L("الحقل جاهز للبذر", "Field ready for sowing") }); },
+      return fieldBoard(k || null, 1, { env: "day", rows: 2, height: 165, act: "g", action: "tile", flat: () => (k ? "" : FLAT.straw), badge: k ? `${L("الموسم", "Season")} ${st.plan[st.active] ? st.active + 1 : 1} · ${cname(k)}` : L("المس الحقل للبذر", "Touch field to sow") }); },
     3: () => { const st = LV.st, y = LEVELS["3"].calc(st), w = Object.keys(st.alloc).length;
-      return fieldBoard(st.crop, Math.min(1, y * 1.35), { env: "drought", noIrrig: true, height: 210, badge: `${cname(st.crop)} · ${L("المردود", "yield")} ${pct(y)}`,
-        flat: (i, c) => (st.mulch ? FLAT.mulch : "") + (w ? (st.method === "drip" ? FLAT.drip : st.method === "flood" && c === 0 ? FLAT.flood : "") : ""),
-        deco: (i, c, r) => (w && st.method === "sprinkler" && (r + c) % 3 === 1 ? XTRA.sprinkler : "") }); },
+      return fieldBoard(st.crop, Math.min(1, y * 1.35), { env: "drought", noIrrig: true, height: 165, act: "g", action: "tile", badge: `${cname(st.crop)} · ${L("المردود", "yield")} ${pct(y)}`,
+        flat: (i, c) => (st.mulch ? FLAT.mulch : "") + (st.watered && st.watered[i] ? '<rect width="50" height="50" fill="#3a5a70" opacity=".45"/>' : "") + (w ? (st.method === "drip" ? FLAT.drip : st.method === "flood" && c === 0 ? FLAT.flood : "") : ""),
+        deco: (i, c, r) => (st.watered && st.watered[i] ? '<g class="splash"><circle cx="0" cy="-10" r="4" fill="#3a8ac9"/><circle cx="-8" cy="-6" r="2.5" fill="#58a6de"/><circle cx="8" cy="-6" r="2.5" fill="#58a6de"/></g>' : "") + (w && st.method === "sprinkler" && (r + c) % 3 === 1 ? XTRA.sprinkler : "") }); },
     4: () => { const st = LV.st, rec = LEVELS["4"].run(st);
-      return fieldBoard(st.crop, Math.min(1, rec.yieldIdx * 1.3), { env: "heat", height: 210, badge: `${L("ضرر الحر", "Heat damage")} ${pct(rec.heat)} · ${pct(rec.yieldIdx)}` }); },
+      return fieldBoard(st.crop, Math.min(1, rec.yieldIdx * 1.3), { env: st.mist ? "day" : "heat", height: 165, act: "g", action: "tile", badge: `${L("ضرر الحر", "Heat damage")} ${pct(rec.heat)} · ${pct(rec.yieldIdx)}` }); },
     6: () => { const st = LV.st;
       return board3d(4, 3, (i, c, r) => ({ fill: soilCol(), flat: (st.inp[r] === "manure" ? FLAT.manure : "") + (st.inp[r] === "drip" ? FLAT.drip : ""), deco: plantDeco(st.seq[r], 4) + (st.inp[r] === "n" && c === 0 ? NBAG : ""), label: `${L("الموسم", "Season")} ${r + 1}` }),
-        { env: "day", act: "noop", height: 220, extras: farmExtras(4, 3), badge: L("كل صف = موسم", "Each row = one season") }); },
+        { env: "day", act: "g", action: "tile", height: 165, extras: farmExtras(4, 3), badge: L("المس أي صف لتغيير التسميد", "Touch any row to change inputs") }); },
     7: () => { const st = LV.st, last = st.results[st.results.length - 1];
-      if (!last) return fieldBoard(st.pick.crop, 0.9, { env: "day", height: 190, badge: L("الطقس مخفي…", "Weather hidden…") });
+      if (!last) return fieldBoard(st.pick.crop, 0.9, { env: "day", height: 165, act: "g", action: "tile", badge: L("المس الحقل لبدء الموسم", "Touch field to start season") });
       const env = last.rec.heat > 0.1 ? "heat" : last.y < 0.45 ? "drought" : "day";
-      return fieldBoard(last.crop, Math.min(1, last.y * 1.3), { env, height: 190, badge: `${DATA.seasons[last.s]} · ${cname(last.crop)} · ${pct(last.y)}` }); },
+      return fieldBoard(last.crop, Math.min(1, last.y * 1.3), { env, height: 165, act: "g", action: "tile", badge: `${DATA.seasons[last.s]} · ${cname(last.crop)} · ${pct(last.y)}` }); },
     9: () => { const st = LV.st, sc = LEVELS["9"].ev(st).scores.erosion;
-      return fieldBoard(null, 1, { env: "storm", rain: sc < 50, height: 200, noIrrig: true, badge: `${L("الحماية", "Protection")} ${sc}/100`,
+      return fieldBoard(null, 1, { env: "storm", rain: sc < 50, height: 165, noIrrig: true, act: "g", action: "tile", badge: `${L("الحماية", "Protection")} ${sc}/100`,
         flat: (i) => (st.till ? FLAT_FURROW : "") + (st.residue === "kept" ? FLAT.straw : st.residue === "grazed" && i % 2 ? FLAT.straw : "") + (sc < 50 && i % 3 === 0 ? FLAT.runoff : ""),
         deco: (i) => (st.cover && st.plan.includes("fallow") && i % 2 === 0 ? plantDeco("vetch", 3) : st.residue === "kept" ? stubble() : "") }); },
     10: () => { const sel = LV.st.sel;
-      return fieldBoard(null, 1, { env: sel.includes("burn") ? "dead" : "soil", height: 190, noIrrig: true,
+      return fieldBoard(null, 1, { env: sel.includes("burn") ? "dead" : "soil", height: 165, noIrrig: true, act: "g", action: "tile",
         flat: (i) => (sel.includes("residue") ? FLAT.straw : "") + (sel.includes("manure") && i % 2 ? FLAT.manure : "") + (sel.includes("burn") ? '<rect width="50" height="50" fill="#3a2e26" opacity=".7"/>' : "") + (!sel.includes("notill") && !sel.includes("residue") ? FLAT_FURROW : ""),
         deco: (i) => (sel.includes("cover") && i % 2 === 0 ? plantDeco("vetch", 3, "grow") : sel.includes("legume") && i % 2 ? plantDeco("lentil", 3, "grow") : "") }); },
     11: () => { const st = LV.st;
       return board3d(3, 2, (i, c) => { const k = st.plots[c], y = k ? LEVELS["11"].yieldAt(k, st.ec) : 1;
         return { fill: mixC(soilCol(), "#d9d2bd", Math.min(1, st.ec / 10)), flat: st.ec >= 4 ? FLAT.salt : "", deco: k ? plantDeco(k, 4, "", Math.min(1, y * 1.3)) : "", label: `${L("القطعة", "Plot")} ${c + 1}` }; },
-        { env: "salt", act: "noop", height: 190, extras: farmExtras(3, 2), badge: `${st.ec} dS/m · ${L("افتراضي", "hypothetical")}` }); },
+        { env: "salt", act: "g", action: "tile", height: 165, extras: farmExtras(3, 2), badge: `${st.ec} dS/m · ${L("المس لتغيير المحصول", "Touch to switch crop")}` }); },
   };
   Object.keys(SCENE).forEach((id) => { const v = LEVELS[id].view; LEVELS[id].view = function () { return `<div class="in d2">${SCENE[id]()}</div>` + v.call(this); }; });
 
