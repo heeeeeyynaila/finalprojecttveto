@@ -554,7 +554,7 @@
   // ---------------------------------------------------------------- 3D farm board (CSS 3D, drag to rotate)
   const T3 = 50, YARD = 34;
   let FLAT_FURROW = "";
-  let RZ = -38, DRAG = null, DRAGGED = false;
+  let RZ = -38, DRAG = null, DRAGGED = false, AMB_ENV = "day";
   const setRZ = (v) => { RZ = v; document.documentElement.style.setProperty("--rz", RZ + "deg"); };
   setRZ(RZ);
   const mixC = (a, b, t) => { const h = (x) => [1, 3, 5].map((i) => parseInt(x.slice(i, i + 2), 16)); const A2 = h(a), B2 = h(b); return "#" + A2.map((v, i) => Math.round(v + (B2[i] - v) * t).toString(16).padStart(2, "0")).join(""); };
@@ -1598,19 +1598,21 @@
   };
   const progress = () => { const g = G(), ids = ORDER.filter((id) => g.levels[id] && g.levels[id].attempts.length); return { n: ids.length, stars: ids.reduce((a, id) => a + (g.levels[id].stars || 0), 0) }; };
   A.SCREENS.hub = () => {
-    const f = S().farm, l = loc(), pr = progress(), crop = lastCrop(), area = +f.area || 5, cols = area < 2 ? 3 : area < 15 ? 4 : 5;
+    const f = S().farm, l = loc() || {}, pr = progress(), crop = lastCrop(), area = +f.area || 5, cols = area < 2 ? 3 : area < 15 ? 4 : 5;
     const irr = { rain: L("مطري", "Rainfed"), drip: L("تنقيط", "Drip"), sprinkler: L("رش", "Sprinkler"), flood: L("غمر", "Flood") }[f.irrig] || "—";
-    const soilN = { sandy: L("رملية", "Sandy"), clay: L("طينية", "Clay"), loam: L("طميية", "Loam") }[f.soil] || (l.soil.texture);
+    const soilN = { sandy: L("رملية", "Sandy"), clay: L("طينية", "Clay"), loam: L("طميية", "Loam") }[f.soil] || (l.soil && l.soil.texture) || L("طميية", "Loam");
+    const slopeVal = l.slope != null ? l.slope : 3.5;
+    const rainMeanVal = (l.summary && l.summary.rain_mean) != null ? l.summary.rain_mean : 350;
     return `<div class="gscreen hub">
       <div class="ghead in">${A.backBtn("farm").replace('class="back"', 'class="iconbtn"')}
         <h1><small>${esc(A.placeName())}</small>${L(`مزرعة ${esc(pname())}`, `${esc(pname())}'s farm`)}</h1>
         <button class="iconbtn" data-act="editFarm" aria-label="${L("تعديل معلومات المزرعة", "Edit farm answers")}"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 17h4l9-9-4-4-9 9z M11 5l4 4" stroke="#516d77" stroke-width="1.8" fill="none" stroke-linejoin="round"/></svg></button>
         <button class="iconbtn" data-act="g" data-a="mute" aria-label="${G().mute ? L("تشغيل الصوت", "Unmute") : L("كتم الصوت", "Mute")}">${G().mute ? "🔇" : "🔊"}</button></div>
       <div class="in d1">${fieldBoard(crop, 1, { cols, rows: 3, env: "day", act: "hub3", height: 250, badge: `${area} ${L("هكتار", "ha")} · ${cname(crop)}` })}</div>
-      <div class="farmchips in d2"><span>${soilN}</span><span>${irr}</span><span>${L("ماء", "Water")}: ${{ low: L("قليل", "low"), medium: L("متوسط", "medium"), high: L("كافٍ", "good") }[f.water] || "—"}</span><span>${L("انحدار", "Slope")} ${l.slope}%</span></div>
+      <div class="farmchips in d2"><span>${soilN}</span><span>${irr}</span><span>${L("ماء", "Water")}: ${{ low: L("قليل", "low"), medium: L("متوسط", "medium"), high: L("كافٍ", "good") }[f.water] || "—"}</span><span>${L("انحدار", "Slope")} ${slopeVal}%</span></div>
       <div class="dock in d2"><div class="who" id="who">${salahM(80, "happy")}</div><div class="say tone-n" id="say"><div>${L(`أهلًا يا ${esc(pname())}! هذه مزرعتك. اسحبها لتدور، واضغط على الحقل لأخبرك عنه. من أين نبدأ؟`, `Welcome, ${esc(pname())}! This is your farm. Drag it to turn it, tap the field and I'll tell you about it. Where do we start?`)}</div></div></div>
       <div class="hubgrid">
-        <button class="hubc tilt c-nasa in d3" data-act="go" data-to="nasa"><span class="hico">${ICO.sat}</span><span class="htx"><small>1</small><b>${L("تقرير ناسا لموقعك", "Your NASA location report")}</b><span>${L(`30 موسمًا من المطر والحرارة والتربة · المتوسط ${l.summary.rain_mean} ملم`, `30 seasons of rain, heat and soil · ${l.summary.rain_mean} mm average`)}</span></span></button>
+        <button class="hubc tilt c-nasa in d3" data-act="go" data-to="nasa"><span class="hico">${ICO.sat}</span><span class="htx"><small>1</small><b>${L("تقرير ناسا لموقعك", "Your NASA location report")}</b><span>${L(`30 موسمًا من المطر والحرارة والتربة · المتوسط ${rainMeanVal} ملم`, `30 seasons of rain, heat and soil · ${rainMeanVal} mm average`)}</span></span></button>
         <button class="hubc tilt c-crop in d4" data-act="go" data-to="crops"><span class="hico">${ICO.sprout}</span><span class="htx"><small>2</small><b>${L("خصائص المحاصيل", "Crop characteristics")}</b><span>${L(`${CROPS.length} محاصيل · مدى ملاءمتها لمزرعتك`, `${CROPS.length} crops · how each one fits your farm`)}</span></span></button>
         <button class="hubc tilt c-game in d5" data-act="go" data-to="map"><span class="hico">${ICO.play}</span><span class="htx"><small>3</small><b>${pr.n ? L("أكمل مغامرة المزرعة", "Continue the farm adventure") : L("ابدأ اتخاذ القرارات: اللعبة", "Start making decisions: the game")}</b><span>${pr.n}/${ORDER.length} ${L("مستويات", "levels")} · ★ ${pr.stars}</span></span>
           <span class="hring"><svg viewBox="0 0 36 36" width="44" height="44" aria-hidden="true"><circle cx="18" cy="18" r="15" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="4"/><circle cx="18" cy="18" r="15" fill="none" stroke="#e8e8bc" stroke-width="4" stroke-dasharray="${(94 * pr.n / ORDER.length).toFixed(1)} 94" transform="rotate(-90 18 18)" stroke-linecap="round"/></svg></span></button>

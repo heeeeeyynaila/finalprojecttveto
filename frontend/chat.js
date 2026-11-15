@@ -230,7 +230,7 @@
     const scr = (S && S().screen) || "welcome";
     const show = FAB_ON.test(scr);
     if (!show) {
-      if (b) b.remove();
+      if (b) { if (b.remove) b.remove(); else if (b.parentNode) b.parentNode.removeChild(b); }
       return;
     }
     if (!b) {
