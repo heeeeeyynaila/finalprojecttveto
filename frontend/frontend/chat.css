@@ -46,3 +46,9 @@
 .chsend{flex:none;width:46px;border:0;border-radius:16px;color:#fff;font-size:18px;cursor:pointer;background:linear-gradient(180deg,#8fdc5a,#45a82c);box-shadow:inset 0 2px 0 rgba(255,255,255,.5),0 4px 0 #2f7d1c}
 [dir=rtl] .chsend{transform:scaleX(-1)}
 @media (prefers-reduced-motion:reduce){.chtalk,.chfab,.chmsg{animation:none}}
+/* language switch in the chat header: ع · دارجة · EN */
+.chlang{display:flex;gap:3px;background:rgba(255,255,255,.22);border-radius:12px;padding:3px;flex:none}
+.chlang button{border:0;background:transparent;color:#fff;font:inherit;font-size:12px;font-weight:800;padding:5px 8px;border-radius:9px;cursor:pointer}
+.chlang button.on{background:#fff;color:#516d77}
+.chhead small{white-space:normal}
+.chsrc ol{direction:ltr;text-align:left}
