@@ -188,17 +188,12 @@
       <g stroke="#e8e8bc" stroke-width="2" opacity=".5" stroke-linecap="round"><path d="M20 740 l60 -8 M100 760 l70 -9 M240 730 l70 -8 M260 770 l90 -10"/></g>
       <g class="hi" stroke="#840000" stroke-width="5" stroke-linecap="round" fill="none"><path d="M318 286 q16 10 18 30"/><path d="M334 268 q24 16 26 46"/></g>
     </svg>
-    <div class="pop d1" style="position:absolute;left:0;right:0;top:clamp(32px,6vh,52px);display:flex;justify-content:center;z-index:6">
-      <div style="display:inline-flex;align-items:center;gap:12px;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);padding:8px 26px 8px 14px;border-radius:999px;box-shadow:0 8px 24px rgba(43,58,63,.14);border:1.5px solid rgba(232,232,188,.9)">
-        <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#ff8a48,#e8552f);display:grid;place-items:center;box-shadow:0 3px 10px rgba(232,85,47,.35)">
-          <svg width="24" height="24" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-            <path d="M7 25 L21 11" stroke="#ffffff" stroke-width="3.8" stroke-linecap="round"/>
-            <path d="M6 26 L9 23" stroke="#ffd9c4" stroke-width="3.8" stroke-linecap="round"/>
-            <path d="M17 7 C22 5 26 8 27 13 C23.5 12 20 13 18 16 L16 14 C16.5 11 16.8 8.5 17 7 Z" fill="#ffffff"/>
-            <rect x="18" y="14" width="4" height="4" rx="1" transform="rotate(-45 18 14)" fill="#ffffff" opacity="0.9"/>
-          </svg>
+    <div class="pop d1" style="position:absolute;left:0;right:0;top:clamp(30px,5.5vh,48px);display:flex;justify-content:center;z-index:6">
+      <div style="display:inline-flex;align-items:center;gap:12px;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);padding:6px 26px 6px 10px;border-radius:999px;box-shadow:0 8px 24px rgba(43,58,63,.14);border:1.5px solid rgba(232,232,188,.95)">
+        <div style="width:46px;height:46px;border-radius:50%;overflow:hidden;box-shadow:0 3px 10px rgba(43,58,63,.18);display:grid;place-items:center;flex:none">
+          <svg viewBox="0 0 200 200" width="46" height="46" aria-hidden="true" style="display:block"><g transform="translate(0 0) scale(1.0)"><circle cx="100" cy="100" r="94" fill="#e8e8bc"/><circle cx="100" cy="100" r="94" fill="none" stroke="#7d8136" stroke-width="2" opacity=".5"/><path d="M122.57 37.98 A66 66 0 0 1 162.02 122.57" fill="none" stroke="#9ca047" stroke-width="17" stroke-linecap="round"/><path d="M154.19 140.55 L171.26 131.73 L149.33 121.96 Z" fill="#9ca047" stroke="#9ca047" stroke-width="3" stroke-linejoin="round"/><path d="M142.42 150.56 A66 66 0 0 1 49.44 142.42" fill="none" stroke="#840000" stroke-width="17" stroke-linecap="round"/><path d="M37.79 126.66 L36.90 145.85 L56.31 131.74 Z" fill="#840000" stroke="#840000" stroke-width="3" stroke-linejoin="round"/><path d="M35.00 111.46 A66 66 0 0 1 88.54 35.00" fill="none" stroke="#516d77" stroke-width="17" stroke-linecap="round"/><path d="M108.02 32.79 L91.85 22.43 L94.36 46.30 Z" fill="#516d77" stroke="#516d77" stroke-width="3" stroke-linejoin="round"/><path d="M78 136 Q100 128 122 136" fill="none" stroke="#1f2612" stroke-width="7" stroke-linecap="round"/><path d="M100 132 C100 118 100 104 101 90" fill="none" stroke="#1f2612" stroke-width="7" stroke-linecap="round"/><path d="M101 104 C86 106 72 96 70 80 C86 78 99 88 101 104 Z" fill="#7d8136"/><path d="M101 92 C104 74 120 64 136 66 C134 84 118 94 101 92 Z" fill="#9ca047"/><path d="M68.53 22.12 A84 84 0 0 1 117.46 17.84" fill="none" stroke="#1f2612" stroke-width="3.5" stroke-dasharray="1 8" stroke-linecap="round"/><g transform="translate(139.4 25.8) rotate(28) scale(.75)"><rect x="-6" y="-6" width="12" height="12" rx="3" fill="#1f2612"/><rect x="-21" y="-4" width="12" height="8" rx="2" fill="#516d77"/><rect x="9" y="-4" width="12" height="8" rx="2" fill="#516d77"/></g></g></svg>
         </div>
-        <span style="font-family:'Baloo Bhaijaan 2',system-ui,sans-serif;font-size:32px;font-weight:900;letter-spacing:-0.5px;color:#2b2a20;line-height:1">Tull</span>
+        <span style="font-family:'Baloo Bhaijaan 2',system-ui,sans-serif;font-size:34px;font-weight:900;letter-spacing:-0.5px;color:#2b2a20;line-height:1">Tull</span>
       </div>
     </div>
     <div style="position:absolute;left:50%;top:clamp(180px,29%,250px);transform:translateX(-50%);max-width:min(340px,88%);display:flex;justify-content:center"><div class="pop d1">${salah(340, "wave")}</div></div>
