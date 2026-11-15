@@ -219,17 +219,17 @@
   function head(def) {
     const nm = def.title();
     return `<div class="plug-head in">
-      <button class="iconbtn mini" data-act="g" data-a="leave" aria-label="${L("الخريطة", "Map")}"><svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M2 5l5-2 6 2 5-2v12l-5 2-6-2-5 2z M7 3v12 M13 5v12" stroke="#516d77" stroke-width="2" fill="none" stroke-linejoin="round"/></svg></button>
+      <button class="iconbtn mini" data-act="g" data-a="leave" aria-label="${L("الخريطة", "Map")}"><svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M2 5l5-2 6 2 5-2v12l-5 2-6-2-5 2z M7 3v12 M13 5v12" stroke="#2f9bd6" stroke-width="2" fill="none" stroke-linejoin="round"/></svg></button>
       <div class="plug-title">
         <b>${nm}</b>
         <span class="timer-pill" id="timer-pill">⏱ <span id="timer-txt">01:00</span></span>
       </div>
       <div class="plug-tools">
         <button type="button" class="nasapill" data-act="g" data-a="toggleNasa" title="${L("بيانات ناسا", "NASA Data")}">📊 ${L("رصد ناسا", "NASA")}</button>
-        <button class="iconbtn mini" data-act="g" data-a="hint" aria-label="${L("تلميح", "Hint")}" title="${L("تلميح", "Hint")}"><svg width="18" height="18" viewBox="0 0 22 22" aria-hidden="true"><path d="M5 9h11v4a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5z M16 10h2a2 2 0 0 1 0 4h-2 M8 3c0 2 2 2 2 4 M12 3c0 2 2 2 2 4" stroke="#840000" stroke-width="2" fill="none" stroke-linecap="round"/></svg></button>
+        <button class="iconbtn mini" data-act="g" data-a="hint" aria-label="${L("تلميح", "Hint")}" title="${L("تلميح", "Hint")}"><svg width="18" height="18" viewBox="0 0 22 22" aria-hidden="true"><path d="M5 9h11v4a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5z M16 10h2a2 2 0 0 1 0 4h-2 M8 3c0 2 2 2 2 4 M12 3c0 2 2 2 2 4" stroke="#e8552f" stroke-width="2" fill="none" stroke-linecap="round"/></svg></button>
         <button class="iconbtn mini" data-act="g" data-a="mute" aria-label="${G().mute ? L("تشغيل الموسيقى", "Unmute Music") : L("كتم الموسيقى", "Mute Music")}">${G().mute
-          ? '<svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 8h3l4-3v10l-4-3H3z M13 7l5 6 M18 7l-5 6" stroke="#516d77" stroke-width="2" fill="none" stroke-linejoin="round"/></svg>'
-          : '<svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 8h3l4-3v10l-4-3H3z M13 7a4 4 0 0 1 0 6 M15.5 5a7 7 0 0 1 0 10" stroke="#516d77" stroke-width="2" fill="none" stroke-linejoin="round"/></svg>'}</button>
+          ? '<svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 8h3l4-3v10l-4-3H3z M13 7l5 6 M18 7l-5 6" stroke="#2f9bd6" stroke-width="2" fill="none" stroke-linejoin="round"/></svg>'
+          : '<svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 8h3l4-3v10l-4-3H3z M13 7a4 4 0 0 1 0 6 M15.5 5a7 7 0 0 1 0 10" stroke="#2f9bd6" stroke-width="2" fill="none" stroke-linejoin="round"/></svg>'}</button>
       </div>
     </div>
     <div class="plug-salah in d1">
@@ -293,9 +293,9 @@
     LV.axeAt = now; LV.axeN++;
     const ov = document.createElement("div"); ov.className = "axe-ov";
     ov.innerHTML = `<div class="flash"></div>
-      <svg class="crack" viewBox="0 0 390 844" preserveAspectRatio="none" aria-hidden="true"><g stroke="#2b2a20" stroke-width="3" fill="none" stroke-linecap="round"><path d="M195 380 L120 300 L80 310 L20 240 M195 380 L260 290 L330 270 L380 200 M195 380 L170 470 L110 520 L60 640 M195 380 L250 460 L300 470 L360 600 M195 380 L215 330 L205 260 M195 380 L140 420 L40 430"/></g><g stroke="#fff" stroke-width="1.2" opacity=".8" fill="none"><path d="M197 382 L262 292 L332 272 M193 382 L118 302 L78 312"/></g></svg>
+      <svg class="crack" viewBox="0 0 390 844" preserveAspectRatio="none" aria-hidden="true"><g stroke="#3a2a18" stroke-width="3" fill="none" stroke-linecap="round"><path d="M195 380 L120 300 L80 310 L20 240 M195 380 L260 290 L330 270 L380 200 M195 380 L170 470 L110 520 L60 640 M195 380 L250 460 L300 470 L360 600 M195 380 L215 330 L205 260 M195 380 L140 420 L40 430"/></g><g stroke="#fff" stroke-width="1.2" opacity=".8" fill="none"><path d="M197 382 L262 292 L332 272 M193 382 L118 302 L78 312"/></g></svg>
       <div class="ang">${salahM(150, "angry")}</div>
-      <svg class="axe" viewBox="0 0 100 100" aria-hidden="true"><rect x="46" y="20" width="8" height="74" rx="4" fill="#9a6a3c"/><path d="M50 18 C70 10 86 18 88 34 C76 32 64 36 54 44 Z" fill="#b9c4c9" stroke="#516d77" stroke-width="2"/><path d="M50 18 C36 14 26 20 24 30 C34 30 44 34 50 40Z" fill="#9aa7ad"/></svg>`;
+      <svg class="axe" viewBox="0 0 100 100" aria-hidden="true"><rect x="46" y="20" width="8" height="74" rx="4" fill="#9a6a3c"/><path d="M50 18 C70 10 86 18 88 34 C76 32 64 36 54 44 Z" fill="#b9c4c9" stroke="#2f9bd6" stroke-width="2"/><path d="M50 18 C36 14 26 20 24 30 C34 30 44 34 50 40Z" fill="#9aa7ad"/></svg>`;
     document.body.appendChild(ov);
     app.classList.add("shake-all");
     snd("whoosh"); setTimeout(() => snd("crack"), 1200);
@@ -330,15 +330,15 @@
       </div>
       
       <div class="dock in d1" style="margin:8px 0;background:var(--paper);border-radius:18px;border:1.5px solid #d4dec4;padding:16px">
-        <div style="font-size:13px;font-weight:900;color:#516d77;margin-bottom:6px">🌾 ${L("تعليق عمّي صالح:", "Ammi Salah's comments:")}</div>
-        <div style="font-size:15px;line-height:1.65;color:#2b2a20;font-weight:600">
+        <div style="font-size:13px;font-weight:900;color:#2f9bd6;margin-bottom:6px">🌾 ${L("تعليق عمّي صالح:", "Ammi Salah's comments:")}</div>
+        <div style="font-size:15px;line-height:1.65;color:#3a2a18;font-weight:600">
           ${r.explain || L(`أحسنت يا ${pname()}! سجّلتُ قراراتك لهذا الموسم. خطوة جيدة إلى الأمام، وسنكتشف صمود المزرعة الشامل وتحليل المخاطر عند إكمال باقي التحديات.`, `Well done, ${pname()}! I recorded your decisions for this season. A solid step forward; your full farm resilience score and risk breakdown will be revealed once all challenges are completed.`)}
         </div>
       </div>
 
-      <div class="panel2 in d2" style="display:flex;align-items:center;gap:12px;background:#fbfbef;border:1.5px dashed #c9c99a;border-radius:16px;padding:12px 14px">
+      <div class="panel2 in d2" style="display:flex;align-items:center;gap:12px;background:#fffdf4;border:1.5px dashed #e6c27e;border-radius:16px;padding:12px 14px">
         <span style="font-size:24px">🛡️</span>
-        <div style="font-size:12px;line-height:1.5;color:#516d77;font-weight:700">
+        <div style="font-size:12px;line-height:1.5;color:#2f9bd6;font-weight:700">
           ${L("نقاط التقييم، تفاصيل المخاطر، والأدلة العلمية محجوبة الآن، وستظهر بالتفصيل في تقرير صمود المزرعة النهائي بعد إنهاء كل التحديات.", "Scores, risk breakdowns, and evidence are withheld now, and will be displayed in full in the final Farm Resilience Report upon finishing all challenges.")}
         </div>
       </div>
@@ -360,8 +360,8 @@
     if (!l) return "";
     return `<div class="riskov fade" id="nasaModal" style="display:${LV.showNasa ? "flex" : "none"}">
       <div class="sheet pop" style="max-height:85vh;overflow-y:auto;display:flex;flex-direction:column;gap:10px">
-        <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1.5px solid #dcdcb8;padding-bottom:8px">
-          <span style="font-weight:900;font-size:15px;color:#516d77">📊 ${L("تقرير رصد ناسا الحقيقي للموقع", "Real NASA Observation Report")}</span>
+        <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1.5px solid #f0dcb0;padding-bottom:8px">
+          <span style="font-weight:900;font-size:15px;color:#2f9bd6">📊 ${L("تقرير رصد ناسا الحقيقي للموقع", "Real NASA Observation Report")}</span>
           <button type="button" class="secondary" style="width:auto;min-height:32px;padding:3px 10px;font-size:12px" data-act="g" data-a="toggleNasa">❌ ${L("إخفاء", "Hide")}</button>
         </div>
         <div style="font-size:12px;color:var(--mute)">📍 ${esc(A.placeName())} (${l.lat ? l.lat.toFixed(2) : ""}°, ${l.lon ? l.lon.toFixed(2) : ""}°) · ⛰️ ${Math.round(l.elev || 450)}m (${L("الارتفاع", "elevation")})</div>
@@ -502,8 +502,8 @@
   const setRZ = (v) => { RZ = v; document.documentElement.style.setProperty("--rz", RZ + "deg"); };
   setRZ(RZ);
   const mixC = (a, b, t) => { const h = (x) => [1, 3, 5].map((i) => parseInt(x.slice(i, i + 2), 16)); const A2 = h(a), B2 = h(b); return "#" + A2.map((v, i) => Math.round(v + (B2[i] - v) * t).toString(16).padStart(2, "0")).join(""); };
-  const soilCol = () => ({ sandy: "#c9a46a", clay: "#8a5a3a", loam: "#9a6a43" }[S().farm.soil] || "#9a6a43");
-  const SKY = { day: ["#bcd3da", "#eef0d6"], harvest: ["#f1d79a", "#f6efd2"], drought: ["#f3dcae", "#f8f1dc"], heat: ["#f2a65a", "#f8dcb0"], storm: ["#7f8f96", "#c4ccc9"], dead: ["#b8a58a", "#e2d8c2"], soil: ["#cdbfa0", "#efe8d2"], salt: ["#d9e2e4", "#f4f4ea"] };
+  const soilCol = () => ({ sandy: "#e8b878", clay: "#a65f34", loam: "#b8743f" }[S().farm.soil] || "#b8743f");
+  const SKY = { day: ["#45b8f0", "#dff5ff"], harvest: ["#56bff2", "#fff0c8"], drought: ["#ffcf7a", "#fff1d6"], heat: ["#ff9a4d", "#ffe0b0"], storm: ["#7f9aab", "#cfdde6"], dead: ["#c9a97a", "#f1e3c8"], soil: ["#8fd0f0", "#f6ecd2"], salt: ["#9fdcf5", "#f4fbff"] };
   function board3d(cols, rows, tile, o = {}) {
     let tiles = "";
     for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
@@ -514,7 +514,7 @@
     }
     const W = cols * T3, H = rows * T3, sky = SKY[o.env || "day"];
     let slabs = "";
-    for (let k = 7; k >= 0; k--) slabs += `<div class="slab" style="left:${-YARD}px;top:${-YARD}px;width:${W + 2 * YARD}px;height:${H + 2 * YARD}px;transform:translateZ(${-k * 3 - 1}px);background:${k === 0 ? (o.yard || "#9ca047") : k < 2 ? "#7d8136" : k < 4 ? "#7a5434" : "#5a3d27"}"></div>`;
+    for (let k = 7; k >= 0; k--) slabs += `<div class="slab" style="left:${-YARD}px;top:${-YARD}px;width:${W + 2 * YARD}px;height:${H + 2 * YARD}px;transform:translateZ(${-k * 3 - 1}px);background:${k === 0 ? (o.yard || "#6cc04a") : k < 2 ? "#4a9e2f" : k < 4 ? "#9a5b2e" : "#6e4527"}"></div>`;
     const xtra = (o.extras || []).map((x) => `<div class="up xtra" style="left:${x.x}px;top:${x.y}px"><svg viewBox="-26 -36 52 40" width="${(x.w || 64) * 1.3}" height="${(x.w || 64) * 1.3 * 40 / 52}" style="margin-inline-start:${-(x.w || 64) * 0.15}px" aria-hidden="true">${x.svg}</svg></div>`).join("");
     const clouds = ["storm", "day", "soil", "dead", "salt"].includes(o.env) ? [0, 1, 2].map((k) => `<span class="cloud3" style="top:${12 + k * 22}px;animation-duration:${26 + k * 9}s;animation-delay:${-k * 8}s;${o.env === "storm" ? "background:#5f6d72;opacity:.85" : ""}"></span>`).join("") : "";
     const sun = ["day", "harvest", "drought", "heat", "salt"].includes(o.env || "day") ? `<span class="sun3 ${o.env === "heat" || o.env === "drought" ? "hot" : ""}"></span>` : "";
@@ -546,38 +546,38 @@
   A.ACT.rot3 = (d) => { snd("whoosh"); setRZ(RZ + Number(d.d)); };
 
   // plants: health 1 = green & upright, 0 = brown & drooping
-  FLAT_FURROW = '<path d="M0 8h50M0 19h50M0 30h50M0 41h50" stroke="#5a3d27" stroke-width="2.4" opacity=".55"/>';
+  FLAT_FURROW = '<path d="M0 8h50M0 19h50M0 30h50M0 41h50" stroke="#6e4527" stroke-width="2.4" opacity=".55"/>';
   const plantDeco = (crop, n = 5, cls = "", hl = 1) => {
-    const cer = ["wheat", "barley", "oat"].includes(crop), base = { wheat: "#e0b44a", barley: "#d8c46a", oat: "#c8cc6a", lentil: "#9ca047", chickpea: "#b5b862", faba: "#9ca047", vetch: "#8a4fbf" }[crop] || "#9ca047";
-    const h = Math.max(0, Math.min(1, hl)), dead = 1 - h, col = mixC(base, "#a99060", dead * 0.9), leaf = mixC("#7d8136", "#8a7a4a", dead), stem = mixC("#a8903a", "#8a7a4a", dead);
+    const cer = ["wheat", "barley", "oat"].includes(crop), base = { wheat: "#ffc83a", barley: "#f5d76e", oat: "#b5ea86", lentil: "#6cc04a", chickpea: "#9be070", faba: "#6cc04a", vetch: "#8a4fbf" }[crop] || "#6cc04a";
+    const h = Math.max(0, Math.min(1, hl)), dead = 1 - h, col = mixC(base, "#c9a66a", dead * 0.9), leaf = mixC("#4a9e2f", "#a8915a", dead), stem = mixC("#d9a93a", "#a8915a", dead);
     let s = "";
     for (let k = 0; k < n; k++) {
       const dx = (k - (n - 1) / 2) * 8, dy = (k % 2) * 4 - 2, lean = h < 0.55 ? (k % 2 ? 1 : -1) * dead * 55 : 0;
       s += `<g class="${cls}" style="animation-delay:${k * 0.05}s"><g transform="rotate(${lean.toFixed(0)} ${dx} ${dy})"><g class="sway" style="animation-delay:${k * 0.1}s">` + (cer
         ? `<path d="M${dx} ${dy} v-16" stroke="${stem}" stroke-width="1.6"/><path d="M${dx} ${dy - 6} q-5 -2 -7 -7 M${dx} ${dy - 9} q5 -2 6 -7" stroke="${leaf}" stroke-width="1.3" fill="none"/><ellipse cx="${dx}" cy="${dy - 18}" rx="2.2" ry="5.2" fill="${col}"/>`
-        : `<path d="M${dx} ${dy} v-8" stroke="${leaf}" stroke-width="1.5"/><circle cx="${dx - 3}" cy="${dy - 7}" r="4" fill="${leaf}"/><circle cx="${dx + 3}" cy="${dy - 9}" r="4.2" fill="${mixC(base, "#a99060", dead)}"/><circle cx="${dx}" cy="${dy - 13}" r="3.4" fill="${mixC("#b5b862", "#a99060", dead)}"/>`) + `</g></g></g>`;
+        : `<path d="M${dx} ${dy} v-8" stroke="${leaf}" stroke-width="1.5"/><circle cx="${dx - 3}" cy="${dy - 7}" r="4" fill="${leaf}"/><circle cx="${dx + 3}" cy="${dy - 9}" r="4.2" fill="${mixC(base, "#c9a66a", dead)}"/><circle cx="${dx}" cy="${dy - 13}" r="3.4" fill="${mixC("#9be070", "#c9a66a", dead)}"/>`) + `</g></g></g>`;
     }
     return s;
   };
-  const stubble = () => `<path d="M-14 0 v-4 M-7 3 v-4 M0 -2 v-4 M7 2 v-4 M14 -1 v-4" stroke="#d6b45c" stroke-width="1.6"/>`;
+  const stubble = () => `<path d="M-14 0 v-4 M-7 3 v-4 M0 -2 v-4 M7 2 v-4 M14 -1 v-4" stroke="#f2c94c" stroke-width="1.6"/>`;
   const FLAT = {
-    straw: '<path d="M4 12 l14 -4 M10 26 l16 -5 M24 14 l14 -3 M30 34 l15 -4 M6 40 l13 -3 M20 44 l14 -4" stroke="#e0c27a" stroke-width="3" stroke-linecap="round"/>',
-    cracks: '<path d="M6 10 l10 8 l-3 9 l9 6 M30 6 l-4 12 l10 6 l-2 10 M22 40 l8 -6 l10 6" stroke="#6b4a30" stroke-width="1.2" fill="none" opacity=".7"/>',
-    salt: '<g fill="#fbfbef" opacity=".85"><circle cx="9" cy="12" r="3"/><circle cx="30" cy="9" r="2"/><circle cx="40" cy="30" r="3.5"/><circle cx="18" cy="36" r="2.5"/><circle cx="27" cy="24" r="1.8"/></g>',
-    drip: '<path d="M0 16h50M0 34h50" stroke="#2f5884" stroke-width="1.6" stroke-dasharray="4 3"/>',
-    flood: '<rect x="0" y="0" width="50" height="7" fill="#4f86b8" opacity=".75"/>',
-    dots: '<g fill="#f1e7c7" opacity=".85"><circle cx="12" cy="14" r="2"/><circle cx="36" cy="18" r="2"/><circle cx="20" cy="34" r="2"/><circle cx="40" cy="40" r="2"/></g>',
+    straw: '<path d="M4 12 l14 -4 M10 26 l16 -5 M24 14 l14 -3 M30 34 l15 -4 M6 40 l13 -3 M20 44 l14 -4" stroke="#f5cf6a" stroke-width="3" stroke-linecap="round"/>',
+    cracks: '<path d="M6 10 l10 8 l-3 9 l9 6 M30 6 l-4 12 l10 6 l-2 10 M22 40 l8 -6 l10 6" stroke="#8a5a33" stroke-width="1.2" fill="none" opacity=".7"/>',
+    salt: '<g fill="#fffdf4" opacity=".85"><circle cx="9" cy="12" r="3"/><circle cx="30" cy="9" r="2"/><circle cx="40" cy="30" r="3.5"/><circle cx="18" cy="36" r="2.5"/><circle cx="27" cy="24" r="1.8"/></g>',
+    drip: '<path d="M0 16h50M0 34h50" stroke="#2b8fe0" stroke-width="1.6" stroke-dasharray="4 3"/>',
+    flood: '<rect x="0" y="0" width="50" height="7" fill="#4fb2f0" opacity=".75"/>',
+    dots: '<g fill="#fff3d6" opacity=".85"><circle cx="12" cy="14" r="2"/><circle cx="36" cy="18" r="2"/><circle cx="20" cy="34" r="2"/><circle cx="40" cy="40" r="2"/></g>',
     runoff: '<path class="runoff" d="M8 6 C16 18 30 22 44 44" stroke="#6b3f1f" stroke-width="3" fill="none" stroke-linecap="round"/>',
-    mulch: '<path d="M2 10 q8 -4 16 0 t16 0 t16 0 M2 24 q8 -4 16 0 t16 0 t16 0 M2 38 q8 -4 16 0 t16 0 t16 0" stroke="#e0c27a" stroke-width="5" fill="none"/>',
+    mulch: '<path d="M2 10 q8 -4 16 0 t16 0 t16 0 M2 24 q8 -4 16 0 t16 0 t16 0 M2 38 q8 -4 16 0 t16 0 t16 0" stroke="#f5cf6a" stroke-width="5" fill="none"/>',
     contour: '<path d="M0 25 h50" stroke="#5f7d36" stroke-width="6" stroke-dasharray="3 5" stroke-linecap="round"/>',
     manure: '<g fill="#4a3220"><ellipse cx="14" cy="16" rx="6" ry="3"/><ellipse cx="34" cy="30" rx="7" ry="3.4"/><ellipse cx="18" cy="38" rx="5" ry="2.6"/></g>',
   };
   const XTRA = {
-    house: '<path d="M-20 4 v-20 h28 v20 z" fill="#e8e8bc" stroke="#c9c99a"/><path d="M-24 -15 L-6 -32 L12 -15 z" fill="#840000"/><rect x="-11" y="-6" width="8" height="10" fill="#516d77"/><rect x="0" y="-12" width="6" height="6" fill="#9cc3d2"/>',
-    tank: '<rect x="-9" y="-30" width="18" height="30" rx="3" fill="#516d77"/><ellipse cx="0" cy="-30" rx="9" ry="3" fill="#6f8b95"/><path d="M-9 -18 h18" stroke="#3f565e"/><path d="M9 -6 h10" stroke="#516d77" stroke-width="3"/>',
-    tree: '<rect x="-2" y="-12" width="4" height="14" fill="#7a5434"/><circle cx="0" cy="-20" r="11" fill="#7d8136"/><circle cx="-6" cy="-14" r="7" fill="#9ca047"/><circle cx="6" cy="-15" r="7" fill="#8a9140"/>',
-    sprinkler: '<path d="M0 4 v-12" stroke="#516d77" stroke-width="2"/><g class="spray"><path d="M0 -9 q-10 -8 -18 0 M0 -9 q10 -8 18 0" stroke="#4f86b8" stroke-width="1.4" fill="none" stroke-dasharray="2 2"/></g>',
-    sheep: '<ellipse cx="0" cy="-7" rx="9" ry="6" fill="#fbfbef" stroke="#c9c99a"/><circle cx="9" cy="-10" r="3.5" fill="#3f3a30"/><path d="M-5 -2 v5 M4 -2 v5" stroke="#3f3a30" stroke-width="1.6"/>',
+    house: '<path d="M-20 4 v-20 h28 v20 z" fill="#ffe9a8" stroke="#e6c27e"/><path d="M-24 -15 L-6 -32 L12 -15 z" fill="#e8552f"/><rect x="-11" y="-6" width="8" height="10" fill="#2f9bd6"/><rect x="0" y="-12" width="6" height="6" fill="#a6e1ff"/>',
+    tank: '<rect x="-9" y="-30" width="18" height="30" rx="3" fill="#2f9bd6"/><ellipse cx="0" cy="-30" rx="9" ry="3" fill="#6f8b95"/><path d="M-9 -18 h18" stroke="#1f78ab"/><path d="M9 -6 h10" stroke="#2f9bd6" stroke-width="3"/>',
+    tree: '<rect x="-2" y="-12" width="4" height="14" fill="#9a5b2e"/><circle cx="0" cy="-20" r="11" fill="#4a9e2f"/><circle cx="-6" cy="-14" r="7" fill="#6cc04a"/><circle cx="6" cy="-15" r="7" fill="#58ad38"/>',
+    sprinkler: '<path d="M0 4 v-12" stroke="#2f9bd6" stroke-width="2"/><g class="spray"><path d="M0 -9 q-10 -8 -18 0 M0 -9 q10 -8 18 0" stroke="#4fb2f0" stroke-width="1.4" fill="none" stroke-dasharray="2 2"/></g>',
+    sheep: '<ellipse cx="0" cy="-7" rx="9" ry="6" fill="#fffdf4" stroke="#e6c27e"/><circle cx="9" cy="-10" r="3.5" fill="#3f3a30"/><path d="M-5 -2 v5 M4 -2 v5" stroke="#3f3a30" stroke-width="1.6"/>',
   };
   // the player's own farm: soil colour, irrigation, house, tank, trees from onboarding answers
   function farmExtras(cols, rows) {
@@ -598,11 +598,11 @@
   }
   A.ACT.noop = () => { };
   const cropArt = (k, w = 120) => {
-    const cer = ["wheat", "barley", "oat"].includes(k), col = { wheat: "#e0b44a", barley: "#d8c46a", oat: "#c8cc6a", lentil: "#9ca047", chickpea: "#e8e8bc", faba: "#fbfbef", vetch: "#8a4fbf" }[k];
-    let s = `<svg width="${w}" height="60" viewBox="0 0 120 60" aria-hidden="true"><path d="M0 52 C40 46 80 50 120 46 L120 60 L0 60Z" fill="#9ca047"/>`;
+    const cer = ["wheat", "barley", "oat"].includes(k), col = { wheat: "#ffc83a", barley: "#f5d76e", oat: "#b5ea86", lentil: "#6cc04a", chickpea: "#ffe9a8", faba: "#fffdf4", vetch: "#8a4fbf" }[k];
+    let s = `<svg width="${w}" height="60" viewBox="0 0 120 60" aria-hidden="true"><path d="M0 52 C40 46 80 50 120 46 L120 60 L0 60Z" fill="#6cc04a"/>`;
     for (let i = 0; i < 6; i++) { const x = 15 + i * 18;
-      s += cer ? `<g class="sway" style="animation-delay:${i * 0.15}s;transform-box:fill-box;transform-origin:50% 100%"><path d="M${x} 52 V24 M${x - 4} 52 V30" stroke="#a8903a" stroke-width="2"/><ellipse cx="${x}" cy="20" rx="3" ry="7" fill="${col}"/><ellipse cx="${x - 4}" cy="27" rx="2.4" ry="6" fill="${col}"/></g>`
-        : `<g class="sway" style="animation-delay:${i * 0.15}s;transform-box:fill-box;transform-origin:50% 100%"><path d="M${x} 52 V36" stroke="#7d8136" stroke-width="2"/><circle cx="${x - 5}" cy="40" r="6" fill="#7d8136"/><circle cx="${x + 5}" cy="38" r="6.5" fill="#9ca047"/><circle cx="${x}" cy="31" r="6" fill="#b5b862"/><circle cx="${x + 2}" cy="32" r="2.2" fill="${col}"/></g>`; }
+      s += cer ? `<g class="sway" style="animation-delay:${i * 0.15}s;transform-box:fill-box;transform-origin:50% 100%"><path d="M${x} 52 V24 M${x - 4} 52 V30" stroke="#d9a93a" stroke-width="2"/><ellipse cx="${x}" cy="20" rx="3" ry="7" fill="${col}"/><ellipse cx="${x - 4}" cy="27" rx="2.4" ry="6" fill="${col}"/></g>`
+        : `<g class="sway" style="animation-delay:${i * 0.15}s;transform-box:fill-box;transform-origin:50% 100%"><path d="M${x} 52 V36" stroke="#4a9e2f" stroke-width="2"/><circle cx="${x - 5}" cy="40" r="6" fill="#4a9e2f"/><circle cx="${x + 5}" cy="38" r="6.5" fill="#6cc04a"/><circle cx="${x}" cy="31" r="6" fill="#9be070"/><circle cx="${x + 2}" cy="32" r="2.2" fill="${col}"/></g>`; }
     return s + "</svg>";
   };
 
@@ -620,10 +620,10 @@
       const st = LV.st, big = S().farm.area >= 5, n = 16;
       st.left = n - st.done.size;
       const tools = [["sickle", L("منجل", "Sickle"), L("قطع صغيرة", "small plots")], ["combine", L("حصادة", "Combine"), L("حقول كبيرة", "big fields")], ["plough", L("محراث", "Plough"), L("للحرث", "tillage")], ["can", L("مرشّة", "Watering can"), L("للسقي", "watering")]];
-      const icon = { sickle: '<path d="M6 22 L14 14 M14 14 C14 6 22 4 26 8 C20 8 16 12 16 16" stroke="#3f565e" stroke-width="2.4" fill="none" stroke-linecap="round"/>', combine: '<rect x="4" y="12" width="18" height="9" rx="2" fill="#840000"/><rect x="14" y="6" width="8" height="7" rx="1" fill="#a51a1a"/><circle cx="8" cy="22" r="3" fill="#2c3f45"/><circle cx="19" cy="22" r="3" fill="#2c3f45"/><path d="M2 14h-0 M2 12v8" stroke="#d6b45c" stroke-width="3"/>', plough: '<path d="M4 8 L20 8 L24 20 L10 20 Z" fill="#9aa7ad"/><path d="M4 8 L2 4" stroke="#5a4535" stroke-width="2"/>', can: '<rect x="6" y="10" width="13" height="11" rx="2" fill="#516d77"/><path d="M19 13 L26 8" stroke="#516d77" stroke-width="2.4"/><path d="M8 10 q4 -6 9 0" stroke="#516d77" stroke-width="2" fill="none"/>' };
+      const icon = { sickle: '<path d="M6 22 L14 14 M14 14 C14 6 22 4 26 8 C20 8 16 12 16 16" stroke="#1f78ab" stroke-width="2.4" fill="none" stroke-linecap="round"/>', combine: '<rect x="4" y="12" width="18" height="9" rx="2" fill="#e8552f"/><rect x="14" y="6" width="8" height="7" rx="1" fill="#ff7a45"/><circle cx="8" cy="22" r="3" fill="#24506a"/><circle cx="19" cy="22" r="3" fill="#24506a"/><path d="M2 14h-0 M2 12v8" stroke="#f2c94c" stroke-width="3"/>', plough: '<path d="M4 8 L20 8 L24 20 L10 20 Z" fill="#9aa7ad"/><path d="M4 8 L2 4" stroke="#7a5236" stroke-width="2"/>', can: '<rect x="6" y="10" width="13" height="11" rx="2" fill="#2f9bd6"/><path d="M19 13 L26 8" stroke="#2f9bd6" stroke-width="2.4"/><path d="M8 10 q4 -6 9 0" stroke="#2f9bd6" stroke-width="2" fill="none"/>' };
       const field = board3d(4, 4, (i, c, r) => {
         const h = st.done.has(i), strawF = h && st.straw ? ({ keep: FLAT.straw, graze: FLAT.straw, burn: '<rect width="50" height="50" fill="#3a2e26" opacity=".75"/>', bale: "" }[st.straw] || "") : "";
-        return { fill: h ? "#c9a46a" : "#b78a55", h: h ? 0 : 2, flat: strawF + irrigFlat(c, r), deco: (h ? (st.just === i ? `<g>${stubble()}${[-10, -2, 6, 12].map((dx, k) => `<circle class="chaff" style="--dx:${dx}px;animation-delay:${k * 0.05}s" cx="${dx / 2}" cy="-8" r="1.8" fill="#e0b44a"/>`).join("")}</g>` : stubble()) : plantDeco(st.crop, 5)) + (h && st.straw === "graze" && i % 5 === 0 ? XTRA.sheep : "") + irrigDeco(c, r), label: h ? L("محصود", "harvested") : L("جاهز للحصاد", "ready to harvest") };
+        return { fill: h ? "#e8b878" : "#cf8f52", h: h ? 0 : 2, flat: strawF + irrigFlat(c, r), deco: (h ? (st.just === i ? `<g>${stubble()}${[-10, -2, 6, 12].map((dx, k) => `<circle class="chaff" style="--dx:${dx}px;animation-delay:${k * 0.05}s" cx="${dx / 2}" cy="-8" r="1.8" fill="#ffc83a"/>`).join("")}</g>` : stubble()) : plantDeco(st.crop, 5)) + (h && st.straw === "graze" && i % 5 === 0 ? XTRA.sheep : "") + irrigDeco(c, r), label: h ? L("محصود", "harvested") : L("جاهز للحصاد", "ready to harvest") };
       }, { env: "harvest", extras: farmExtras(4, 4), label: L("حقلك", "Your field"), badge: `${S().farm.area} ${L("هكتار", "ha")} · ${cname(st.crop)}` });
       return `<div class="in d2">${field}</div>
         <div class="in d3"><div class="pbar"><i style="width:${Math.round(st.done.size / n * 100)}%"></i></div>
@@ -705,7 +705,7 @@
       const fact = (t, v, na) => `<div class="fact ${na ? "na" : ""}">${t}<b>${v}</b></div>`;
       const why = { water: L("قد يحتاج ماءً أكثر مما يوفّره مطرك وتربتك عادة.", "It may need more water than your rain and soil usually provide."), heat: L("إزهاره يقع غالبًا في أيام حارة في موقعك.", "Its flowering often meets hot days at your location."), rotation: L(`من نفس عائلة ${cname(prev)}: خطر تراكم الأمراض.`, `Same family as ${cname(prev).toLowerCase()}: disease build-up risk.`), broomrape: L("بقولي بعد بقولي: خطر الهالوك (Orobanche).", "Legume after legume: broomrape (Orobanche) risk."), salt: L("حساس للملوحة.", "Sensitive to salinity."), system: L("النتائج مصمّمة للحقل المفتوح فقط.", "Results are designed for open fields only.") };
       return `<div class="riskcard sheet" role="dialog">
-        <div style="display:flex;gap:10px;align-items:center"><div style="width:120px;border-radius:14px;overflow:hidden;background:linear-gradient(#dfe7e9,#eef0d6)">${cropArt(k)}</div><div style="flex:1"><div style="font-size:20px;font-weight:900">${cname(k)}</div></div></div>
+        <div style="display:flex;gap:10px;align-items:center"><div style="width:120px;border-radius:14px;overflow:hidden;background:linear-gradient(#cdeeff,#eaf7dc)">${cropArt(k)}</div><div style="flex:1"><div style="font-size:20px;font-weight:900">${cname(k)}</div></div></div>
         <div class="facts">
           ${fact(L("العائلة", "Family"), fam)}
           ${fact(L("موسم النمو", "Growing season"), `${mName(c.sow)} → ${mName(harvestM)}`)}
@@ -720,7 +720,7 @@
           ${fact(L("متطلبات الحرارة والـ pH والعناصر", "Temperature, pH & nutrient needs"), L("غير متوفرة في قاعدة بياناتنا بعد", "Not in our database yet"), true)}
           ${fact(L("ملاحظة الدورة", "Rotation note"), c.host >= 1 ? L("عائل للهالوك", "Broomrape host") : c.family === "cereal" ? L("لا تكرّره بعد حبوب", "Don't repeat after a cereal") : L("يكسر دورة أمراض الحبوب", "Breaks cereal disease cycles"))}
         </div>
-        ${su.flags.length ? `<div class="panel2" style="background:#fff8ee"><b>${L("نقاط الانتباه", "Watch-outs")}</b><ul style="margin:4px 0 0;padding-inline-start:18px;font-size:13px;line-height:1.6">${su.flags.map((f) => `<li>${why[f]}</li>`).join("")}</ul></div>` : ""}
+        ${su.flags.length ? `<div class="panel2" style="background:#fff6e6"><b>${L("نقاط الانتباه", "Watch-outs")}</b><ul style="margin:4px 0 0;padding-inline-start:18px;font-size:13px;line-height:1.6">${su.flags.map((f) => `<li>${why[f]}</li>`).join("")}</ul></div>` : ""}
         <div class="note">${L("المصادر: معاملات المحاصيل FAO-56، استجابة المردود للماء FAO-33/66، بيانات ناسا POWER 1995–2025 لموقعك. القيم تقديرية للموقع وليست قياسًا لحقلك.", "Sources: FAO-56 crop coefficients, FAO-33/66 yield response to water, NASA POWER 1995–2025 at your location. Location estimates, not field measurements.")}</div>
         <div style="display:flex;gap:8px"><button class="secondary" data-r="close" style="flex:1">${L("إغلاق", "Close")}</button>${pick ? `<button class="primary" data-r="pick" style="flex:1">${L("ضعه في الموسم", "Put in season")} ${LV.st.active + 1}</button>` : ""}</div></div>`;
     },
@@ -826,18 +826,18 @@
       const y = this.calc(st), y0 = this.calc({ ...st, alloc: {}, mulch: false });
       const bars = months.map(({ mo, m }) => { const add = (st.alloc[m] || 0) * 30 * eff, got = Math.min(mo.demand, mo.aet + add);
         return `<button class="mbar ${m === rec.flowerMonth ? "flower" : ""}" data-act="g" data-a="tok" data-m="${m}" aria-label="${mName(m)}"><span class="tok">${st.alloc[m] ? "+" + st.alloc[m] : ""}</span>
-          <span class="stack" style="height:${Math.round(mo.demand / maxD * 110)}px"><i style="height:${Math.round(Math.min(mo.aet, mo.demand) / mo.demand * 100)}%;background:#9ca047"></i><i style="height:${Math.round((got - Math.min(mo.aet, mo.demand)) / mo.demand * 100)}%;background:#2f5884"></i></span>
+          <span class="stack" style="height:${Math.round(mo.demand / maxD * 110)}px"><i style="height:${Math.round(Math.min(mo.aet, mo.demand) / mo.demand * 100)}%;background:#6cc04a"></i><i style="height:${Math.round((got - Math.min(mo.aet, mo.demand)) / mo.demand * 100)}%;background:#2b8fe0"></i></span>
           <span>${mName(m).slice(0, S().lang === "en" ? 3 : 4)}</span></button>`; }).join("");
       return `<div class="panel2 in d2"><div style="display:flex;justify-content:space-between;align-items:center"><b>${cname(st.crop)} · ${DATA.seasons[st.s]}</b><span class="obs">${L("موسم حقيقي من ناسا", "Real NASA season")}</span></div>
           <div class="mbars">${bars}</div>
-          <div class="legend2"><span><i style="background:#9ca047"></i>${L("ماء من المطر والتربة", "Water from rain & soil")}</span><span><i style="background:#2f5884"></i>${L("سقيك", "Your watering")}</span><span><i style="background:#efe9d8"></i>${L("عجز", "Deficit")}</span><span style="color:#840000">● ${L("شهر الإزهار", "flowering month")}</span></div>
+          <div class="legend2"><span><i style="background:#6cc04a"></i>${L("ماء من المطر والتربة", "Water from rain & soil")}</span><span><i style="background:#2b8fe0"></i>${L("سقيك", "Your watering")}</span><span><i style="background:#fbeccc"></i>${L("عجز", "Deficit")}</span><span style="color:#e8552f">● ${L("شهر الإزهار", "flowering month")}</span></div>
           <div class="note">${L("اضغط على شهر لإضافة حصة ماء، واضغط مطوّلًا مرة ثانية بعد امتلاء الحصص لإزالتها.", "Tap a month to add a water share; tap again when all shares are used to remove one.")} <span class="hyp">${L("الحصص افتراضية", "Water budget is hypothetical")}</span></div></div>
         <div class="panel2 in d3" style="display:flex;flex-direction:column;gap:8px">
           <div style="display:flex;justify-content:space-between"><b>${L("حصص الماء", "Water shares")}: ${st.tokens - used}/${st.tokens}</b><button class="chip" data-act="g" data-a="clear" style="min-height:36px;padding:4px 12px">${L("مسح", "Clear")}</button></div>
           <div class="chiprow">${[["drip", L("تنقيط 90%", "Drip 90%")], ["sprinkler", L("رش 75%", "Sprinkler 75%")], ["flood", L("غمر 60%", "Flood 60%")]].map((o) => `<button class="chip ${st.method === o[0] ? "on" : ""}" data-act="g" data-a="method" data-v="${o[0]}">${o[1]}</button>`).join("")}</div>
           <button class="chip ${st.mulch ? "on" : ""}" data-act="g" data-a="mulch" style="align-self:flex-start">${st.mulch ? '<span class="ck"></span>' : ""}${L("غطاء تبن (Mulch) يقلّل التبخّر", "Straw mulch reduces evaporation")}</button>
           <div class="note">${L("نسب الكفاءة تقديرية لطرق الري (FAO).", "Efficiencies are typical values for irrigation methods (FAO).")}</div></div>
-        <div class="panel2 in d4 gauge"><svg class="ring" viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="32" fill="none" stroke="#ece7dc" stroke-width="9"/><circle cx="40" cy="40" r="32" fill="none" stroke="${y > 0.5 ? "#7d8136" : y > 0.3 ? "#c48a1c" : "#b8423a"}" stroke-width="9" stroke-dasharray="${201 * y} 201" transform="rotate(-90 40 40)" stroke-linecap="round" style="transition:stroke-dasharray .6s"/><text x="40" y="45" text-anchor="middle" font-size="16" font-weight="900" fill="#2b2a20">${pct(y)}</text></svg>
+        <div class="panel2 in d4 gauge"><svg class="ring" viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="32" fill="none" stroke="#ece7dc" stroke-width="9"/><circle cx="40" cy="40" r="32" fill="none" stroke="${y > 0.5 ? "#4a9e2f" : y > 0.3 ? "#f5a623" : "#e8483d"}" stroke-width="9" stroke-dasharray="${201 * y} 201" transform="rotate(-90 40 40)" stroke-linecap="round" style="transition:stroke-dasharray .6s"/><text x="40" y="45" text-anchor="middle" font-size="16" font-weight="900" fill="#3a2a18">${pct(y)}</text></svg>
           <div><b>${L("المردود المتوقع (من الممكن)", "Expected yield (of possible)")}</b><div class="note">${L("بدون سقي", "Without water")}: ${pct(y0)} · ${L("مؤشر من محرك الماء (FAO-33)", "Index from the water engine (FAO-33)")}</div></div></div>
         <div class="spacer"></div>
         ${used > 0 ? `<button class="primary pop" data-act="g" data-a="run">${L("شغّل الموسم", "Run the season")} ${A.fwd()}</button>` : `<button class="primary" disabled>${L("وزّع حصة ماء واحدة على الأقل", "Place at least one water share")}</button>`}`;
@@ -903,20 +903,20 @@
       const start = rec.months.findIndex((x) => x.kc !== null), end = rec.months.reduce((a, x, i) => (x.kc !== null ? i : a), start);
       const hmax = Math.max(...l.hot[st.s].slice(0, 10), 1);
       const strip = l.hot[st.s].slice(0, 10).map((h, m) => `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">
-        <div style="width:100%;height:60px;display:flex;align-items:flex-end"><div style="width:100%;height:${Math.round(h / hmax * 56) + 2}px;border-radius:4px 4px 0 0;background:${h >= 10 ? "#b8423a" : h >= 4 ? "#e08a3a" : "#e8d9a8"};transition:height .4s"></div></div>
-        <div style="width:100%;height:12px;background:${m >= start && m <= end ? (m === rec.flowerMonth ? "#840000" : "#9ca047") : "transparent"};border-radius:3px;transition:background .4s"></div>
-        <span style="font-size:9.5px;font-weight:700;color:#4f5a5e">${mName(m).slice(0, S().lang === "en" ? 3 : 4)}</span></div>`).join("");
+        <div style="width:100%;height:60px;display:flex;align-items:flex-end"><div style="width:100%;height:${Math.round(h / hmax * 56) + 2}px;border-radius:4px 4px 0 0;background:${h >= 10 ? "#e8483d" : h >= 4 ? "#ff9a3d" : "#e8d9a8"};transition:height .4s"></div></div>
+        <div style="width:100%;height:12px;background:${m >= start && m <= end ? (m === rec.flowerMonth ? "#e8552f" : "#6cc04a") : "transparent"};border-radius:3px;transition:background .4s"></div>
+        <span style="font-size:9.5px;font-weight:700;color:#6a5440">${mName(m).slice(0, S().lang === "en" ? 3 : 4)}</span></div>`).join("");
       return `<div class="panel2 in d2"><div style="display:flex;justify-content:space-between"><b>${L("أيام الحر (>31°) لكل شهر", "Hot days (>31°C) per month")}</b><span class="obs">${L("مُرصود · ناسا", "Observed · NASA")} ${DATA.seasons[st.s]}</span></div>
           <div style="display:flex;gap:3px;margin-top:6px">${strip}</div>
-          <div class="legend2" style="margin-top:4px"><span><i style="background:#9ca047"></i>${L("المحصول في الحقل", "Crop in the field")}</span><span><i style="background:#840000"></i>${L("الإزهار", "Flowering")}</span></div>
+          <div class="legend2" style="margin-top:4px"><span><i style="background:#6cc04a"></i>${L("المحصول في الحقل", "Crop in the field")}</span><span><i style="background:#e8552f"></i>${L("الإزهار", "Flowering")}</span></div>
           <div class="note">${c.flower < 0 ? L("هذا المحصول يُحش علفًا قبل الإزهار.", "This crop is cut for forage before flowering.") : L(`الإزهار في ${rec.flowerMonth != null ? mName(rec.flowerMonth) : "—"}: ${rec.flowerMonth != null ? l.hot[st.s][rec.flowerMonth] : 0} يوم حار.`, `Flowering in ${rec.flowerMonth != null ? mName(rec.flowerMonth) : "—"}: ${rec.flowerMonth != null ? l.hot[st.s][rec.flowerMonth] : 0} hot days.`)}</div></div>
         <div class="panel2 in d3" style="display:flex;flex-direction:column;gap:8px">
           <b>${L("المحصول", "Crop")}</b><div class="chiprow">${st.crops.map((k) => `<button class="chip ${st.crop === k ? "on" : ""}" data-act="g" data-a="crop" data-v="${k}">${cname(k)}</button>`).join("")}</div>
           <b>${L("موعد البذر", "Sowing date")}</b><div class="chiprow">${[["early", L("مبكر (أكتوبر)", "Early (Oct)")], ["normal", L("عادي (نوفمبر)", "Normal (Nov)")], ["late", L("متأخر (ديسمبر)", "Late (Dec)")]].map((o) => `<button class="chip ${st.sowing === o[0] ? "on" : ""}" data-act="g" data-a="sow" data-v="${o[0]}">${o[1]}</button>`).join("")}</div>
           ${farmE().water ? `<button class="chip ${st.water ? "on" : ""}" data-act="g" data-a="water" style="align-self:flex-start">${st.water ? '<span class="ck"></span>' : ""}${L("سقية عند الإزهار", "One watering at flowering")}</button>` : `<div class="note">${L("لا ماء إضافي لديك: السقي غير متاح.", "No extra water on your farm: watering is not available.")}</div>`}
         </div>
-        <div class="panel2 in d4" style="display:flex;gap:12px;align-items:center"><div style="flex:1"><b>${L("ضرر الحر عند الإزهار", "Heat damage at flowering")}</b><div class="pbar" style="margin-top:4px"><i style="width:${Math.round(rec.heat / 0.35 * 100)}%;background:#b8423a"></i></div></div>
-          <div style="text-align:center"><div style="font-size:24px;font-weight:900;color:#840000">${pct(rec.yieldIdx)}</div><div class="note">${L("المردود", "yield")}</div></div></div>
+        <div class="panel2 in d4" style="display:flex;gap:12px;align-items:center"><div style="flex:1"><b>${L("ضرر الحر عند الإزهار", "Heat damage at flowering")}</b><div class="pbar" style="margin-top:4px"><i style="width:${Math.round(rec.heat / 0.35 * 100)}%;background:#e8483d"></i></div></div>
+          <div style="text-align:center"><div style="font-size:24px;font-weight:900;color:#e8552f">${pct(rec.yieldIdx)}</div><div class="note">${L("المردود", "yield")}</div></div></div>
         <div class="spacer"></div>
         <button class="primary" data-act="g" data-a="lock">${L("ثبّت الخطة", "Lock in the plan")} ${A.fwd()}</button>`;
     },
@@ -987,7 +987,7 @@
       const colr = (v) => v > 0.9 ? "#b5674a" : v > 0.6 ? "#c98e62" : v > 0.4 ? "#c9b37a" : "#9fb46a";
       const field = board3d(5, 4, (i, c, r) => { const p = st.prot[i];
         return { fill: colr(this.tileRisk(st, i)), h: (3 - r) * 7, flat: (p === "mulch" ? FLAT.mulch : "") + (st.contour[r] ? FLAT.contour : "") + (st.stormed && this.tileRisk(st, i) > 0.6 ? FLAT.runoff : ""),
-          deco: p === "cover" ? plantDeco("vetch", 4, "grow") : p === "barrier" ? `<g class="grow"><path d="M-18 2 L18 2" stroke="#5f7d36" stroke-width="7" stroke-linecap="round"/><circle cx="-10" cy="-3" r="5" fill="#7d8136"/><circle cx="2" cy="-5" r="5" fill="#9ca047"/><circle cx="13" cy="-3" r="4" fill="#7d8136"/></g>` : "", label: L("قطعة", "plot") }; },
+          deco: p === "cover" ? plantDeco("vetch", 4, "grow") : p === "barrier" ? `<g class="grow"><path d="M-18 2 L18 2" stroke="#5f7d36" stroke-width="7" stroke-linecap="round"/><circle cx="-10" cy="-3" r="5" fill="#4a9e2f"/><circle cx="2" cy="-5" r="5" fill="#6cc04a"/><circle cx="13" cy="-3" r="4" fill="#4a9e2f"/></g>` : "", label: L("قطعة", "plot") }; },
         { env: "storm", rain: st.stormed, label: L("حقل منحدر: الصف الأول هو الأعلى", "Sloped field: the first row is the highest"), badge: L(`انحدار ${farmE().slope}% · الأعلى في الخلف`, `Slope ${farmE().slope}% · top row at the back`) });
       const tools = [["mulch", L("غطاء تبن", "Mulch"), "1"], ["cover", L("غطاء نباتي", "Cover crop"), "1"], ["barrier", L("حاجز نباتي", "Veg. barrier"), "1"], ["contour", L("خط كنتوري (صف)", "Contour (row)"), "2"]];
       return `<div class="in d2">${field}<div class="legend2" style="padding:4px 6px"><span><i style="background:#b5674a"></i>${L("خطر عالٍ", "High risk")}</span><span><i style="background:#c9b37a"></i>${L("متوسط", "Medium")}</span><span><i style="background:#9fb46a"></i>${L("منخفض", "Low")}</span><span class="hyp">${L("عاصفة افتراضية · مستويات نسبية", "Hypothetical storm · relative levels")}</span></div></div>
@@ -1041,7 +1041,7 @@
           ${st.open === i ? `<div class="chiprow reveal" style="margin:6px 0">${CROPS.map((x) => `<button class="chip ${x === k ? "on" : ""}" data-act="g" data-a="crop" data-i="${i}" data-v="${x}">${cname(x)}</button>`).join("")}</div>` : ""}
           <div class="chiprow" style="margin-top:6px">${inputs.map((o) => `<button class="chip ${st.inp[i] === o[0] ? "on" : ""}" style="min-height:38px;padding:4px 10px;font-size:13px" data-act="g" data-a="inp" data-i="${i}" data-v="${o[0]}">${o[1]}${o[2] ? " · " + o[2] : ""}</button>`).join("")}</div></div>`).join("")}</div>
         <div class="panel2 in d3" style="display:flex;flex-direction:column;gap:6px">
-          <div class="dimrow"><span style="width:110px">${L("الميزانية", "Budget")}</span><span class="pbar"><i style="width:${Math.min(100, spent)}%;background:${spent > 100 ? "#b8423a" : "#516d77"}"></i></span><span dir="ltr">${spent}/100</span></div>
+          <div class="dimrow"><span style="width:110px">${L("الميزانية", "Budget")}</span><span class="pbar"><i style="width:${Math.min(100, spent)}%;background:${spent > 100 ? "#e8483d" : "#2f9bd6"}"></i></span><span dir="ltr">${spent}/100</span></div>
           <div class="dimrow"><span style="width:110px">${L("الإنتاجية", "Productivity")}</span><span class="pbar"><i style="width:${sc.production}%"></i></span><span dir="ltr">${sc.production}</span></div>
           <div class="dimrow"><span style="width:110px">${L("استقلالية الآزوت", "N independence")}</span><span class="pbar"><i style="width:${sc.fertilizer}%"></i></span><span dir="ltr">${sc.fertilizer}</span></div>
           <div class="dimrow"><span style="width:110px">${L("توفير الماء", "Water")}</span><span class="pbar"><i style="width:${sc.water}%"></i></span><span dir="ltr">${sc.water}</span></div>
@@ -1096,7 +1096,7 @@
     init() { const n = loc().rain.length; LV.st = { seasons: [n - 3, n - 2, n - 1], round: 0, prev: lastCrop(), pick: { crop: "barley", sowing: "normal", water: false }, tokens: 2, results: [] }; },
     view() {
       const st = LV.st, l = loc();
-      const done = st.results.map((r, i) => `<div class="result" style="background:#fff"><span style="flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:900;color:#fff;background:${r.y > 0.5 ? "#7d8136" : r.y > 0.3 ? "#c48a1c" : "#b8423a"}">${i + 1}</span><span style="flex:1;font-size:13px"><b>${DATA.seasons[r.s]} · ${cname(r.crop)}</b><br>${r.events}</span><b style="font-size:18px">${pct(r.y)}</b></div>`).join("");
+      const done = st.results.map((r, i) => `<div class="result" style="background:#fff"><span style="flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:900;color:#fff;background:${r.y > 0.5 ? "#4a9e2f" : r.y > 0.3 ? "#f5a623" : "#e8483d"}">${i + 1}</span><span style="flex:1;font-size:13px"><b>${DATA.seasons[r.s]} · ${cname(r.crop)}</b><br>${r.events}</span><b style="font-size:18px">${pct(r.y)}</b></div>`).join("");
       if (st.round >= 3) return `<div class="stagger" style="display:flex;flex-direction:column;gap:8px">${done}</div><div class="spacer"></div><button class="primary pop" data-act="g" data-a="end">${L("النتيجة النهائية", "Final result")} ${A.fwd()}</button>`;
       const s = st.seasons[st.round], p = st.pick;
       return `<div style="display:flex;flex-direction:column;gap:8px">${done}</div>
@@ -1179,14 +1179,14 @@
     scene(dead) {
       if (dead) return board3d(4, 3, (i) => {
         const rev = LV.st.revived && LV.st.revived[i];
-        return { fill: rev ? "#7a5638" : "#a98a62", flat: rev ? "" : FLAT.cracks, deco: rev ? plantDeco("lentil", 4, "grow") : `<g>${[...Array(4)].map((_, k) => `<g class="wilt" style="animation-delay:${(i * 0.08 + k * 0.05).toFixed(2)}s"><path d="M${-12 + k * 8} 0 v-14" stroke="#8a7a4a" stroke-width="1.6"/><ellipse cx="${-12 + k * 8}" cy="-16" rx="2" ry="4" fill="#a99060"/></g>`).join("")}</g>` };
+        return { fill: rev ? "#7a5638" : "#a98a62", flat: rev ? "" : FLAT.cracks, deco: rev ? plantDeco("lentil", 4, "grow") : `<g>${[...Array(4)].map((_, k) => `<g class="wilt" style="animation-delay:${(i * 0.08 + k * 0.05).toFixed(2)}s"><path d="M${-12 + k * 8} 0 v-14" stroke="#a8915a" stroke-width="1.6"/><ellipse cx="${-12 + k * 8}" cy="-16" rx="2" ry="4" fill="#c9a66a"/></g>`).join("")}</g>` };
       }, { env: "dead", act: "g", action: "tile", height: 165, extras: farmExtras(4, 3), label: L("حقل جاف ومحاصيل ميتة", "Dry field with dead crops"), badge: `${cname(LV.st.crop)} · ${pct(LV.st.rec.yieldIdx)}` });
       const r2 = seasonRun(LV.st.fix.crop, LV.st.s, { prev: LV.st.prev, sowing: LV.st.fix.sowing, residue: LV.st.fix.residue });
       return fieldBoard(LV.st.fix.crop, Math.min(1, r2.yieldIdx * 1.4), { env: r2.yieldIdx > 0.4 ? "day" : "drought", height: 165, act: "g", action: "tile", flat: () => (LV.st.fix.residue === "kept" ? FLAT.straw : ""), label: L("الحقل بعد خطة التعافي", "The field after the recovery plan"), badge: `${cname(LV.st.fix.crop)} · ${pct(r2.yieldIdx)}` });
     },
     view() {
       const st = LV.st;
-      const icons = { drop: '<path d="M11 3 C7 9 5 12 5 15 a6 6 0 0 0 12 0 C17 12 15 9 11 3z" fill="#516d77"/>', cal: '<rect x="3" y="5" width="16" height="14" rx="2" stroke="#516d77" stroke-width="2" fill="none"/><path d="M3 9h16 M7 3v4 M15 3v4" stroke="#516d77" stroke-width="2"/>', sun: '<circle cx="11" cy="11" r="5" fill="#e08a3a"/><path d="M11 1v3 M11 18v3 M1 11h3 M18 11h3 M4 4l2 2 M16 16l2 2 M4 18l2-2 M16 6l2-2" stroke="#e08a3a" stroke-width="2"/>', soil: '<path d="M2 14 h18 v5 h-18z" fill="#9a6a43"/><path d="M5 14 l3 -3 l3 3 l4 -4 l4 4" stroke="#7d8136" stroke-width="2" fill="none"/>', rot: '<path d="M5 11 a6 6 0 0 1 11 -3 M17 11 a6 6 0 0 1 -11 3" stroke="#516d77" stroke-width="2" fill="none"/><path d="M16 4 v4 h-4 M6 18 v-4 h4" stroke="#516d77" stroke-width="2" fill="none"/>', bug: '<ellipse cx="11" cy="12" rx="5" ry="6" fill="#7a3f2a"/><path d="M6 9 l-3 -2 M16 9 l3 -2 M6 14 h-4 M16 14 h4" stroke="#7a3f2a" stroke-width="1.6"/>' };
+      const icons = { drop: '<path d="M11 3 C7 9 5 12 5 15 a6 6 0 0 0 12 0 C17 12 15 9 11 3z" fill="#2f9bd6"/>', cal: '<rect x="3" y="5" width="16" height="14" rx="2" stroke="#2f9bd6" stroke-width="2" fill="none"/><path d="M3 9h16 M7 3v4 M15 3v4" stroke="#2f9bd6" stroke-width="2"/>', sun: '<circle cx="11" cy="11" r="5" fill="#ff9a3d"/><path d="M11 1v3 M11 18v3 M1 11h3 M18 11h3 M4 4l2 2 M16 16l2 2 M4 18l2-2 M16 6l2-2" stroke="#ff9a3d" stroke-width="2"/>', soil: '<path d="M2 14 h18 v5 h-18z" fill="#b8743f"/><path d="M5 14 l3 -3 l3 3 l4 -4 l4 4" stroke="#4a9e2f" stroke-width="2" fill="none"/>', rot: '<path d="M5 11 a6 6 0 0 1 11 -3 M17 11 a6 6 0 0 1 -11 3" stroke="#2f9bd6" stroke-width="2" fill="none"/><path d="M16 4 v4 h-4 M6 18 v-4 h4" stroke="#2f9bd6" stroke-width="2" fill="none"/>', bug: '<ellipse cx="11" cy="12" rx="5" ry="6" fill="#7a3f2a"/><path d="M6 9 l-3 -2 M16 9 l3 -2 M6 14 h-4 M16 14 h4" stroke="#7a3f2a" stroke-width="1.6"/>' };
       if (st.phase === "investigate") return `<div class="in d2">${this.scene(true)}<div class="note" style="padding:4px 6px">${cname(st.crop)} · ${DATA.seasons[st.s]} · ${L("المردود", "Yield")} ${pct(st.rec.yieldIdx)} <span class="obs">${L("موسم حقيقي", "Real season")}</span></div></div>
           <b class="in d3">${L("التحقيق: اختر الأسباب المدعومة بالأدلة", "Investigation: pick the causes the evidence supports")}</b>
           <div class="stagger" style="display:flex;flex-direction:column;gap:8px">${st.ev.map((e) => `<button class="evc ${st.sel[e.k] ? "on" : ""}" aria-pressed="${!!st.sel[e.k]}" data-act="g" data-a="sel" data-v="${e.k}"><span class="ico"><svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true">${icons[e.ico]}</svg></span><span><b>${e.t}</b><small>${e.v}</small></span></button>`).join("")}</div>
@@ -1197,7 +1197,7 @@
           <div class="chiprow">${CROPS.map((k) => `<button class="chip ${fx.crop === k ? "on" : ""}" data-act="g" data-a="fcrop" data-v="${k}">${cname(k)}</button>`).join("")}</div>
           <div class="chiprow">${[["early", L("بذر مبكر", "Early sowing")], ["normal", L("بذر عادي", "Normal sowing")], ["late", L("بذر متأخر", "Late sowing")]].map((o) => `<button class="chip ${fx.sowing === o[0] ? "on" : ""}" data-act="g" data-a="fsow" data-v="${o[0]}">${o[1]}</button>`).join("")}</div>
           <div class="chiprow">${[["kept", L("ترك البقايا", "Keep residue")], ["grazed", L("رعي البقايا", "Graze residue")], ["removed", L("إزالة البقايا", "Remove residue")]].map((o) => `<button class="chip ${fx.residue === o[0] ? "on" : ""}" data-act="g" data-a="fres" data-v="${o[0]}">${o[1]}</button>`).join("")}</div></div>
-        <div class="panel2 in d4" style="display:flex;justify-content:space-around;text-align:center"><div><div class="note">${L("قبل", "Before")}</div><div style="font-size:24px;font-weight:900;color:#b8423a">${pct(st.rec.yieldIdx)}</div></div><div><div class="note">${L("بعد خطتك", "With your plan")}</div><div style="font-size:24px;font-weight:900;color:${r2.yieldIdx > st.rec.yieldIdx ? "#7d8136" : "#b8423a"}">${pct(r2.yieldIdx)}</div></div></div>
+        <div class="panel2 in d4" style="display:flex;justify-content:space-around;text-align:center"><div><div class="note">${L("قبل", "Before")}</div><div style="font-size:24px;font-weight:900;color:#e8483d">${pct(st.rec.yieldIdx)}</div></div><div><div class="note">${L("بعد خطتك", "With your plan")}</div><div style="font-size:24px;font-weight:900;color:${r2.yieldIdx > st.rec.yieldIdx ? "#4a9e2f" : "#e8483d"}">${pct(r2.yieldIdx)}</div></div></div>
         <div class="spacer"></div><button class="primary" data-act="g" data-a="end">${L("ثبّت خطة التعافي", "Confirm the recovery plan")} ${A.fwd()}</button>`;
     },
     on(a, d) {
@@ -1244,7 +1244,7 @@
       const st = LV.st, used = Object.keys(st.act).length, T = this.tools();
       const field = board3d(4, 4, (i) => { const t = st.act[i], tired = st.tired.has(i), v = t ? T.find((x) => x[0] === t)[2] : 0;
         return { fill: t ? (v > 0 ? "#7a5638" : v < 0 ? "#c2a87a" : "#b39566") : tired ? "#c2a87a" : "#9a7a52", h: t && v > 0 ? 3 : 0, flat: (tired && !t ? FLAT.dots : "") + (t === "compost" ? FLAT.manure : ""),
-          deco: (t === "legume" ? plantDeco("lentil", 4, "grow") : t === "compost" ? `<g class="grow"><ellipse cx="0" cy="-2" rx="14" ry="5" fill="#5a3d27"/><circle cx="-4" cy="-5" r="2" fill="#7d8136"/></g>` : t === "diverse" ? plantDeco("faba", 3, "grow") + plantDeco("barley", 2, "grow") : t === "moreN" ? `<g class="grow"><rect x="-6" y="-14" width="12" height="12" rx="2" fill="#e8e8bc" stroke="#516d77"/><text x="0" y="-5" text-anchor="middle" font-size="7" font-weight="900" fill="#516d77">N</text></g>` : t === "same" ? plantDeco("wheat", 4, "grow") : ""),
+          deco: (t === "legume" ? plantDeco("lentil", 4, "grow") : t === "compost" ? `<g class="grow"><ellipse cx="0" cy="-2" rx="14" ry="5" fill="#6e4527"/><circle cx="-4" cy="-5" r="2" fill="#4a9e2f"/></g>` : t === "diverse" ? plantDeco("faba", 3, "grow") + plantDeco("barley", 2, "grow") : t === "moreN" ? `<g class="grow"><rect x="-6" y="-14" width="12" height="12" rx="2" fill="#ffe9a8" stroke="#2f9bd6"/><text x="0" y="-5" text-anchor="middle" font-size="7" font-weight="900" fill="#2f9bd6">N</text></g>` : t === "same" ? plantDeco("wheat", 4, "grow") : ""),
           label: tired ? L("قطعة مُنهكة", "tired plot") : L("قطعة", "plot") }; }, { env: "soil", extras: farmExtras(4, 4), label: L("حقلك", "Your field") });
       return `<div class="in d2">${field}<div class="note" style="padding:4px 6px">${L("النقاط البيضاء = قطعة مُنهكة (تقدير من تاريخ محاصيلك)", "White dots = tired plot (estimated from your crop history)")} · ${L("التدخلات", "Actions")}: ${used}/8</div></div>
         <div class="toolbar in d3">${T.map((t) => `<button class="tool ${st.tool === t[0] ? "on" : ""}" data-act="g" data-a="tool" data-v="${t[0]}">${t[1]}<small>${QUAL(t[2]).replace(/<[^>]+>/g, "")}</small></button>`).join("")}</div>
@@ -1293,7 +1293,7 @@
         svg += arc(R - 12, R, a0, a1, `rgba(31,95,168,${0.08 + 0.9 * heavy[m] / hmax})`);
         const c = cov[m]; svg += arc(R - 40, R - 14, a0, a1, c < 0.3 ? "#3f8f4a" : c < 0.55 ? "#a7b65a" : c < 0.8 ? "#c49a63" : "#8f5a33");
         svg += `<text x="${C + (R + 8) * Math.sin(am)}" y="${C - (R + 8) * Math.cos(am) + 3}" text-anchor="middle" font-size="8" fill="#33402f">${mName(m).slice(0, S().lang === "en" ? 1 : 3)}</text>`; }
-      svg += `<text x="${C}" y="${C}" text-anchor="middle" font-size="20" font-weight="900" fill="#2b2a20">${ev.scores.erosion}</text><text x="${C}" y="${C + 13}" text-anchor="middle" font-size="7.5" fill="#4f5a5e">${L("حماية /100", "protection /100")}</text></svg>`;
+      svg += `<text x="${C}" y="${C}" text-anchor="middle" font-size="20" font-weight="900" fill="#3a2a18">${ev.scores.erosion}</text><text x="${C}" y="${C + 13}" text-anchor="middle" font-size="7.5" fill="#6a5440">${L("حماية /100", "protection /100")}</text></svg>`;
       const chip = (a, v, on, txt) => `<button class="chip ${on ? "on" : ""}" data-act="g" data-a="${a}" data-v="${v}">${on ? '<span class="ck"></span>' : ""}${txt}</button>`;
       return `<div class="panel2 in d2" style="display:flex;flex-direction:column;align-items:center">${svg}
           <div class="legend2"><span><i style="background:#1f5fa8"></i>${L("مطر غزير (ناسا)", "Heavy rain (NASA)")}</span><span><i style="background:#3f8f4a"></i>${L("مغطاة", "Covered")}</span><span><i style="background:#8f5a33"></i>${L("عارية", "Bare")}</span></div>
@@ -1339,7 +1339,7 @@
     view() {
       const st = LV.st, s = loc().soil;
       return `<div class="panel2 in d2"><b>${L("الكربون العضوي حسب العمق (SoilGrids)", "Organic carbon by depth (SoilGrids)")}</b>
-          <div style="display:flex;align-items:flex-end;gap:6px;height:70px;margin-top:6px">${[s.soc, s.soc * 0.57, s.soc * 0.44, s.soc * 0.3, s.soc * 0.17].map((v, i) => `<div style="flex:1;text-align:center"><div style="height:${Math.round(v / s.soc * 56)}px;background:#5a3d27;border-radius:4px 4px 0 0"></div><span class="note">${["0–5", "5–15", "15–30", "30–60", "60–100"][i]}</span></div>`).join("")}</div>
+          <div style="display:flex;align-items:flex-end;gap:6px;height:70px;margin-top:6px">${[s.soc, s.soc * 0.57, s.soc * 0.44, s.soc * 0.3, s.soc * 0.17].map((v, i) => `<div style="flex:1;text-align:center"><div style="height:${Math.round(v / s.soc * 56)}px;background:#6e4527;border-radius:4px 4px 0 0"></div><span class="note">${["0–5", "5–15", "15–30", "30–60", "60–100"][i]}</span></div>`).join("")}</div>
           <div class="note">${L("الشكل تقريبي بنسب ملف التربة؛ القيمة العليا من SoilGrids لموقعك، وليست تحليلًا لحقلك.", "Shape approximated from the profile; the top value is SoilGrids for your location, not a test of your field.")}</div></div>
         <b class="in d3">${L("اختر 3 ممارسات", "Choose 3 practices")} (${st.sel.length}/3)</b>
         <div class="stagger" style="display:flex;flex-direction:column;gap:8px">${this.P().map((p) => `<button class="evc ${st.sel.includes(p[0]) ? "on" : ""}" aria-pressed="${st.sel.includes(p[0])}" data-act="g" data-a="sel" data-v="${p[0]}"><span style="flex:1"><b>${p[1]}</b><small>${L("الثمن", "Trade-off")}: ${p[3]}</small></span>${st.sel.includes(p[0]) ? QUAL(p[2]) : ""}</button>`).join("")}</div>
@@ -1429,7 +1429,7 @@
       if (CHAPTER[id] !== cur) { cur = CHAPTER[id]; html += `<div class="chap">${chapters[cur]}</div>`; }
       const isDone = done(id), isUnlocked = unlocked(id), rec = g.levels[id];
       let statusLabel = L("مغلق", "Locked");
-      let icon = '<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><rect x="4" y="8" width="10" height="8" rx="2" fill="#fbfbef"/><path d="M6 8V6a3 3 0 0 1 6 0v2" stroke="#fbfbef" stroke-width="2" fill="none"/></svg>';
+      let icon = '<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><rect x="4" y="8" width="10" height="8" rx="2" fill="#fffdf4"/><path d="M6 8V6a3 3 0 0 1 6 0v2" stroke="#fffdf4" stroke-width="2" fill="none"/></svg>';
       if (isDone) {
         statusLabel = L("✓ تم الإنجاز", "✓ Completed");
         icon = (id === "F" ? "!" : id);
@@ -1444,7 +1444,7 @@
       </button>`;
     });
     return `<div class="gscreen">
-      <div class="ghead in"><button class="iconbtn" data-act="go" data-to="hub" aria-label="${L("رجوع", "Back")}">${S().lang === "en" ? '<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M11 4l-5 5 5 5" stroke="#516d77" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>' : '<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M7 4l5 5-5 5" stroke="#516d77" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>'}</button>
+      <div class="ghead in"><button class="iconbtn" data-act="go" data-to="hub" aria-label="${L("رجوع", "Back")}">${S().lang === "en" ? '<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M11 4l-5 5 5 5" stroke="#2f9bd6" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>' : '<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M7 4l5 5-5 5" stroke="#2f9bd6" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>'}</button>
         <h1><small>${esc(A.placeName())} · ${esc(pname())}</small>${L("مغامرة المزرعة", "The farm adventure")}</h1></div>
       <div class="dock in d1"><div class="who">${salahM(80, "happy")}</div><div class="say tone-n">${L("كل مستوى مقفل حتى تكمل المستوى الذي قبله. أتمم كل التحديات لتكتشف تقرير صمود مزرعتك الشامل!", "Each level is locked until you complete the one before it. Finish all challenges to unlock your comprehensive Farm Resilience Report!")}</div></div>
       <div class="mapw">${html}</div>
@@ -1471,25 +1471,25 @@
     const allRisks = (g.risks || []).slice(-8);
 
     return `<div class="gscreen">
-      <div class="ghead in"><button class="iconbtn" data-act="go" data-to="map" aria-label="${L("الخريطة", "Map")}"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M2 5l5-2 6 2 5-2v12l-5 2-6-2-5 2z" stroke="#516d77" stroke-width="1.7" fill="none"/></svg></button><h1><small>${esc(pname())} · ${esc(A.placeName())}</small>${L("تقرير صمود المزرعة", "Farm Resilience Report")}</h1></div>
+      <div class="ghead in"><button class="iconbtn" data-act="go" data-to="map" aria-label="${L("الخريطة", "Map")}"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M2 5l5-2 6 2 5-2v12l-5 2-6-2-5 2z" stroke="#2f9bd6" stroke-width="1.7" fill="none"/></svg></button><h1><small>${esc(pname())} · ${esc(A.placeName())}</small>${L("تقرير صمود المزرعة", "Farm Resilience Report")}</h1></div>
       <div class="panel2 pop" style="display:flex;align-items:center;gap:14px"><div style="width:90px;height:90px">${salahM(90, overall >= 65 ? "happy" : "worried")}</div><div><div class="note">${L("النتيجة الإجمالية لصمود المزرعة", "Overall Resilience Score")}</div><div class="bigscore" style="font-size:52px">${overall}</div><div class="note">${recs.length}/${ORDER.length} ${L("مستويات مكتملة", "completed levels")}</div></div></div>
       <div class="panel2 in d2" style="display:flex;flex-direction:column;gap:5px"><b>📊 ${L("تقييم الأداء حسب المستوى", "Level-by-level resilience scores")}</b>${recs.map((x) => `<div class="dimrow"><span style="width:150px;font-size:12px">${LTITLE(x.id)}</span><span class="pbar"><i style="width:${x.r.best}%"></i></span><span dir="ltr">${x.r.best}/100</span></div>`).join("")}</div>
       <div class="panel2 in d3"><b>🔍 ${L("تحليل المخاطر والأدلة العلمية لقراراتك", "Full Risk Analysis & Evidence")}</b>
         ${allRisks.length ? `<div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">${allRisks.map(r => `
-          <div style="background:#fff;border:1px solid #dcdcb8;border-radius:12px;padding:10px;font-size:12.5px;line-height:1.5">
+          <div style="background:#fff;border:1px solid #f0dcb0;border-radius:12px;padding:10px;font-size:12.5px;line-height:1.5">
             <div style="display:flex;justify-content:space-between;align-items:center">
               <b>${r.t}</b>
               <span class="rlvl rl-${r.level || 'moderate'}" style="font-size:10.5px">${r.level === 'high' ? L('خطر مرتفع', 'High Risk') : L('خطر متوسط', 'Moderate Risk')}</span>
             </div>
-            ${r.cons ? `<div style="margin-top:3px;color:#516d77"><b>${L("العواقب:", "Consequences:")}</b> ${r.cons}</div>` : ""}
-            ${r.mitig ? `<div style="margin-top:2px;color:#2c3f45"><b>${L("كيف تخفف الخطر:", "Mitigation:")}</b> ${r.mitig}</div>` : ""}
+            ${r.cons ? `<div style="margin-top:3px;color:#2f9bd6"><b>${L("العواقب:", "Consequences:")}</b> ${r.cons}</div>` : ""}
+            ${r.mitig ? `<div style="margin-top:2px;color:#24506a"><b>${L("كيف تخفف الخطر:", "Mitigation:")}</b> ${r.mitig}</div>` : ""}
           </div>
-        `).join("")}</div>` : `<p style="font-size:12.5px;color:#516d77;margin:4px 0">${L("لم تُسجّل أي مخاطر حرجة أثناء التحديات.", "No critical risks registered.")}</p>`}
+        `).join("")}</div>` : `<p style="font-size:12.5px;color:#2f9bd6;margin:4px 0">${L("لم تُسجّل أي مخاطر حرجة أثناء التحديات.", "No critical risks registered.")}</p>`}
       </div>
       <div class="panel2 in d3"><b>🛰️ ${L("نقاط ضعف مزرعتك المناخية (بيانات ناسا POWER 1995–2025)", "Climate vulnerabilities (NASA POWER 1995–2025)")}</b><ul style="margin:4px 0 0;padding-inline-start:18px;font-size:13px;line-height:1.6">${vul.map((v) => `<li>${v}</li>`).join("")}</ul></div>
       <div class="panel2 in d4"><b>🌾 ${L("استراتيجيتك الزراعية: البداية مقابل النهاية", "Your farming strategy: start vs end")}</b>
         <div class="result" style="margin-top:6px"><span style="flex:1">${L("الدورة المبدئية", "Initial")}: ${initSeq.map(cname).join(A.arrow())}</span><b>${evS(initSeq)}</b></div>
-        <div class="result" style="margin-top:6px"><span style="flex:1">${L("الدورة المقترحة", "Final")}: ${finSeq.map(cname).join(A.arrow())}</span><b style="color:#7d8136">${evS(finSeq)}</b></div>
+        <div class="result" style="margin-top:6px"><span style="flex:1">${L("الدورة المقترحة", "Final")}: ${finSeq.map(cname).join(A.arrow())}</span><b style="color:#4a9e2f">${evS(finSeq)}</b></div>
         <div class="note">${L("التقييم من 100 محسوب حسب أولوياتك على 30 موسمًا حقيقيًا.", "Score /100 calculated against your farm priorities over 30 real NASA seasons.")}</div></div>
       <div class="panel2 in d5"><b>🌱 ${L("توصيات عمّي صالح العلمية للتحسين", "Ammi Salah's scientific recommendations")}</b><ul style="margin:4px 0 0;padding-inline-start:18px;font-size:13px;line-height:1.6">
         <li>${L("نوّع العائلات (حبوب ← بقوليات) لتكسر الأمراض وتساعد إدارة الآزوت.", "Alternate families (cereal ↔ legume) to break disease and help nitrogen.")}</li>
@@ -1502,7 +1502,7 @@
   };
 
   // ---------------------------------------------------------------- live 3D scenes on top of every level
-  const NBAG = '<g class="grow"><rect x="-8" y="-18" width="16" height="18" rx="3" fill="#e8e8bc" stroke="#516d77"/><text x="0" y="-6" text-anchor="middle" font-size="9" font-weight="900" fill="#516d77">N</text></g>';
+  const NBAG = '<g class="grow"><rect x="-8" y="-18" width="16" height="18" rx="3" fill="#ffe9a8" stroke="#2f9bd6"/><text x="0" y="-6" text-anchor="middle" font-size="9" font-weight="900" fill="#2f9bd6">N</text></g>';
   const SCENE = {
     2: () => { const st = LV.st, k = st.plan[st.active] || st.plan[0];
       return fieldBoard(k || null, 1, { env: "day", rows: 2, height: 165, act: "g", action: "tile", flat: () => (k ? "" : FLAT.straw), badge: k ? `${L("الموسم", "Season")} ${st.plan[st.active] ? st.active + 1 : 1} · ${cname(k)}` : L("المس الحقل للبذر", "Touch field to sow") }); },
@@ -1536,9 +1536,9 @@
 
   // ---------------------------------------------------------------- HUB: three doors after onboarding
   const ICO = {
-    sat: '<svg width="46" height="46" viewBox="0 0 46 46" aria-hidden="true"><rect x="17" y="17" width="12" height="12" rx="2" fill="#fbfbef" transform="rotate(45 23 23)"/><rect x="3" y="19" width="12" height="8" rx="1" fill="#e8e8bc" transform="rotate(45 23 23)"/><rect x="31" y="19" width="12" height="8" rx="1" fill="#e8e8bc" transform="rotate(45 23 23)"/><path d="M30 38 a10 10 0 0 0 8 -8 M30 43 a15 15 0 0 0 13 -13" stroke="#fbfbef" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>',
-    sprout: '<svg width="46" height="46" viewBox="0 0 46 46" aria-hidden="true"><path d="M23 42 V22" stroke="#fbfbef" stroke-width="3" stroke-linecap="round"/><path d="M23 26 C10 26 6 16 8 8 C18 8 24 14 23 26Z" fill="#fbfbef"/><path d="M23 22 C34 22 39 14 38 6 C28 6 22 12 23 22Z" fill="#e8e8bc"/></svg>',
-    play: '<svg width="46" height="46" viewBox="0 0 46 46" aria-hidden="true"><circle cx="23" cy="23" r="19" fill="none" stroke="#fbfbef" stroke-width="3"/><path d="M18 14 L33 23 L18 32Z" fill="#fbfbef"/></svg>',
+    sat: '<svg width="46" height="46" viewBox="0 0 46 46" aria-hidden="true"><rect x="17" y="17" width="12" height="12" rx="2" fill="#fffdf4" transform="rotate(45 23 23)"/><rect x="3" y="19" width="12" height="8" rx="1" fill="#ffe9a8" transform="rotate(45 23 23)"/><rect x="31" y="19" width="12" height="8" rx="1" fill="#ffe9a8" transform="rotate(45 23 23)"/><path d="M30 38 a10 10 0 0 0 8 -8 M30 43 a15 15 0 0 0 13 -13" stroke="#fffdf4" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>',
+    sprout: '<svg width="46" height="46" viewBox="0 0 46 46" aria-hidden="true"><path d="M23 42 V22" stroke="#fffdf4" stroke-width="3" stroke-linecap="round"/><path d="M23 26 C10 26 6 16 8 8 C18 8 24 14 23 26Z" fill="#fffdf4"/><path d="M23 22 C34 22 39 14 38 6 C28 6 22 12 23 22Z" fill="#ffe9a8"/></svg>',
+    play: '<svg width="46" height="46" viewBox="0 0 46 46" aria-hidden="true"><circle cx="23" cy="23" r="19" fill="none" stroke="#fffdf4" stroke-width="3"/><path d="M18 14 L33 23 L18 32Z" fill="#fffdf4"/></svg>',
   };
   const progress = () => { const g = G(), ids = ORDER.filter((id) => g.levels[id] && g.levels[id].attempts.length); return { n: ids.length, stars: ids.reduce((a, id) => a + (g.levels[id].stars || 0), 0) }; };
   A.SCREENS.hub = () => {
@@ -1548,7 +1548,7 @@
     return `<div class="gscreen hub">
       <div class="ghead in">${A.backBtn("farm").replace('class="back"', 'class="iconbtn"')}
         <h1><small>${esc(A.placeName())}</small>${L(`مزرعة ${esc(pname())}`, `${esc(pname())}'s farm`)}</h1>
-        <button class="iconbtn" data-act="editFarm" aria-label="${L("تعديل معلومات المزرعة", "Edit farm answers")}"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 17h4l9-9-4-4-9 9z M11 5l4 4" stroke="#516d77" stroke-width="1.8" fill="none" stroke-linejoin="round"/></svg></button>
+        <button class="iconbtn" data-act="editFarm" aria-label="${L("تعديل معلومات المزرعة", "Edit farm answers")}"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 17h4l9-9-4-4-9 9z M11 5l4 4" stroke="#2f9bd6" stroke-width="1.8" fill="none" stroke-linejoin="round"/></svg></button>
         <button class="iconbtn" data-act="g" data-a="mute" aria-label="${G().mute ? L("تشغيل الصوت", "Unmute") : L("كتم الصوت", "Mute")}">${G().mute ? "🔇" : "🔊"}</button></div>
       <div class="in d1">${fieldBoard(crop, 1, { cols, rows: 3, env: "day", act: "hub3", height: 250, badge: `${area} ${L("هكتار", "ha")} · ${cname(crop)}` })}</div>
       <div class="farmchips in d2"><span>${soilN}</span><span>${irr}</span><span>${L("ماء", "Water")}: ${{ low: L("قليل", "low"), medium: L("متوسط", "medium"), high: L("كافٍ", "good") }[f.water] || "—"}</span><span>${L("انحدار", "Slope")} ${l.slope}%</span></div>
@@ -1557,7 +1557,7 @@
         <button class="hubc tilt c-nasa in d3" data-act="go" data-to="nasa"><span class="hico">${ICO.sat}</span><span class="htx"><small>1</small><b>${L("تقرير ناسا لموقعك", "Your NASA location report")}</b><span>${L(`30 موسمًا من المطر والحرارة والتربة · المتوسط ${l.summary.rain_mean} ملم`, `30 seasons of rain, heat and soil · ${l.summary.rain_mean} mm average`)}</span></span></button>
         <button class="hubc tilt c-crop in d4" data-act="go" data-to="crops"><span class="hico">${ICO.sprout}</span><span class="htx"><small>2</small><b>${L("خصائص المحاصيل", "Crop characteristics")}</b><span>${L(`${CROPS.length} محاصيل · مدى ملاءمتها لمزرعتك`, `${CROPS.length} crops · how each one fits your farm`)}</span></span></button>
         <button class="hubc tilt c-game in d5" data-act="go" data-to="map"><span class="hico">${ICO.play}</span><span class="htx"><small>3</small><b>${pr.n ? L("أكمل مغامرة المزرعة", "Continue the farm adventure") : L("ابدأ اتخاذ القرارات: اللعبة", "Start making decisions: the game")}</b><span>${pr.n}/${ORDER.length} ${L("مستويات", "levels")} · ★ ${pr.stars}</span></span>
-          <span class="hring"><svg viewBox="0 0 36 36" width="44" height="44" aria-hidden="true"><circle cx="18" cy="18" r="15" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="4"/><circle cx="18" cy="18" r="15" fill="none" stroke="#e8e8bc" stroke-width="4" stroke-dasharray="${(94 * pr.n / ORDER.length).toFixed(1)} 94" transform="rotate(-90 18 18)" stroke-linecap="round"/></svg></span></button>
+          <span class="hring"><svg viewBox="0 0 36 36" width="44" height="44" aria-hidden="true"><circle cx="18" cy="18" r="15" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="4"/><circle cx="18" cy="18" r="15" fill="none" stroke="#ffe9a8" stroke-width="4" stroke-dasharray="${(94 * pr.n / ORDER.length).toFixed(1)} 94" transform="rotate(-90 18 18)" stroke-linecap="round"/></svg></span></button>
       </div>
     </div>`;
   };
@@ -1581,29 +1581,29 @@
     const l = loc(), v = l.summary.rain_oct_may, n = v.length, W = 340, H = 150, P = 26, mx = Math.max(...v) * 1.05, bw = (W - P - 6) / n;
     let b = "";
     v.forEach((x, i) => { const h = x / mx * (H - 22), dry = l.summary.driest.includes(i);
-      b += `<rect class="gbar" style="animation-delay:${i * 0.02}s" x="${(P + i * bw + 1).toFixed(1)}" y="${(H - 16 - h).toFixed(1)}" width="${(bw - 2).toFixed(1)}" height="${h.toFixed(1)}" rx="2" fill="${dry ? "#840000" : "#9CA047"}" data-tip="${DATA.seasons[i]}: ${x} ${L("ملم", "mm")}${dry ? " · " + L("من الأجف", "among the driest") : ""}"/>`; });
+      b += `<rect class="gbar" style="animation-delay:${i * 0.02}s" x="${(P + i * bw + 1).toFixed(1)}" y="${(H - 16 - h).toFixed(1)}" width="${(bw - 2).toFixed(1)}" height="${h.toFixed(1)}" rx="2" fill="${dry ? "#e8552f" : "#6cc04a"}" data-tip="${DATA.seasons[i]}: ${x} ${L("ملم", "mm")}${dry ? " · " + L("من الأجف", "among the driest") : ""}"/>`; });
     const ym = H - 16 - l.summary.rain_mean / mx * (H - 22);
-    const ticks = [0, 200, 400, 600, 800].filter((t) => t < mx).map((t) => { const y = H - 16 - t / mx * (H - 22); return `<line x1="${P}" x2="${W}" y1="${y}" y2="${y}" stroke="#e3e3bf" stroke-width="1"/><text x="${P - 4}" y="${y + 3}" text-anchor="end" font-size="8" fill="#6b706a">${t}</text>`; }).join("");
+    const ticks = [0, 200, 400, 600, 800].filter((t) => t < mx).map((t) => { const y = H - 16 - t / mx * (H - 22); return `<line x1="${P}" x2="${W}" y1="${y}" y2="${y}" stroke="#f3e2b6" stroke-width="1"/><text x="${P - 4}" y="${y + 3}" text-anchor="end" font-size="8" fill="#8a7158">${t}</text>`; }).join("");
     return `<svg viewBox="0 0 ${W} ${H}" class="chartsvg" role="img" aria-label="${L("المطر لكل موسم", "Rain per season")}">${ticks}${b}
-      <line x1="${P}" x2="${W}" y1="${ym}" y2="${ym}" stroke="#2b2a20" stroke-width="1.2" stroke-dasharray="4 3"/><text x="${W - 2}" y="${ym - 4}" text-anchor="end" font-size="8.5" font-weight="800" fill="#2b2a20">${L("المتوسط", "avg")} ${l.summary.rain_mean}</text>
-      <text x="${P}" y="${H - 3}" font-size="8" fill="#6b706a">${DATA.seasons[0]}</text><text x="${W}" y="${H - 3}" text-anchor="end" font-size="8" fill="#6b706a">${DATA.seasons[n - 1]}</text></svg>`;
+      <line x1="${P}" x2="${W}" y1="${ym}" y2="${ym}" stroke="#3a2a18" stroke-width="1.2" stroke-dasharray="4 3"/><text x="${W - 2}" y="${ym - 4}" text-anchor="end" font-size="8.5" font-weight="800" fill="#3a2a18">${L("المتوسط", "avg")} ${l.summary.rain_mean}</text>
+      <text x="${P}" y="${H - 3}" font-size="8" fill="#8a7158">${DATA.seasons[0]}</text><text x="${W}" y="${H - 3}" text-anchor="end" font-size="8" fill="#8a7158">${DATA.seasons[n - 1]}</text></svg>`;
   }
   function chartMonths() {
     const l = loc(), n = l.rain.length, R = Array(12).fill(0), Et = Array(12).fill(0);
     for (let s = 0; s < n; s++) for (let m = 0; m < 12; m++) { R[m] += l.rain[s][m] / n; Et[m] += l.et0[s][m] / n; }
     const W = 340, H = 160, P = 26, mx = Math.max(...R, ...Et) * 1.08, bw = (W - P - 6) / 12, y = (v) => H - 18 - v / mx * (H - 26);
-    let s = [0, 50, 100, 150, 200].filter((t) => t < mx).map((t) => `<line x1="${P}" x2="${W}" y1="${y(t)}" y2="${y(t)}" stroke="#e3e3bf"/><text x="${P - 4}" y="${y(t) + 3}" text-anchor="end" font-size="8" fill="#6b706a">${t}</text>`).join("");
-    R.forEach((v, m) => { s += `<rect class="gbar" style="animation-delay:${m * 0.04}s" x="${P + m * bw + 4}" y="${y(v)}" width="${bw - 8}" height="${y(0) - y(v)}" rx="3" fill="#516D77" data-tip="${mName(m)} · ${L("مطر", "rain")} ${Math.round(v)} ${L("ملم", "mm")} · ET0 ${Math.round(Et[m])} ${L("ملم", "mm")}"/><text x="${P + m * bw + bw / 2}" y="${H - 5}" text-anchor="middle" font-size="7.5" fill="#6b706a">${mName(m).slice(0, S().lang === "en" ? 3 : 4)}</text>`; });
-    s += `<path class="gline" d="${Et.map((v, m) => `${m ? "L" : "M"}${(P + m * bw + bw / 2).toFixed(1)} ${y(v).toFixed(1)}`).join(" ")}" fill="none" stroke="#840000" stroke-width="2" stroke-linejoin="round"/>`;
-    s += Et.map((v, m) => `<circle cx="${P + m * bw + bw / 2}" cy="${y(v)}" r="4" fill="#840000" stroke="#fbfbef" stroke-width="2" data-tip="${mName(m)} · ET0 ${Math.round(v)} ${L("ملم", "mm")} · ${L("مطر", "rain")} ${Math.round(R[m])} ${L("ملم", "mm")}"/>`).join("");
+    let s = [0, 50, 100, 150, 200].filter((t) => t < mx).map((t) => `<line x1="${P}" x2="${W}" y1="${y(t)}" y2="${y(t)}" stroke="#f3e2b6"/><text x="${P - 4}" y="${y(t) + 3}" text-anchor="end" font-size="8" fill="#8a7158">${t}</text>`).join("");
+    R.forEach((v, m) => { s += `<rect class="gbar" style="animation-delay:${m * 0.04}s" x="${P + m * bw + 4}" y="${y(v)}" width="${bw - 8}" height="${y(0) - y(v)}" rx="3" fill="#2f9bd6" data-tip="${mName(m)} · ${L("مطر", "rain")} ${Math.round(v)} ${L("ملم", "mm")} · ET0 ${Math.round(Et[m])} ${L("ملم", "mm")}"/><text x="${P + m * bw + bw / 2}" y="${H - 5}" text-anchor="middle" font-size="7.5" fill="#8a7158">${mName(m).slice(0, S().lang === "en" ? 3 : 4)}</text>`; });
+    s += `<path class="gline" d="${Et.map((v, m) => `${m ? "L" : "M"}${(P + m * bw + bw / 2).toFixed(1)} ${y(v).toFixed(1)}`).join(" ")}" fill="none" stroke="#e8552f" stroke-width="2" stroke-linejoin="round"/>`;
+    s += Et.map((v, m) => `<circle cx="${P + m * bw + bw / 2}" cy="${y(v)}" r="4" fill="#e8552f" stroke="#fffdf4" stroke-width="2" data-tip="${mName(m)} · ET0 ${Math.round(v)} ${L("ملم", "mm")} · ${L("مطر", "rain")} ${Math.round(R[m])} ${L("ملم", "mm")}"/>`).join("");
     return `<svg viewBox="0 0 ${W} ${H}" class="chartsvg" role="img" aria-label="${L("المطر والتبخر الشهري", "Monthly rain and evaporative demand")}">${s}</svg>`;
   }
   function chartHot() {
     const l = loc(), n = l.hot.length, Hh = Array(12).fill(0);
     for (let s = 0; s < n; s++) for (let m = 0; m < 12; m++) Hh[m] += l.hot[s][m] / n;
     const W = 340, H = 120, P = 26, mx = Math.max(...Hh, 1) * 1.1, bw = (W - P - 6) / 12, y = (v) => H - 18 - v / mx * (H - 26);
-    let s = `<rect x="${P + 7 * bw}" y="4" width="${2 * bw}" height="${H - 22}" fill="#840000" opacity=".07" rx="4"/><text x="${P + 8 * bw}" y="13" text-anchor="middle" font-size="8" font-weight="800" fill="#840000">${L("الإزهار", "flowering")}</text>`;
-    Hh.forEach((v, m) => { s += `<rect class="gbar" style="animation-delay:${m * 0.04}s" x="${P + m * bw + 4}" y="${y(v)}" width="${bw - 8}" height="${Math.max(0, y(0) - y(v))}" rx="3" fill="${m === 7 || m === 8 ? "#840000" : "#C9A15C"}" data-tip="${mName(m)} · ${v.toFixed(1)} ${L("يوم فوق 31°", "days above 31°C")}"/><text x="${P + m * bw + bw / 2}" y="${H - 5}" text-anchor="middle" font-size="7.5" fill="#6b706a">${mName(m).slice(0, S().lang === "en" ? 3 : 4)}</text>`; });
+    let s = `<rect x="${P + 7 * bw}" y="4" width="${2 * bw}" height="${H - 22}" fill="#e8552f" opacity=".07" rx="4"/><text x="${P + 8 * bw}" y="13" text-anchor="middle" font-size="8" font-weight="800" fill="#e8552f">${L("الإزهار", "flowering")}</text>`;
+    Hh.forEach((v, m) => { s += `<rect class="gbar" style="animation-delay:${m * 0.04}s" x="${P + m * bw + 4}" y="${y(v)}" width="${bw - 8}" height="${Math.max(0, y(0) - y(v))}" rx="3" fill="${m === 7 || m === 8 ? "#e8552f" : "#C9A15C"}" data-tip="${mName(m)} · ${v.toFixed(1)} ${L("يوم فوق 31°", "days above 31°C")}"/><text x="${P + m * bw + bw / 2}" y="${H - 5}" text-anchor="middle" font-size="7.5" fill="#8a7158">${mName(m).slice(0, S().lang === "en" ? 3 : 4)}</text>`; });
     return `<svg viewBox="0 0 ${W} ${H}" class="chartsvg" role="img" aria-label="${L("أيام الحر", "Hot days")}">${s}</svg>`;
   }
   A.SCREENS.nasa = () => {
@@ -1616,9 +1616,9 @@
       <div class="dock in d1"><div class="who">${salahM(80, "worried")}</div><div class="say tone-warn">${L(`باختصار يا ${esc(pname())}: آخر 3 مواسم (${dry3}) كانت الأجف في 30 سنة، ومطر البذر يتأخر، والحاجة للماء ترتفع. هذا ما ستواجهه في اللعبة.`, `In short, ${esc(pname())}: the last 3 seasons (${dry3}) were the driest in 30 years, the sowing rain comes later and water demand is rising. That's what you'll face in the game.`)}</div></div>
       <div class="cover in d2"><span class="obs">${L("رصد", "Observed")}</span> NASA POWER · ${f1(l.lat)}°, ${f1(l.lon)}° · ${L("خلية ~50 كم", "~50 km cell")} · 1995–2025 (${DATA.seasons.length} ${L("موسمًا", "seasons")})<br>SoilGrids v2.0 (250 m) · NASADEM (30 m) · ${L("الارتفاع", "elevation")} ${Math.round(l.elev)} ${L("م", "m")}</div>
       <div class="kpis in d3">${kpi(`${l.summary.rain_mean}`, L("ملم مطر أكتوبر–ماي", "mm rain Oct–May"), L("المتوسط على 30 موسمًا", "30-season average"))}${kpi(`+${Math.round(tr.et0.per_decade)}`, L("ملم ET0 / عقد", "mm ET0 / decade"), sig(tr.et0.p))}${kpi(`+${Math.round(tr.onset.per_decade)}`, L("يوم تأخر مطر البذر / عقد", "days later sowing rain / decade"), sig(tr.onset.p))}${kpi(`+${tr.tmean.per_decade}°`, L("حرارة / عقد", "temperature / decade"), sig(tr.tmean.p))}${kpi(`${so.paw100}`, L("ملم ماء متاح في التربة", "mm plant-available water"), L("أول متر · SoilGrids", "top metre · SoilGrids"))}${kpi(`${l.slope}%`, L("انحدار الحقل", "field slope"), "NASADEM")}</div>
-      <div class="panel2 chart in d3"><b>${L("مطر كل موسم (أكتوبر–ماي)", "Rain each season (Oct–May)")}</b><div class="legend2"><span><i style="background:#9CA047"></i>${L("موسم", "Season")}</span><span><i style="background:#840000"></i>${L("أجف 3 مواسم", "3 driest seasons")}</span></div>${chartSeasons()}<div class="tipbox" aria-live="polite">${L("المس عمودًا لرؤية القيمة", "Touch a bar to see its value")}</div>
+      <div class="panel2 chart in d3"><b>${L("مطر كل موسم (أكتوبر–ماي)", "Rain each season (Oct–May)")}</b><div class="legend2"><span><i style="background:#6cc04a"></i>${L("موسم", "Season")}</span><span><i style="background:#e8552f"></i>${L("أجف 3 مواسم", "3 driest seasons")}</span></div>${chartSeasons()}<div class="tipbox" aria-live="polite">${L("المس عمودًا لرؤية القيمة", "Touch a bar to see its value")}</div>
         <div class="note">${L(`التغير ${Math.round(tr.rain.per_decade)} ملم/عقد، لكنه غير دال إحصائيًا (p=${tr.rain.p}). السنوات تتقلّب كثيرًا.`, `Change ${Math.round(tr.rain.per_decade)} mm/decade, but not statistically significant (p=${tr.rain.p}). Years swing a lot.`)}</div></div>
-      <div class="panel2 chart in d4"><b>${L("المطر مقابل حاجة التبخر (متوسط شهري)", "Rain vs evaporative demand (monthly average)")}</b><div class="legend2"><span><i style="background:#516D77"></i>${L("مطر", "Rain")}</span><span><i style="background:#840000"></i>ET0</span></div>${chartMonths()}<div class="tipbox">${L("المس شهرًا", "Touch a month")}</div>
+      <div class="panel2 chart in d4"><b>${L("المطر مقابل حاجة التبخر (متوسط شهري)", "Rain vs evaporative demand (monthly average)")}</b><div class="legend2"><span><i style="background:#2f9bd6"></i>${L("مطر", "Rain")}</span><span><i style="background:#e8552f"></i>ET0</span></div>${chartMonths()}<div class="tipbox">${L("المس شهرًا", "Touch a month")}</div>
         <div class="note">${L("عندما يتجاوز الخط الأحمر الأعمدة، يعتمد المحصول على ماء التربة المخزّن.", "When the red line rises above the bars, the crop relies on water stored in the soil.")}</div></div>
       <div class="panel2 chart in d4"><b>${L("أيام الحر فوق 31° (متوسط شهري)", "Days above 31°C (monthly average)")}</b>${chartHot()}<div class="tipbox">${L("المس شهرًا", "Touch a month")}</div>
         <div class="note">${L(`أفريل+ماي: ${tr.hot_flowering.early} ← ${tr.hot_flowering.late} يوم بين 1995–2004 و2015–2024.`, `April+May: ${tr.hot_flowering.early} → ${tr.hot_flowering.late} days between 1995–2004 and 2015–2024.`)} ${sig(tr.hot_flowering.p)}</div></div>
@@ -1626,7 +1626,7 @@
         <div class="trtab">${TR.map(([k, nm, u]) => { const t = tr[k]; return `<div class="trrow"><span class="trn">${nm}<small>${u}</small></span><span dir="ltr" class="trv">${f1(t.early)} → <b>${f1(t.late)}</b></span>${sig(t.p)}</div>`; }).join("")}</div>
         <div class="note">${L("اتجاه Theil–Sen واختبار Mann–Kendall على 30 موسمًا. \"دال\" = p<0.05.", "Theil–Sen slope and Mann–Kendall test over 30 seasons. \"Significant\" = p<0.05.")}</div></div>
       <div class="panel2 in d5"><b>${L("تربتك (SoilGrids)", "Your soil (SoilGrids)")}</b>
-        <div class="texbar"><i style="width:${so.clay}%;background:#840000">${L("طين", "Clay")} ${so.clay}%</i><i style="width:${so.silt}%;background:#C9A15C">${L("طمي", "Silt")} ${so.silt}%</i><i style="width:${so.sand}%;background:#E8E8BC;color:#2b2a20">${L("رمل", "Sand")} ${so.sand}%</i></div>
+        <div class="texbar"><i style="width:${so.clay}%;background:#e8552f">${L("طين", "Clay")} ${so.clay}%</i><i style="width:${so.silt}%;background:#C9A15C">${L("طمي", "Silt")} ${so.silt}%</i><i style="width:${so.sand}%;background:#ffe9a8;color:#3a2a18">${L("رمل", "Sand")} ${so.sand}%</i></div>
         <div class="facts" style="margin-top:8px"><div class="fact">${L("القوام", "Texture")}<b>${so.texture}</b></div><div class="fact">pH<b>${so.ph}</b></div><div class="fact">${L("الكربون العضوي", "Organic carbon")}<b>${so.soc} g/kg</b></div><div class="fact">CEC<b>${so.cec} cmol/kg</b></div></div>
         <div class="note">${L("قيم تقديرية لخلية 250 م، وليست تحليلًا لحقلك. الملوحة غير متوفرة في بياناتنا.", "Estimates for a 250 m cell, not a test of your field. Salinity is not in our data.")}</div></div>
       <div class="panel2 in d5"><b>${L("مؤشر FAO GAEZ v4", "FAO GAEZ v4 benchmark")}</b><p style="margin:4px 0 0;font-size:13.5px;line-height:1.6">${L(`المردود الممكن للقمح المطري (مدخلات عالية): حوالي ${l.gaez_wheat} كغ/هكتار في هذه الخلية.`, `Attainable rainfed wheat yield (high inputs): about ${l.gaez_wheat} kg/ha in this cell.`)}</p></div>

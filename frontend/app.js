@@ -117,9 +117,9 @@
   let PREV = { scale: null, lvl: null, soil: null };
 
   const ICON = {
-    back: '<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M7 4l5 5-5 5" stroke="#516d77" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-    fwd: '<svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M12 5l-5 5 5 5" stroke="#fbfbef" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
-    tick: '<svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3L12.5 5" stroke="#fbfbef" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    back: '<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M7 4l5 5-5 5" stroke="#2f9bd6" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    fwd: '<svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M12 5l-5 5 5 5" stroke="#fffdf4" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    tick: '<svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3L12.5 5" stroke="#fffdf4" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   };
   const salah = (size, cls = "") => `<span class="${cls}" style="display:inline-block;width:${size}px;height:${size}px;max-width:100%;max-height:100%">${ART.salah.replace(/__S__/g, size)}</span>`;
   const backBtn = (to) => `<button class="back" data-act="go" data-to="${to}" aria-label="${t().back}">${S.lang === "en" ? ICON.back.replace('M7 4l5 5-5 5', 'M11 4l-5 5 5 5') : ICON.back}</button>`;
@@ -177,20 +177,20 @@
   SCREENS.welcome = () => `
   <div class="welcome">
     <svg width="100%" height="100%" viewBox="0 0 390 844" preserveAspectRatio="xMidYMax slice" aria-hidden="true" style="position:absolute;inset:0">
-      <defs><radialGradient id="msun" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#fbfbe4"/><stop offset="1" stop-color="#e8e8bc"/></radialGradient>
-      <linearGradient id="mh1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b5b862"/><stop offset="1" stop-color="#9ca047"/></linearGradient>
-      <linearGradient id="mh2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9ca047"/><stop offset="1" stop-color="#7d8136"/></linearGradient></defs>
+      <defs><radialGradient id="msun" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#fffbe6"/><stop offset="1" stop-color="#ffe9a8"/></radialGradient>
+      <linearGradient id="mh1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9be070"/><stop offset="1" stop-color="#6cc04a"/></linearGradient>
+      <linearGradient id="mh2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6cc04a"/><stop offset="1" stop-color="#4a9e2f"/></linearGradient></defs>
       <circle cx="300" cy="140" r="54" fill="url(#msun)"/>
-      <path d="M40 210 q20 -18 44 -6 q14 -14 34 -2 q18 2 14 16 Z" fill="#fbfbef" opacity=".8"/><path d="M200 90 q16 -14 36 -4 q12 -10 28 0 q14 2 10 12 Z" fill="#fbfbef" opacity=".7"/>
+      <path d="M40 210 q20 -18 44 -6 q14 -14 34 -2 q18 2 14 16 Z" fill="#fffdf4" opacity=".8"/><path d="M200 90 q16 -14 36 -4 q12 -10 28 0 q14 2 10 12 Z" fill="#fffdf4" opacity=".7"/>
       <path d="M0 600 C90 560 160 590 230 576 C300 562 350 572 390 560 L390 844 L0 844 Z" fill="url(#mh1)"/>
       <path d="M0 690 C80 662 170 684 250 668 C320 656 360 664 390 658 L390 844 L0 844 Z" fill="url(#mh2)"/>
-      <g stroke="#e8e8bc" stroke-width="2" opacity=".5" stroke-linecap="round"><path d="M20 740 l60 -8 M100 760 l70 -9 M240 730 l70 -8 M260 770 l90 -10"/></g>
-      <g class="hi" stroke="#840000" stroke-width="5" stroke-linecap="round" fill="none"><path d="M318 286 q16 10 18 30"/><path d="M334 268 q24 16 26 46"/></g>
+      <g stroke="#ffe9a8" stroke-width="2" opacity=".5" stroke-linecap="round"><path d="M20 740 l60 -8 M100 760 l70 -9 M240 730 l70 -8 M260 770 l90 -10"/></g>
+      <g class="hi" stroke="#e8552f" stroke-width="5" stroke-linecap="round" fill="none"><path d="M318 286 q16 10 18 30"/><path d="M334 268 q24 16 26 46"/></g>
     </svg>
     <div style="position:absolute;left:50%;top:clamp(180px,29%,250px);transform:translateX(-50%);max-width:min(340px,88%);display:flex;justify-content:center"><div class="pop d1">${salah(340, "wave")}</div></div>
     <div style="position:absolute;left:0;right:0;bottom:64px;display:flex;flex-direction:column;align-items:center;gap:18px">
-      <div class="dots in d4" aria-hidden="true"><i class="on"></i><i style="background:#fbfbef"></i><i style="background:#fbfbef"></i></div>
-      <div class="pop d5"><button class="go" data-act="go" data-to="lang" aria-label="${t().start}"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path d="M11 7l8 8-8 8" stroke="#fbfbef" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+      <div class="dots in d4" aria-hidden="true"><i class="on"></i><i style="background:#fffdf4"></i><i style="background:#fffdf4"></i></div>
+      <div class="pop d5"><button class="go" data-act="go" data-to="lang" aria-label="${t().start}"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path d="M11 7l8 8-8 8" stroke="#fffdf4" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
     </div>
   </div>`;
 
@@ -198,14 +198,14 @@
   SCREENS.lang = () => {
     const T = t(), card = (id, badge, name, sub, dir) => `
       <button class="opt ${S.lang === id ? "on" : ""}" role="radio" aria-checked="${S.lang === id}" data-act="lang" data-v="${id}" style="min-height:88px;padding:16px">
-        <span style="flex:none;width:52px;height:52px;border-radius:16px;display:grid;place-items:center;font-size:22px;font-weight:800;${S.lang === id ? "background:#516d77;color:#fbfbef" : "background:#e8e8bc;color:#3f565e"}">${badge}</span>
+        <span style="flex:none;width:52px;height:52px;border-radius:16px;display:grid;place-items:center;font-size:22px;font-weight:800;${S.lang === id ? "background:#2f9bd6;color:#fffdf4" : "background:#ffe9a8;color:#1f78ab"}">${badge}</span>
         <span style="flex:1" dir="${dir}"><b style="font-size:21px">${name}</b><small>${sub}</small></span>
-        <span style="flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;${S.lang === id ? "background:#9ca047" : "border:2px solid #d6d6a8"}">${S.lang === id ? ICON.tick : ""}</span>
+        <span style="flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;${S.lang === id ? "background:#6cc04a" : "border:2px solid #f0d9a0"}">${S.lang === id ? ICON.tick : ""}</span>
       </button>`;
     return `<div class="screen">
       <div class="top in" style="justify-content:space-between">${backBtn("welcome")}<div class="dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div></div>
       <div class="pop d1" style="display:flex;flex-direction:column;align-items:center;gap:6px">${salah(140, "wave2")}
-        <div class="bubble" style="text-align:center;border-radius:20px"><div style="font-size:17px;font-weight:800">${TXT.ar.langQ}</div><div dir="ltr" style="font-size:14px;font-weight:700;color:#516d77">${TXT.en.langQ}</div></div></div>
+        <div class="bubble" style="text-align:center;border-radius:20px"><div style="font-size:17px;font-weight:800">${TXT.ar.langQ}</div><div dir="ltr" style="font-size:14px;font-weight:700;color:#2f9bd6">${TXT.en.langQ}</div></div></div>
       <div role="radiogroup" class="in d3" style="display:flex;flex-direction:column;gap:12px">${card("ar", "ع", "العربية", "Arabic", "rtl")}${card("en", "En", "English", "الإنجليزية", "ltr")}</div>
       <div class="in d4 muted" style="text-align:center;font-size:13px">${S.lang ? T.voice : TXT.ar.voice + " · " + TXT.en.voice}</div>
       <div class="spacer"></div>
@@ -219,32 +219,32 @@
     const T = t();
     return `<div class="screen" style="position:relative;padding:0">
       <div style="position:absolute;top:16px;inset-inline-start:16px;z-index:10">${backBtn("lang")}</div>
-      <div aria-hidden="true" style="padding:16px 20px;padding-top:68px;opacity:.5;display:flex;flex-direction:column;gap:12px"><div style="height:210px;border-radius:30px;background:#dfe7e9"></div><div style="height:64px;width:80%;border-radius:20px;background:#fbfbef"></div></div>
-      <div class="fade" data-act="go" data-to="lang" aria-label="${T.back}" style="position:absolute;inset:0;background:rgba(43,58,63,.55);cursor:pointer"></div>
-      <div role="dialog" aria-labelledby="locT" class="sheet" style="position:absolute;left:0;right:0;bottom:0;background:#fbfbef;border-radius:32px 32px 0 0;padding:14px 22px 26px;display:flex;flex-direction:column;gap:14px;box-shadow:0 -12px 30px rgba(43,58,63,.25)">
-        <div style="display:flex;align-items:center;justify-content:space-between;width:100%">${backBtn("lang")}<div style="width:48px;height:5px;border-radius:3px;background:#c9c99a"></div><div style="width:44px"></div></div>
-        <div style="height:168px;border-radius:24px;background:#e8e8bc;position:relative;overflow:hidden">
+      <div aria-hidden="true" style="padding:16px 20px;padding-top:68px;opacity:.5;display:flex;flex-direction:column;gap:12px"><div style="height:210px;border-radius:30px;background:#cdeeff"></div><div style="height:64px;width:80%;border-radius:20px;background:#fffdf4"></div></div>
+      <div class="fade" data-act="go" data-to="lang" aria-label="${T.back}" style="position:absolute;inset:0;background:rgba(24,86,128,.55);cursor:pointer"></div>
+      <div role="dialog" aria-labelledby="locT" class="sheet" style="position:absolute;left:0;right:0;bottom:0;background:#fffdf4;border-radius:32px 32px 0 0;padding:14px 22px 26px;display:flex;flex-direction:column;gap:14px;box-shadow:0 -12px 30px rgba(24,86,128,.25)">
+        <div style="display:flex;align-items:center;justify-content:space-between;width:100%">${backBtn("lang")}<div style="width:48px;height:5px;border-radius:3px;background:#e6c27e"></div><div style="width:44px"></div></div>
+        <div style="height:168px;border-radius:24px;background:#ffe9a8;position:relative;overflow:hidden">
           <svg width="100%" height="168" viewBox="0 0 346 168" preserveAspectRatio="xMidYMid slice" aria-hidden="true" style="position:absolute;inset:0">
-            <defs><radialGradient id="pinG" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#c23a2c"/><stop offset=".6" stop-color="#840000"/><stop offset="1" stop-color="#4f0000"/></radialGradient></defs>
-            <path d="M-10 40 L120 10 L200 60 L80 100 Z" fill="#c8cc6a"/><path d="M200 60 L320 20 L360 90 L240 120 Z" fill="#9ca047"/><path d="M80 100 L200 60 L240 120 L110 170 Z" fill="#b5b862"/>
-            <path d="M-10 120 L80 100 L110 170 L-10 180 Z" fill="#9ca047" opacity=".8"/><path d="M240 120 L360 90 L360 180 L260 180 Z" fill="#c8cc6a"/>
-            <path d="M-10 70 C90 80 140 40 220 90 S330 140 360 120" stroke="#516d77" stroke-width="7" fill="none" opacity=".55" stroke-linecap="round"/>
-            <g class="pin"><path d="M172 122 C160 104 148 92 148 76 C148 62 159 52 172 52 C185 52 196 62 196 76 C196 92 184 104 172 122 Z" fill="url(#pinG)"/><circle cx="172" cy="76" r="9" fill="#fbfbef"/><ellipse cx="164" cy="64" rx="6" ry="4" fill="#fff" opacity=".35"/></g>
-            <circle class="ring" cx="172" cy="124" r="30" fill="none" stroke="#840000" stroke-width="3"/>
+            <defs><radialGradient id="pinG" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#c23a2c"/><stop offset=".6" stop-color="#e8552f"/><stop offset="1" stop-color="#4f0000"/></radialGradient></defs>
+            <path d="M-10 40 L120 10 L200 60 L80 100 Z" fill="#b5ea86"/><path d="M200 60 L320 20 L360 90 L240 120 Z" fill="#6cc04a"/><path d="M80 100 L200 60 L240 120 L110 170 Z" fill="#9be070"/>
+            <path d="M-10 120 L80 100 L110 170 L-10 180 Z" fill="#6cc04a" opacity=".8"/><path d="M240 120 L360 90 L360 180 L260 180 Z" fill="#b5ea86"/>
+            <path d="M-10 70 C90 80 140 40 220 90 S330 140 360 120" stroke="#2f9bd6" stroke-width="7" fill="none" opacity=".55" stroke-linecap="round"/>
+            <g class="pin"><path d="M172 122 C160 104 148 92 148 76 C148 62 159 52 172 52 C185 52 196 62 196 76 C196 92 184 104 172 122 Z" fill="url(#pinG)"/><circle cx="172" cy="76" r="9" fill="#fffdf4"/><ellipse cx="164" cy="64" rx="6" ry="4" fill="#fff" opacity=".35"/></g>
+            <circle class="ring" cx="172" cy="124" r="30" fill="none" stroke="#e8552f" stroke-width="3"/>
           </svg>
           <div style="position:absolute;bottom:6px;inset-inline-start:10px">${salah(86, "wave1")}</div>
         </div>
 
         ${PENDING_GEO ? `
-          <div class="in d2" style="background:#f4f6e8;border:2px solid #7d8136;border-radius:18px;padding:12px 14px;display:flex;flex-direction:column;gap:6px">
+          <div class="in d2" style="background:#f4f6e8;border:2px solid #4a9e2f;border-radius:18px;padding:12px 14px;display:flex;flex-direction:column;gap:6px">
             <div style="display:flex;align-items:center;gap:10px">
               <span style="font-size:24px">📍</span>
               <div style="flex:1">
-                <div style="font-size:11px;font-weight:800;color:#516d77">${T.detectedLoc}</div>
-                <div style="font-size:18px;font-weight:900;color:#2b2a20;line-height:1.25">${esc(PENDING_GEO.town)}</div>
+                <div style="font-size:11px;font-weight:800;color:#2f9bd6">${T.detectedLoc}</div>
+                <div style="font-size:18px;font-weight:900;color:#3a2a18;line-height:1.25">${esc(PENDING_GEO.town)}</div>
               </div>
             </div>
-            <div style="display:flex;justify-content:space-between;align-items:center;font-size:11.5px;color:#516d77;border-top:1px dashed #d6dcba;padding-top:6px;margin-top:2px">
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:11.5px;color:#2f9bd6;border-top:1px dashed #d6dcba;padding-top:6px;margin-top:2px">
               <span dir="ltr"><b>GPS:</b> ${PENDING_GEO.lat.toFixed(4)}°, ${PENDING_GEO.lon.toFixed(4)}°</span>
               ${PENDING_GEO.gridName ? `<span>🛰️ ${esc(PENDING_GEO.gridName)}</span>` : ""}
             </div>
@@ -276,13 +276,13 @@
       <div class="in d2"><label class="lbl" for="town">${T.townLbl}</label>
         <input id="town" class="field" type="text" autocomplete="off" placeholder="${T.townPh}" value="${PICK && PICK.town ? esc(PICK.town) : ""}">
         <div id="sugg" class="sugg card" style="margin-top:6px;overflow:hidden;display:none"></div></div>
-      <div class="in d3" style="display:flex;align-items:center;gap:10px;color:#4f5a5e;font-size:13px"><span style="flex:1;height:1px;background:#d6d6a8"></span>${T.or}<span style="flex:1;height:1px;background:#d6d6a8"></span></div>
+      <div class="in d3" style="display:flex;align-items:center;gap:10px;color:#6a5440;font-size:13px"><span style="flex:1;height:1px;background:#f0d9a0"></span>${T.or}<span style="flex:1;height:1px;background:#f0d9a0"></span></div>
       <div class="in d4"><button class="secondary" data-act="map">${T.onMap}</button><div id="mapbox"></div></div>
-      <details class="in d5" style="font-size:13px;color:#3f565e"><summary style="cursor:pointer;font-weight:700;min-height:32px">${T.gps}</summary>
+      <details class="in d5" style="font-size:13px;color:#1f78ab"><summary style="cursor:pointer;font-weight:700;min-height:32px">${T.gps}</summary>
         <div style="display:flex;gap:8px;margin-top:6px">
           <label style="flex:1;display:flex;flex-direction:column;gap:2px">${T.lat}<input id="lat" type="text" inputmode="decimal" placeholder="35.37" dir="ltr" class="field" style="font-size:15px;padding:8px;border-width:1.5px"></label>
           <label style="flex:1;display:flex;flex-direction:column;gap:2px">${T.lon}<input id="lon" type="text" inputmode="decimal" placeholder="1.32" dir="ltr" class="field" style="font-size:15px;padding:8px;border-width:1.5px"></label></div></details>
-      <div id="manMsg" style="font-size:14px;font-weight:700;color:#840000"></div>
+      <div id="manMsg" style="font-size:14px;font-weight:700;color:#e8552f"></div>
       <div class="spacer"></div>
       <button id="confirmLoc" class="primary in d6" data-act="confirmLoc" ${PICK ? "" : "disabled"}>${PICK ? T.confirm + (PICK.town ? ": " + esc(PICK.town) : "") : T.chooseFirst}</button>
     </div>`;
@@ -337,10 +337,10 @@
     return `<div class="screen">${ART.avatars}
       <div class="top in" style="justify-content:space-between">${backBtn("location")}<div class="dots" aria-hidden="true"><i class="on"></i><i></i><i></i></div></div>
       <div class="pop d1" style="display:flex;flex-direction:column;align-items:center;gap:8px">
-        <div style="position:relative;width:132px;height:132px"><div style="width:132px;height:132px;border-radius:50%;box-shadow:0 8px 0 #d6d6a8,0 14px 28px rgba(43,58,63,.18);overflow:hidden;background:#fbfbef">
+        <div style="position:relative;width:132px;height:132px"><div style="width:132px;height:132px;border-radius:50%;box-shadow:0 8px 0 #f0d9a0,0 14px 28px rgba(24,86,128,.18);overflow:hidden;background:#fffdf4">
           <svg id="avPrev" class="swap" width="132" height="132" viewBox="0 0 100 100" role="img" aria-label="${T.av[S.avatar]}"><use href="#av-${S.avatar}"/></svg></div>
           <div style="position:absolute;bottom:-2px;inset-inline-start:-8px">${salah(64)}</div></div>
-        <div style="font-size:24px;font-weight:800">${T.hello}<span id="hiName" style="color:#840000">${esc(nm || T.friend)}</span>!</div></div>
+        <div style="font-size:24px;font-weight:800">${T.hello}<span id="hiName" style="color:#e8552f">${esc(nm || T.friend)}</span>!</div></div>
       <div class="in d2"><label class="lbl" for="fname">${T.nameQ}</label><input id="fname" class="field" type="text" autocomplete="given-name" placeholder="${T.namePh}" value="${esc(S.name)}"></div>
       <div class="in d3" style="display:flex;flex-direction:column;gap:8px"><div style="font-size:15px;font-weight:800">${T.pickAv}</div>
         <div role="radiogroup" class="stagger" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px">
@@ -367,7 +367,7 @@
   const SEASONS_LBL = ["2024–25", "2023–24", "2022–23", "2021–22", "2020–21"];
   SCREENS.farm = () => `<div class="screen" style="gap:12px">
       <div class="top in"><button class="back" data-act="qback" aria-label="${t().back}">${S.lang === "en" ? ICON.back.replace('M7 4l5 5-5 5', 'M11 4l-5 5 5 5') : ICON.back}</button>
-        <div style="flex:1;display:flex;flex-direction:column;gap:4px"><div style="display:flex;justify-content:space-between;font-size:12.5px;font-weight:700;color:#3f565e"><span>${t().aboutFarm}</span><span id="qCount"></span></div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:4px"><div style="display:flex;justify-content:space-between;font-size:12.5px;font-weight:700;color:#1f78ab"><span>${t().aboutFarm}</span><span id="qCount"></span></div>
         <div class="progress"><i id="qBar" style="width:0"></i></div></div></div>
       <div id="scene" class="scene in d1"></div>
       <div id="qBox" style="flex:1;display:flex;flex-direction:column;gap:10px"></div>
@@ -390,33 +390,33 @@
     const A = animate ? "" : " style-still";
     let body = "";
     if (k === "area") {
-      body = `<div class="stepper"><button data-act="area" data-d="0.5" aria-label="+" style="background:#516d77;color:#fbfbef">+</button>
-        <label style="flex:1;display:flex;flex-direction:column;align-items:center"><input id="areaIn" type="number" inputmode="decimal" min="0" step="0.5" value="${f.area}" dir="ltr"><span style="font-size:14px;font-weight:700;color:#3f565e">${T.ha}</span></label>
-        <button data-act="area" data-d="-0.5" aria-label="−" style="background:#e8e8bc;color:#3f565e">−</button></div>
+      body = `<div class="stepper"><button data-act="area" data-d="0.5" aria-label="+" style="background:#2f9bd6;color:#fffdf4">+</button>
+        <label style="flex:1;display:flex;flex-direction:column;align-items:center"><input id="areaIn" type="number" inputmode="decimal" min="0" step="0.5" value="${f.area}" dir="ltr"><span style="font-size:14px;font-weight:700;color:#1f78ab">${T.ha}</span></label>
+        <button data-act="area" data-d="-0.5" aria-label="−" style="background:#ffe9a8;color:#1f78ab">−</button></div>
         <div class="stagger" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px">${[1, 5, 10, 20].map((v) => `<button class="chip ${Number(f.area) === v ? "on" : ""}" style="justify-content:center" data-act="areaSet" data-v="${v}">${v === 20 ? "+20" : v}</button>`).join("")}</div>`;
     } else if (q[2]) {
       body = `<div role="radiogroup" class="stagger" style="display:flex;flex-direction:column;gap:10px">${q[2].map((o) => {
         const on = f[k] === o[0], soon = !!o[3];
         return `<button class="opt ${on ? "on" : ""}" role="radio" aria-checked="${on}" ${soon ? 'aria-disabled="true"' : ""} data-act="${soon ? "" : "ans"}" data-k="${k}" data-v="${o[0]}">
           <span class="rad"></span><span style="flex:1"><b>${o[1]}</b>${o[2] ? `<small>${o[2]}</small>` : ""}</span>${soon ? `<span class="tag">${T.soon}</span>` : ""}</button>`; }).join("")}</div>`;
-      if (k === "intent" && f.intent === "crop") body += `<div class="card reveal" style="padding:10px 12px;display:flex;flex-direction:column;gap:8px;box-shadow:none"><div style="font-size:14px;font-weight:800;color:#3f565e">${T.whichCrop}</div>
+      if (k === "intent" && f.intent === "crop") body += `<div class="card reveal" style="padding:10px 12px;display:flex;flex-direction:column;gap:8px;box-shadow:none"><div style="font-size:14px;font-weight:800;color:#1f78ab">${T.whichCrop}</div>
         <div class="chips">${CROPLIST.filter((c) => c !== "fallow").map((c) => `<button class="chip ${f.focus === c ? "on" : ""}" data-act="ans" data-k="focus" data-v="${c}">${T.crops[c]}</button>`).join("")}</div></div>`;
     } else if (k === "history") {
-      body = `<div class="stagger" style="display:flex;flex-direction:column;gap:8px">${f.history.map((v, i) => `<label class="histrow"><span style="flex:none;width:74px;font-size:13px;font-weight:800;color:#3f565e" dir="ltr">${SEASONS_LBL[i]}</span>
+      body = `<div class="stagger" style="display:flex;flex-direction:column;gap:8px">${f.history.map((v, i) => `<label class="histrow"><span style="flex:none;width:74px;font-size:13px;font-weight:800;color:#1f78ab" dir="ltr">${SEASONS_LBL[i]}</span>
         <select data-hist="${i}"><option value="unknown" ${v === "unknown" ? "selected" : ""}>${T.unknown}</option>${CROPLIST.map((c) => `<option value="${c}" ${v === c ? "selected" : ""}>${T.crops[c]}</option>`).join("")}</select></label>`).join("")}
-        ${f.history.length < 5 ? `<button data-act="addHist" style="align-self:flex-start;border:2px dashed #9ca047;background:transparent;color:#3f565e;border-radius:14px;padding:8px 14px;font-weight:800;font-size:14px;min-height:44px">${T.moreSeason}</button>` : ""}</div>`;
+        ${f.history.length < 5 ? `<button data-act="addHist" style="align-self:flex-start;border:2px dashed #6cc04a;background:transparent;color:#1f78ab;border-radius:14px;padding:8px 14px;font-weight:800;font-size:14px;min-height:44px">${T.moreSeason}</button>` : ""}</div>`;
     } else if (k === "current") {
       body = `<div class="chips stagger">${CROPLIST.filter((c) => c !== "fallow").concat(["none"]).map((c) => `<button class="chip ${f.current === c ? "on" : ""}" data-act="ans" data-k="current" data-v="${c}">${c === "none" ? T.none : T.crops[c]}</button>`).join("")}</div>`;
     } else if (k === "prios") {
       const full = f.prios.length >= 3;
-      body = `<div style="font-size:14px;font-weight:800;color:#840000">${T.chosen(f.prios.length)}</div>
+      body = `<div style="font-size:14px;font-weight:800;color:#e8552f">${T.chosen(f.prios.length)}</div>
         <div class="chips stagger">${PRIOS.map((p) => { const on = f.prios.includes(p); return `<button class="chip ${on ? "on" : ""} ${full && !on ? "dim" : ""}" aria-pressed="${on}" data-act="prio" data-v="${p}">${on ? '<span class="ck"></span>' : ""}${T.prio[p]}</button>`; }).join("")}</div>`;
     } else if (k === "order") {
-      const W = f.prios.length === 1 ? ["100%"] : f.prios.length === 2 ? ["60%", "40%"] : ["50%", "30%", "20%"], C = ["#840000", "#a33a2a", "#b8705f"];
+      const W = f.prios.length === 1 ? ["100%"] : f.prios.length === 2 ? ["60%", "40%"] : ["50%", "30%", "20%"], C = ["#e8552f", "#a33a2a", "#b8705f"];
       body = `<div class="stagger" style="display:flex;flex-direction:column;gap:10px">${f.prios.map((p, i) => `<div class="orow"><span class="rk" style="background:${C[i]}">${i + 1}</span>
         <span style="flex:1"><b style="display:block;font-size:16.5px">${T.prio[p]}</b><small class="muted" style="font-size:12.5px">${T.weight}: ${W[i]}</small></span>
-        <button data-act="move" data-i="${i}" data-d="-1" aria-label="${T.up}" ${i === 0 ? "disabled" : ""}><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 10l4-4 4 4" stroke="#fbfbef" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-        <button data-act="move" data-i="${i}" data-d="1" aria-label="${T.down}" ${i === f.prios.length - 1 ? "disabled" : ""}><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="#fbfbef" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>`).join("")}</div>`;
+        <button data-act="move" data-i="${i}" data-d="-1" aria-label="${T.up}" ${i === 0 ? "disabled" : ""}><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 10l4-4 4 4" stroke="#fffdf4" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button data-act="move" data-i="${i}" data-d="1" aria-label="${T.down}" ${i === f.prios.length - 1 ? "disabled" : ""}><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4" stroke="#fffdf4" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>`).join("")}</div>`;
     }
     box.innerHTML = `<div class="${animate ? "qin" : ""}"><h1 style="font-size:22px;font-weight:800">${q[0]}</h1>${q[1] ? `<div class="muted" style="font-size:13.5px;line-height:1.5">${q[1]}</div>` : ""}</div><div class="${animate ? "qin" : "still"}" style="display:flex;flex-direction:column;gap:10px">${body}</div>`;
     if (!animate) box.querySelectorAll(".stagger>*").forEach((e) => (e.style.animation = "none"));
@@ -450,7 +450,7 @@
     const rows = [192, 174, 157, 141, 127];
     const furrows = rows.map((y) => { const tt = (192 - y) / 74, x0 = 30 + 38 * tt, x1 = 320 - 38 * tt; return { y, x0, x1, d: `M${x0} ${y} L${x1} ${y}`, delay: (tt * 0.5).toFixed(2) }; });
     const shown = f.current && f.current !== "none" ? f.current : (f.history[0] && !["unknown", "fallow"].includes(f.history[0]) ? f.history[0] : null);
-    const LOOK = { wheat: ["#b8903a", "#e0b44a", "c"], barley: ["#a8963c", "#d8c46a", "c"], oat: ["#8f9a46", "#c8cc6a", "c"], lentil: ["", "#9ca047", "b"], chickpea: ["", "#e8e8bc", "b"], faba: ["", "#fbfbef", "b"], vetch: ["", "#8a4fbf", "b"] };
+    const LOOK = { wheat: ["#b8903a", "#ffc83a", "c"], barley: ["#a8963c", "#f5d76e", "c"], oat: ["#8f9a46", "#b5ea86", "c"], lentil: ["", "#6cc04a", "b"], chickpea: ["", "#ffe9a8", "b"], faba: ["", "#fffdf4", "b"], vetch: ["", "#8a4fbf", "b"] };
     let plants = "";
     if (shown && LOOK[shown]) {
       const L = LOOK[shown], per = a < 2 ? 5 : a < 10 ? 7 : 9;
@@ -458,48 +458,48 @@
         const x = Math.round(fr.x0 + (fr.x1 - fr.x0) * (k + 0.5) / per), sc = (0.6 + 0.4 * (1 - r / 5)).toFixed(2), dl = ((r * per + k) * 0.03).toFixed(2);
         const shape = L[2] === "c"
           ? `<path d="M0 0 V-22 M-4 0 V-17 M4 0 V-18" stroke="${L[0]}" stroke-width="2" stroke-linecap="round"/><ellipse cx="0" cy="-25" rx="2.6" ry="6" fill="${L[1]}"/><ellipse cx="-4" cy="-20" rx="2.2" ry="5" fill="${L[1]}"/><ellipse cx="4" cy="-21" rx="2.2" ry="5" fill="${L[1]}"/>`
-          : `<circle cx="-5" cy="-7" r="6" fill="#7d8136"/><circle cx="5" cy="-8" r="6.5" fill="#9ca047"/><circle cx="0" cy="-13" r="6" fill="#b5b862"/><circle cx="2" cy="-12" r="1.8" fill="${L[1]}"/><circle cx="-5" cy="-6" r="1.6" fill="${L[1]}"/>`;
+          : `<circle cx="-5" cy="-7" r="6" fill="#4a9e2f"/><circle cx="5" cy="-8" r="6.5" fill="#6cc04a"/><circle cx="0" cy="-13" r="6" fill="#9be070"/><circle cx="2" cy="-12" r="1.8" fill="${L[1]}"/><circle cx="-5" cy="-6" r="1.6" fill="${L[1]}"/>`;
         plants += `<g transform="translate(${x} ${fr.y - 2}) scale(${sc})"><g class="${fx.has("crop") ? "grow" : ""}" style="animation-delay:${dl}s"><g class="sway" style="animation-delay:${dl}s">${shape}</g></g></g>`;
       } });
     }
     const irr = f.irrig || "rain", ir = fx.has("irrig");
     const lvl = { low: 0.22, medium: 0.55, high: 0.9 }[f.water] || 0.08, fromLvl = PREV.lvl == null ? lvl : PREV.lvl;
-    const flags = f.prios.map((p, i) => `<g transform="translate(${70 + i * 22} 112)"><g class="${fx.has("prios") ? "grow" : ""}"><path d="M0 0 V-26" stroke="#5a4535" stroke-width="2.4"/><g class="flag"><path d="M0 -26 L16 -21 L0 -16 Z" fill="${["#840000", "#a33a2a", "#b8705f"][i]}"/><text x="6" y="-19" font-size="7" font-weight="800" fill="#fbfbef" text-anchor="middle">${i + 1}</text></g></g></g>`).join("");
+    const flags = f.prios.map((p, i) => `<g transform="translate(${70 + i * 22} 112)"><g class="${fx.has("prios") ? "grow" : ""}"><path d="M0 0 V-26" stroke="#7a5236" stroke-width="2.4"/><g class="flag"><path d="M0 -26 L16 -21 L0 -16 Z" fill="${["#e8552f", "#a33a2a", "#b8705f"][i]}"/><text x="6" y="-19" font-size="7" font-weight="800" fill="#fffdf4" text-anchor="middle">${i + 1}</text></g></g></g>`).join("");
     const hist = f.history.filter((h) => h && h !== "unknown");
-    const tractor = `<g class="tractor"><g transform="translate(0 150)"><rect x="6" y="-20" width="34" height="16" rx="4" fill="#840000"/><rect x="24" y="-34" width="14" height="16" rx="3" fill="#a51a1a"/><rect x="27" y="-31" width="8" height="8" rx="1" fill="#dfe7e9"/><path d="M12 -20 v-8" stroke="#3f565e" stroke-width="3"/><circle cx="34" cy="-4" r="9" fill="#2c3f45"/><circle cx="34" cy="-4" r="4" fill="#9ca047"/><circle cx="12" cy="-2" r="6" fill="#2c3f45"/><circle cx="12" cy="-2" r="2.5" fill="#9ca047"/></g></g>`;
-    el.style.background = irr === "rain" ? "#d4dfe3" : "#dfe7e9";
+    const tractor = `<g class="tractor"><g transform="translate(0 150)"><rect x="6" y="-20" width="34" height="16" rx="4" fill="#e8552f"/><rect x="24" y="-34" width="14" height="16" rx="3" fill="#ff7a45"/><rect x="27" y="-31" width="8" height="8" rx="1" fill="#cdeeff"/><path d="M12 -20 v-8" stroke="#1f78ab" stroke-width="3"/><circle cx="34" cy="-4" r="9" fill="#24506a"/><circle cx="34" cy="-4" r="4" fill="#6cc04a"/><circle cx="12" cy="-2" r="6" fill="#24506a"/><circle cx="12" cy="-2" r="2.5" fill="#6cc04a"/></g></g>`;
+    el.style.background = irr === "rain" ? "#d4dfe3" : "#cdeeff";
     el.innerHTML = `<svg viewBox="0 0 350 196" preserveAspectRatio="xMidYMid slice" role="img" aria-label="${a} ${T.ha}">
-      <defs><linearGradient id="fh" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b5b862"/><stop offset="1" stop-color="#9ca047"/></linearGradient>
-      <linearGradient id="ft" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#7f9ba5"/><stop offset="1" stop-color="#3f565e"/></linearGradient>
-      <linearGradient id="fw" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8fb3c2"/><stop offset="1" stop-color="#516d77"/></linearGradient>
-      <linearGradient id="fg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity=".75"/><stop offset="1" stop-color="#dfe7e9" stop-opacity=".35"/></linearGradient></defs>
-      <circle cx="56" cy="40" r="20" fill="#fbfbe4"/>
-      ${irr === "rain" ? `<g class="${ir ? "slidein" : ""}"><g class="cloud"><ellipse cx="200" cy="34" rx="34" ry="13" fill="#fbfbef"/><ellipse cx="222" cy="26" rx="20" ry="13" fill="#fbfbef"/><ellipse cx="182" cy="28" rx="16" ry="11" fill="#fbfbef"/></g></g>
-        <g stroke="#516d77" stroke-width="2" stroke-linecap="round">${[184, 198, 212, 226].map((x, i) => `<path class="rain" style="animation-delay:${i * 0.2}s" d="M${x} 50 l-3 8"/>`).join("")}</g>` : ""}
+      <defs><linearGradient id="fh" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9be070"/><stop offset="1" stop-color="#6cc04a"/></linearGradient>
+      <linearGradient id="ft" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6fc8f2"/><stop offset="1" stop-color="#1f78ab"/></linearGradient>
+      <linearGradient id="fw" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8ad6fb"/><stop offset="1" stop-color="#2f9bd6"/></linearGradient>
+      <linearGradient id="fg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity=".75"/><stop offset="1" stop-color="#cdeeff" stop-opacity=".35"/></linearGradient></defs>
+      <circle cx="56" cy="40" r="20" fill="#fffbe6"/>
+      ${irr === "rain" ? `<g class="${ir ? "slidein" : ""}"><g class="cloud"><ellipse cx="200" cy="34" rx="34" ry="13" fill="#fffdf4"/><ellipse cx="222" cy="26" rx="20" ry="13" fill="#fffdf4"/><ellipse cx="182" cy="28" rx="16" ry="11" fill="#fffdf4"/></g></g>
+        <g stroke="#2f9bd6" stroke-width="2" stroke-linecap="round">${[184, 198, 212, 226].map((x, i) => `<path class="rain" style="animation-delay:${i * 0.2}s" d="M${x} 50 l-3 8"/>`).join("")}</g>` : ""}
       <path d="M0 112 C70 92 140 104 210 96 C270 90 320 98 350 92 L350 196 L0 196 Z" fill="url(#fh)"/>
       <g class="fs-field" style="transform:scale(${scale});${fx.has("area") ? `animation:fsField .7s cubic-bezier(.3,1.3,.5,1) both;--from:${fromScale};--to:${scale}` : ""}">
         <path d="M30 192 L320 192 L282 118 L68 118 Z" fill="${fx.has("soil") ? prevSoil[0] : soil[0]}"/>
         ${fx.has("soil") ? `<rect class="till" x="30" y="118" width="290" height="74" fill="${soil[0]}" clip-path="url(#fieldClip)"/>` : ""}
         <clipPath id="fieldClip"><path d="M30 192 L320 192 L282 118 L68 118 Z"/></clipPath>
-        ${fx.has("area") ? `<path class="ring2" d="M30 192 L320 192 L282 118 L68 118 Z" fill="none" stroke="#fbfbef"/>` : ""}
+        ${fx.has("area") ? `<path class="ring2" d="M30 192 L320 192 L282 118 L68 118 Z" fill="none" stroke="#fffdf4"/>` : ""}
         ${furrows.map((fr) => `<path d="${fr.d}" stroke="${soil[1]}" stroke-width="1.5" fill="none" opacity=".6"/>`).join("")}
-        ${irr === "flood" ? `<g class="${ir ? "rise" : ""}"><path class="shine" d="M34 188 L316 188 L284 124 L66 124 Z" fill="#8fb3c2"/></g>` : ""}
-        ${irr === "drip" ? furrows.map((fr) => `<path class="${ir ? "draw" : ""}" style="animation-delay:${fr.delay}s" d="${fr.d}" stroke="#2f5884" stroke-width="2" fill="none"/>`).join("") + furrows.slice(0, 4).map((fr, r) => [0.3, 0.6].map((tt, k) => `<circle class="drop" style="animation-delay:${((r + k) * 0.3).toFixed(1)}s" cx="${Math.round(fr.x0 + (fr.x1 - fr.x0) * tt)}" cy="${fr.y + 1}" r="2.4" fill="#2f5884"/>`).join("")).join("") : ""}
+        ${irr === "flood" ? `<g class="${ir ? "rise" : ""}"><path class="shine" d="M34 188 L316 188 L284 124 L66 124 Z" fill="#8ad6fb"/></g>` : ""}
+        ${irr === "drip" ? furrows.map((fr) => `<path class="${ir ? "draw" : ""}" style="animation-delay:${fr.delay}s" d="${fr.d}" stroke="#2b8fe0" stroke-width="2" fill="none"/>`).join("") + furrows.slice(0, 4).map((fr, r) => [0.3, 0.6].map((tt, k) => `<circle class="drop" style="animation-delay:${((r + k) * 0.3).toFixed(1)}s" cx="${Math.round(fr.x0 + (fr.x1 - fr.x0) * tt)}" cy="${fr.y + 1}" r="2.4" fill="#2b8fe0"/>`).join("")).join("") : ""}
         ${plants}
-        ${irr === "sprinkler" ? `<g class="${ir ? "rise" : ""}"><path d="M110 150 v-14 M240 150 v-14" stroke="#3f565e" stroke-width="3" stroke-linecap="round"/><path class="spray" d="M110 136 q-26 -18 -40 4 M110 136 q26 -18 40 4" stroke="#8fb3c2" stroke-width="3" fill="none" stroke-linecap="round"/><path class="spray" style="animation-delay:.8s" d="M240 136 q-26 -18 -40 4 M240 136 q26 -18 40 4" stroke="#8fb3c2" stroke-width="3" fill="none" stroke-linecap="round"/></g>` : ""}
-        ${f.system === "green" ? `<g class="${fx.has("system") ? "rise" : ""}"><path d="M40 192 C40 96 310 96 310 192 Z" fill="url(#fg)" stroke="#fbfbef" stroke-width="2"/></g>` : ""}
+        ${irr === "sprinkler" ? `<g class="${ir ? "rise" : ""}"><path d="M110 150 v-14 M240 150 v-14" stroke="#1f78ab" stroke-width="3" stroke-linecap="round"/><path class="spray" d="M110 136 q-26 -18 -40 4 M110 136 q26 -18 40 4" stroke="#8ad6fb" stroke-width="3" fill="none" stroke-linecap="round"/><path class="spray" style="animation-delay:.8s" d="M240 136 q-26 -18 -40 4 M240 136 q26 -18 40 4" stroke="#8ad6fb" stroke-width="3" fill="none" stroke-linecap="round"/></g>` : ""}
+        ${f.system === "green" ? `<g class="${fx.has("system") ? "rise" : ""}"><path d="M40 192 C40 96 310 96 310 192 Z" fill="url(#fg)" stroke="#fffdf4" stroke-width="2"/></g>` : ""}
         ${fx.has("soil") ? tractor : ""}
       </g>
       <g transform="translate(312 92)"><rect width="26" height="58" rx="6" fill="url(#ft)"/>
         <rect x="4" y="4" width="18" height="50" rx="3" fill="url(#fw)" style="transform-box:fill-box;transform-origin:50% 100%;transform:scaleY(${lvl});${fx.has("water") ? `animation:fsTank .8s cubic-bezier(.3,1.3,.5,1) both;--from:${fromLvl};--to:${lvl}` : ""}"/>
-        ${fx.has("water") ? `<circle class="fall" cx="13" cy="${Math.round(4 + 50 * (1 - lvl))}" r="3.5" fill="#516d77"/><circle class="splash" cx="13" cy="${Math.round(4 + 50 * (1 - lvl))}" r="7" fill="none" stroke="#8fb3c2" stroke-width="2"/>` : ""}
-        <path d="M2 58 v10 M24 58 v10" stroke="#3f565e" stroke-width="3"/><rect x="7" y="-6" width="12" height="6" rx="2" fill="#3f565e"/></g>
+        ${fx.has("water") ? `<circle class="fall" cx="13" cy="${Math.round(4 + 50 * (1 - lvl))}" r="3.5" fill="#2f9bd6"/><circle class="splash" cx="13" cy="${Math.round(4 + 50 * (1 - lvl))}" r="7" fill="none" stroke="#8ad6fb" stroke-width="2"/>` : ""}
+        <path d="M2 58 v10 M24 58 v10" stroke="#1f78ab" stroke-width="3"/><rect x="7" y="-6" width="12" height="6" rx="2" fill="#1f78ab"/></g>
       ${flags}
     </svg>
     <div class="labels"><span>${a || "—"} ${T.ha}</span>
       ${hist.length && S.step >= 5 ? `<span class="${fx.has("crop") ? "slidein" : ""}" style="font-size:11px;max-width:180px">${T.pastSeasons}${hist.slice(0, 3).map((h) => T.crops[h]).join(arrow())}</span>` : ""}
-      ${f.intent === "crop" && f.focus ? `<span class="${fx.has("intent") ? "dropin" : ""}" style="background:#840000;color:#fbfbef">${T.thinking}${T.crops[f.focus]}</span>` : ""}
-      ${f.intent === "suggest" ? `<span class="${fx.has("intent") ? "dropin" : ""}" style="background:#516d77;color:#fbfbef"><span class="wiggle">?</span> ${T.wantIdeas}</span>` : ""}</div>
+      ${f.intent === "crop" && f.focus ? `<span class="${fx.has("intent") ? "dropin" : ""}" style="background:#e8552f;color:#fffdf4">${T.thinking}${T.crops[f.focus]}</span>` : ""}
+      ${f.intent === "suggest" ? `<span class="${fx.has("intent") ? "dropin" : ""}" style="background:#2f9bd6;color:#fffdf4"><span class="wiggle">?</span> ${T.wantIdeas}</span>` : ""}</div>
     <div class="salah"><div class="${fx.has("any") ? "hop" : ""}">${salah(64)}</div></div>`;
     PREV.scale = scale; PREV.lvl = lvl; PREV.soil = f.soil;
   }

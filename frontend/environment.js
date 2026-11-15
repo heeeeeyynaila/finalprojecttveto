@@ -67,10 +67,10 @@
     return `<div class="screen envload">
       <div class="top in">${A.backBtn("location")}<h1 style="font-size:20px;font-weight:800">${L("بيانات ناسا لأرضك", "NASA data for your land")}</h1></div>
       <div class="sat-scene pop d1" aria-hidden="true">
-        <svg viewBox="0 0 340 170" width="100%" height="170"><circle cx="170" cy="300" r="190" fill="#9ca047"/><circle cx="170" cy="300" r="190" fill="none" stroke="#7d8136" stroke-width="3"/>
-          <g class="sat-orbit"><g transform="translate(60 54)"><rect x="-10" y="-10" width="20" height="20" rx="3" fill="#516d77"/><rect x="-34" y="-6" width="20" height="12" rx="2" fill="#e8e8bc"/><rect x="14" y="-6" width="20" height="12" rx="2" fill="#e8e8bc"/></g></g>
-          <g class="beam"><path d="M170 60 L150 128 L190 128 Z" fill="#e8e8bc" opacity=".55"/></g>
-          <g class="pin"><path d="M170 128 C162 116 154 108 154 98 C154 89 161 82 170 82 C179 82 186 89 186 98 C186 108 178 116 170 128 Z" fill="#840000"/><circle cx="170" cy="98" r="6" fill="#fbfbef"/></g></svg>
+        <svg viewBox="0 0 340 170" width="100%" height="170"><circle cx="170" cy="300" r="190" fill="#6cc04a"/><circle cx="170" cy="300" r="190" fill="none" stroke="#4a9e2f" stroke-width="3"/>
+          <g class="sat-orbit"><g transform="translate(60 54)"><rect x="-10" y="-10" width="20" height="20" rx="3" fill="#2f9bd6"/><rect x="-34" y="-6" width="20" height="12" rx="2" fill="#ffe9a8"/><rect x="14" y="-6" width="20" height="12" rx="2" fill="#ffe9a8"/></g></g>
+          <g class="beam"><path d="M170 60 L150 128 L190 128 Z" fill="#ffe9a8" opacity=".55"/></g>
+          <g class="pin"><path d="M170 128 C162 116 154 108 154 98 C154 89 161 82 170 82 C179 82 186 89 186 98 C186 108 178 116 170 128 Z" fill="#e8552f"/><circle cx="170" cy="98" r="6" fill="#fffdf4"/></g></svg>
         <div class="sat-salah">${A.salah(74, "wave1")}</div>
       </div>
       <div class="card in d2" style="padding:12px 14px;display:flex;flex-direction:column;gap:2px">
