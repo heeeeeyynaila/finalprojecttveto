@@ -85,3 +85,37 @@ CREATE TABLE IF NOT EXISTS decision_log (
   flags_json   TEXT,
   created_at   TEXT
 );
+
+-- ---------------------------------------------------------------------------
+-- Dynamic NASA environment (added). Existing tables above are unchanged; new farm
+-- columns (name, env_key, updated_at) are added by app/db.py:migrate() on start-up.
+
+CREATE TABLE IF NOT EXISTS env_cache (
+  cache_key    TEXT PRIMARY KEY,            -- POWER cell + point (~1 km) + date range + parameter set
+  cell_id      TEXT NOT NULL,               -- MERRA-2 cell, e.g. "m2_250_287"
+  lat REAL, lon REAL,
+  start_date   TEXT NOT NULL,
+  end_date     TEXT NOT NULL,
+  json         TEXT NOT NULL,               -- full environment package (engine_location + aggregates + quality)
+  fetched_at   TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS env_cache_cell ON env_cache(cell_id);
+
+CREATE TABLE IF NOT EXISTS env_job (
+  job_id       TEXT PRIMARY KEY,
+  cache_key    TEXT NOT NULL,
+  farm_id      TEXT,
+  lat REAL, lon REAL,
+  start_date   TEXT, end_date TEXT,
+  status       TEXT NOT NULL,               -- pending | running | ready | failed
+  error        TEXT,
+  created_at   TEXT, updated_at TEXT
+);
+
+CREATE TABLE IF NOT EXISTS farm_location_history (
+  id           INTEGER PRIMARY KEY AUTOINCREMENT,
+  farm_id      TEXT NOT NULL,
+  lat REAL, lon REAL,
+  place_name   TEXT,
+  changed_at   TEXT
+);

@@ -1,5 +1,5 @@
 /* ---------------- Field Shift game ---------------- */
-.gscreen{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;gap:12px;padding:12px 16px 22px}
+.gscreen{min-height:100%;display:flex;flex-direction:column;gap:12px;padding:12px 16px 22px;box-sizing:border-box}
 .ghead{display:flex;align-items:center;gap:8px}
 .ghead h1{flex:1;font-size:18px;font-weight:800;line-height:1.25}
 .ghead small{display:block;font-size:11.5px;font-weight:700;color:var(--mute)}
@@ -72,7 +72,7 @@
 .gauge .ring{width:76px;height:76px}
 /* risk card */
 .riskov{position:fixed;inset:0;background:rgba(43,58,63,.55);z-index:40;display:flex;align-items:flex-end;justify-content:center}
-.riskcard{width:100%;max-width:430px;background:var(--card);border-radius:28px 28px 0 0;padding:16px 18px 22px;display:flex;flex-direction:column;gap:8px;max-height:88vh;overflow:auto}
+.riskcard{width:100%;max-width:390px;background:var(--card);border-radius:28px 28px 0 0;padding:16px 18px 22px;display:flex;flex-direction:column;gap:8px;max-height:88vh;overflow:auto}
 .rlvl{font-weight:900;font-size:13px;border-radius:10px;padding:3px 10px;display:inline-block}
 .rl-low{background:#dfeccc;color:#3c5a14}.rl-moderate{background:#fdf1d6;color:#7a5307}.rl-high{background:#f6dede;color:#8f2a22}
 .rrow{font-size:13.5px;line-height:1.55}.rrow b{color:var(--jean-d)}
@@ -205,13 +205,435 @@
 .cmpt th{text-align:start;font-weight:800;color:#3f565e;padding:4px}.cmpt td{padding:6px;border-radius:8px;background:#f5f5e4;font-weight:700}
 .cmpt td.win{background:#dfe3b0;color:#3e4318}
 .ccard.picked{border-color:#840000;box-shadow:0 0 0 3px rgba(132,0,0,.25),0 4px 0 #e3e3bf}
-@media (prefers-reduced-motion:reduce){.b3d .world,.gbar,.gline,.texbar i,.cloud3,.rain3 i,.haze3,.sun3{animation:none!important}.gline{stroke-dashoffset:0}}
 
-/* compact results */
-.rsum{display:flex;flex-direction:column;gap:8px}
-.rcount{display:flex;gap:8px}.rcount span{flex:1;text-align:center;border-radius:12px;padding:6px;font-weight:900;font-size:15px}
-.rcount .g{background:#dfeccc;color:#3c5a14}.rcount .w{background:#fdf1d6;color:#7a5307}.rcount .m{background:#f6dede;color:#8f2a22}
-.rdet{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:10px 12px}
-.rdet summary{font-weight:800;font-size:14px;color:var(--jean-d);cursor:pointer;list-style:none;display:flex;justify-content:space-between}
-.rdet summary::after{content:"▾";transition:transform .2s}.rdet[open] summary::after{transform:rotate(180deg)}
-.rdet[open]>div{animation:fsIn .3s ease}
+/* ===================== 60-Second Level Timer ===================== */
+.timer-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fbfbef;
+  border: 1.5px solid var(--line, #e3e3bf);
+  border-radius: 14px;
+  padding: 6px 12px;
+  margin: 4px 0 6px 0;
+  box-shadow: 0 2px 5px rgba(0,0,0,.04);
+}
+.timer-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 800;
+  font-size: 13.5px;
+  color: #516d77;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.timer-track {
+  flex: 1;
+  height: 8px;
+  background: #e9e9d0;
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+}
+.timer-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #7d8136, #9ca047);
+  border-radius: 999px;
+  transition: width 1s linear;
+}
+.timer-urgent .timer-fill {
+  background: linear-gradient(90deg, #b8423a, #e08a3a);
+}
+.timer-urgent .timer-badge {
+  color: #b8423a;
+  animation: pulseTimer 1s infinite;
+}
+@keyframes pulseTimer {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.04); }
+}
+
+/* ===================== Dynamic Farm Changes over 1 Minute ===================== */
+.b3d {
+  transition: filter 1s ease, box-shadow 1s ease;
+}
+.b3d .sun3 {
+  transition: transform 1s ease, box-shadow 1s ease, filter 1s ease;
+}
+.b3d[data-stress="1"] .sun3 {
+  transform: scale(1.12);
+  filter: drop-shadow(0 0 14px #f28b38);
+}
+.b3d[data-stress="2"] .sun3 {
+  transform: scale(1.24);
+  filter: drop-shadow(0 0 22px #e25822);
+}
+.b3d[data-stress="3"] .sun3 {
+  transform: scale(1.38);
+  filter: drop-shadow(0 0 32px #d83b01);
+}
+.b3d[data-stress="1"] {
+  filter: saturate(0.92) contrast(1.05);
+}
+.b3d[data-stress="2"] {
+  filter: saturate(0.82) contrast(1.12) brightness(1.04);
+}
+.b3d[data-stress="3"] {
+  filter: saturate(0.72) contrast(1.18) brightness(1.08);
+}
+.b3d[data-stress="2"] .haze3 {
+  opacity: 0.65;
+}
+.b3d[data-stress="3"] .haze3 {
+  opacity: 0.95;
+}
+
+/* ===================== Real NASA Data Drawer & Toggle ===================== */
+.nasa-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 6px 0 10px 0;
+  width: 100%;
+}
+.nasa-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 14px;
+  background: linear-gradient(180deg, #fbfbef, #f3f5e5);
+  border: 1.5px solid #516d77;
+  border-radius: 14px;
+  color: #2b2a20;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 3px 0 #516d7740;
+  transition: all 0.2s ease;
+}
+.nasa-toggle-btn:hover {
+  background: #edf1dc;
+  border-color: #3f565e;
+}
+.nasa-toggle-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #516d7740;
+}
+.nasa-toggle-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.nasa-toggle-pill {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #516d77;
+  color: #fbfbef;
+}
+.nasa-drawer {
+  background: #fbfbef;
+  border: 1.5px solid #c9c99a;
+  border-radius: 18px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+  animation: slideDown .25s ease-out;
+}
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.nasa-drawer-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+.nasa-cell-box {
+  background: #eef0d6;
+  border-radius: 12px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.nasa-cell-box small {
+  font-size: 11px;
+  font-weight: 700;
+  color: #516d77;
+  line-height: 1.25;
+}
+.nasa-cell-box b {
+  font-size: 15px;
+  font-weight: 900;
+  color: #2b2a20;
+}
+.nasa-citation {
+  font-size: 11px;
+  line-height: 1.5;
+  color: #6b706a;
+  border-top: 1px dashed #dcdcb8;
+  padding-top: 8px;
+}
+
+/* ===================== Plugged Mobile Layout (Zero-Scroll Gameplay) ===================== */
+.gscreen.plugged {
+  height: 100%;
+  max-height: 844px;
+  overflow: hidden;
+  padding: 8px 12px 10px;
+  gap: 6px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+.plug-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  min-height: 38px;
+  flex: none;
+}
+.plug-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+.plug-title b {
+  font-size: 14.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--ink);
+}
+.timer-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #fbfbef;
+  border: 1.5px solid var(--orch);
+  color: var(--orch-d);
+  font-size: 11.5px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  flex: none;
+}
+.timer-pill.urgent {
+  background: #ffeded;
+  border-color: #840000;
+  color: #840000;
+  animation: pulseTimer 1s infinite;
+}
+.plug-tools {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: none;
+}
+.nasapill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #eef2f5;
+  border: 1.5px solid #516d77;
+  color: #516d77;
+  font-size: 11.5px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.nasapill:active {
+  transform: scale(0.95);
+  background: #516d77;
+  color: #fff;
+}
+.iconbtn.mini {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+}
+
+/* Plugged Salah Speech Bar */
+.plug-salah {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--card);
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  padding: 4px 10px;
+  min-height: 34px;
+  flex: none;
+}
+.plug-salah .who-mini {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+}
+.plug-salah .say-mini {
+  flex: 1;
+  font-size: 11.5px;
+  line-height: 1.35;
+  color: var(--ink);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Plugged 3D Board */
+.plug-board {
+  flex: none;
+  border-radius: 18px;
+  overflow: hidden;
+}
+.plug-board .b3d {
+  height: 165px !important;
+  max-height: 165px !important;
+}
+
+/* Plugged Control Deck */
+.plug-deck {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 4px 2px;
+}
+.plug-deck::-webkit-scrollbar {
+  width: 4px;
+}
+.plug-deck::-webkit-scrollbar-thumb {
+  background: #dcdcb8;
+  border-radius: 2px;
+}
+
+/* Compact Toolbars & Slots in Deck */
+.plug-deck .slotbar {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin: 0;
+}
+.plug-deck .slotc {
+  min-height: 40px;
+  padding: 4px 8px;
+  border-radius: 10px;
+}
+.plug-deck .cgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(78px, 1fr));
+  gap: 6px;
+  margin: 0;
+}
+.plug-deck .ccard {
+  padding: 6px;
+  gap: 2px;
+  border-radius: 12px;
+}
+.plug-deck .ccard .art {
+  height: 40px;
+}
+.plug-deck .ccard b {
+  font-size: 12px;
+}
+.plug-deck .ccard small {
+  font-size: 10px;
+}
+.plug-deck .toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: 0;
+}
+.plug-deck .tool {
+  min-height: 36px;
+  padding: 4px 8px;
+  font-size: 11.5px;
+  border-radius: 10px;
+}
+.plug-deck .chiprow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 0;
+}
+.plug-deck .chip {
+  min-height: 32px;
+  padding: 3px 8px;
+  font-size: 12px;
+  border-radius: 999px;
+}
+.plug-deck .panel2 {
+  padding: 6px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  margin: 0;
+}
+.plug-deck .note {
+  font-size: 11px;
+  line-height: 1.35;
+  margin: 2px 0;
+}
+.plug-deck .spacer {
+  display: none;
+}
+
+/* Plugged Footer Button */
+.plug-foot {
+  flex: none;
+  padding-top: 4px;
+}
+.plug-foot .primary {
+  min-height: 46px;
+  font-size: 15px;
+  border-radius: 14px;
+  width: 100%;
+}
+
+/* 3D Tile Pop & Touch Interaction */
+@keyframes tilePop {
+  0% { transform: scale(0.92); }
+  50% { transform: scale(1.15) translateZ(8px); }
+  100% { transform: scale(1) translateZ(0); }
+}
+.t3.pop-anim {
+  animation: tilePop 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.3);
+}
+.t3:active .tp, .t3.touched .tp {
+  transform: translateZ(calc(var(--h, 0px) + 8px)) scale(1.06);
+  filter: brightness(1.2);
+  box-shadow: 0 0 10px rgba(230, 210, 80, 0.7);
+}
+
+/* NASA Observation Modal Sheet */
+#nasaModal .sheet {
+  background: var(--card);
+  border-radius: 24px 24px 0 0;
+  max-width: 540px;
+  width: 100%;
+  padding: 16px 20px;
+  box-sizing: border-box;
+}
+
+@media (prefers-reduced-motion:reduce){.b3d .world,.gbar,.gline,.texbar i,.cloud3,.rain3 i,.haze3,.sun3{animation:none!important}.gline{stroke-dashoffset:0}}

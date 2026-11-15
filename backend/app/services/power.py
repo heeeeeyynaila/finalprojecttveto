@@ -1,15 +1,13 @@
-"""NASA POWER daily point API (no key needed)."""
-import httpx
-from ..config import HTTP_TIMEOUT
+"""Backward-compatible wrapper: services/location.py still calls fetch_daily(lat, lon).
+New code should use services/nasa_power.py + services/data_processing.py directly."""
+from datetime import date
+
+from . import nasa_power
 from .derive import clean
 
-URL = "https://power.larc.nasa.gov/api/temporal/daily/point"
-PARAMS = "PRECTOTCORR,T2M,T2M_MAX,T2M_MIN,RH2M,WS2M,ALLSKY_SFC_SW_DWN"
 
 def fetch_daily(lat, lon, start=19910101, end=20201231):
-    r = httpx.get(URL, params={"parameters": PARAMS, "community": "AG", "longitude": lon, "latitude": lat,
-                               "start": start, "end": end, "format": "JSON"}, timeout=HTTP_TIMEOUT * 3)
-    r.raise_for_status()
-    p = r.json()["properties"]["parameter"]
-    days = sorted(p["PRECTOTCORR"].keys())
-    return [{"date": d, **{k: clean(p[k].get(d)) for k in p}} for d in days]
+    s, e = date(start // 10000, start // 100 % 100, start % 100), date(end // 10000, end // 100 % 100, end % 100)
+    resp = nasa_power.fetch_daily(lat, lon, s, e, params=["PRECTOTCORR", "T2M", "T2M_MAX", "T2M_MIN", "RH2M", "WS2M", "ALLSKY_SFC_SW_DWN"])
+    days = sorted(resp.daily["PRECTOTCORR"].keys())
+    return [{"date": d, **{k: clean(resp.daily[k].get(d)) for k in resp.daily}} for d in days]

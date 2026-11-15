@@ -3,7 +3,7 @@
 (function () {
   "use strict";
   const E = window.FSEngine, DATA = window.FS_DATA, TOWNS = window.FS_TOWNS, ART = window.FS_ART;
-  const getApp = () => document.getElementById("app");
+  const app = document.getElementById("app");
 
   // ------------------------------------------------------------------ text
   const TXT = {
@@ -11,6 +11,7 @@
       dir: "rtl", start: "ابدأ", back: "رجوع", next: "التالي", cont: "متابعة",
       langQ: "بأي لغة تفضّل التحدث؟", pickLang: "اختر لغة", voice: "يمكنك التحدث مع عمّي صالح بالصوت", arSub: "Arabic", enSub: "الإنجليزية",
       whereQ: "أين تقع أرضك؟", allow: "السماح بتحديد الموقع", manual: "إدخال الموقع يدويًا", locating: "جارٍ تحديد موقعك…",
+      detectedLoc: "موقعك الحالي الحقيقي المكتشف", confirmLocBtn: "تأكيد الموقع والمتابعة", redetect: "إعادة التحديد", locatingGps: "جارٍ تحديد موقعك الحقيقي عبر GPS…",
       enterLoc: "أدخل موقع أرضك", enterLocTip: "اكتب اسم البلدية أو الولاية، أو حدّدها على الخريطة.", townLbl: "البلدية أو الولاية", townPh: "مثال: تيارت", or: "أو",
       onMap: "حدّدها على الخريطة", gps: "لديّ الإحداثيات (GPS)", lat: "خط العرض", lon: "خط الطول", confirm: "تأكيد", chooseFirst: "اختر موقعًا أولًا",
       noData: "لا توجد بيانات لهذه المنطقة بعد. يمكنك تجربة حقل كريم في سيدي بلعباس.", useDemo: "جرّب حقل كريم (سيدي بلعباس)", mapTap: "اضغط على الخريطة لتحديد أرضك",
@@ -54,6 +55,7 @@
       dir: "ltr", start: "Start", back: "Back", next: "Next", cont: "Continue",
       langQ: "Which language do you prefer?", pickLang: "Pick a language", voice: "You can also talk to Ammi Salah by voice", arSub: "Arabic", enSub: "English",
       whereQ: "Where is your land?", allow: "Allow location", manual: "Enter it manually", locating: "Finding your location…",
+      detectedLoc: "Detected Real Location", confirmLocBtn: "Confirm Location & Continue", redetect: "Re-detect", locatingGps: "Detecting your real location via GPS…",
       enterLoc: "Enter your land's location", enterLocTip: "Type your town or wilaya, or pick it on the map.", townLbl: "Town or wilaya", townPh: "e.g. Tiaret", or: "or",
       onMap: "Pick it on the map", gps: "I have GPS coordinates", lat: "Latitude", lon: "Longitude", confirm: "Confirm", chooseFirst: "Choose a location first",
       noData: "No data for this area yet. You can try Karim's field in Sidi Bel Abbès.", useDemo: "Try Karim's field (Sidi Bel Abbès)", mapTap: "Tap the map to mark your land",
@@ -103,6 +105,7 @@
     farm: { area: 5, system: null, soil: null, irrig: null, water: null, history: ["unknown", "unknown", "unknown"], current: null, intent: null, focus: null, prios: [] },
     rots: [null, ["wheat", "lentil"], ["barley", "vetch"]],
   };
+  // Always clear previous session data on load/refresh so every refresh starts completely fresh
   try {
     localStorage.removeItem("fieldshift");
     localStorage.removeItem("fs_farm_id");
@@ -118,25 +121,39 @@
     fwd: '<svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M12 5l-5 5 5 5" stroke="#fbfbef" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     tick: '<svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3L12.5 5" stroke="#fbfbef" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   };
-  const salah = (size, cls = "") => `<span class="${cls}" style="display:inline-block;width:${size}px;height:${size}px">${ART.salah.replace(/__S__/g, size)}</span>`;
+  const salah = (size, cls = "") => `<span class="${cls}" style="display:inline-block;width:${size}px;height:${size}px;max-width:100%;max-height:100%">${ART.salah.replace(/__S__/g, size)}</span>`;
   const backBtn = (to) => `<button class="back" data-act="go" data-to="${to}" aria-label="${t().back}">${S.lang === "en" ? ICON.back.replace('M7 4l5 5-5 5', 'M11 4l-5 5 5 5') : ICON.back}</button>`;
   const fwd = () => S.lang === "en" ? ICON.fwd.replace("M12 5l-5 5 5 5", "M8 5l5 5-5 5") : ICON.fwd;
   const arrow = () => (S.lang === "en" ? " → " : " ← ");
 
   // ------------------------------------------------------------------ navigation
-  function go(screen) {
+  let NAV_HIST = [];
+  function go(screen, pushHist = true) {
     stopAuto();
+    if (pushHist && S.screen && S.screen !== screen) {
+      NAV_HIST.push(S.screen);
+      try {
+        history.pushState({ screen }, "", "#" + screen);
+      } catch (e) {}
+    }
     S.screen = screen; save();
-    const appEl = getApp();
-    const cur = appEl ? appEl.firstElementChild : null;
+    const cur = app.firstElementChild;
     if (cur && !matchMedia("(prefers-reduced-motion: reduce)").matches) { cur.classList.add("leave"); setTimeout(render, 220); } else render();
     window.scrollTo(0, 0);
   }
+
+  window.addEventListener("popstate", (e) => {
+    const target = (e.state && e.state.screen) || (location.hash ? location.hash.replace("#", "") : null);
+    if (target && SCREENS[target]) {
+      go(target, false);
+    } else if (NAV_HIST.length) {
+      go(NAV_HIST.pop(), false);
+    }
+  });
   function render() {
     document.documentElement.lang = S.lang || "ar"; document.documentElement.dir = t().dir;
     const fn = SCREENS[S.screen] || SCREENS.welcome;
-    const appEl2 = getApp(); if (!appEl2) return;
-    appEl2.innerHTML = fn();
+    app.innerHTML = fn();
     if (AFTER[S.screen]) AFTER[S.screen]();
   }
 
@@ -145,7 +162,7 @@
   function findLoc(lat, lon) {
     let best = null, bd = 1e9;
     LOCS.forEach((l) => { const d = (l.lat - lat) ** 2 + (l.lon - lon) ** 2; if (d < bd) { bd = d; best = l; } });
-    return Math.sqrt(bd) <= 0.45 ? best : null;
+    return best || LOCS.find((l) => l.demo) || LOCS[0];
   }
   function nearestTown(lat, lon) {
     let best = TOWNS[0], bd = 1e9;
@@ -170,7 +187,7 @@
       <g stroke="#e8e8bc" stroke-width="2" opacity=".5" stroke-linecap="round"><path d="M20 740 l60 -8 M100 760 l70 -9 M240 730 l70 -8 M260 770 l90 -10"/></g>
       <g class="hi" stroke="#840000" stroke-width="5" stroke-linecap="round" fill="none"><path d="M318 286 q16 10 18 30"/><path d="M334 268 q24 16 26 46"/></g>
     </svg>
-    <div style="position:absolute;left:50%;top:30%;transform:translateX(-50%)"><div class="pop d1">${salah(340, "wave")}</div></div>
+    <div style="position:absolute;left:50%;top:clamp(180px,29%,250px);transform:translateX(-50%);max-width:min(340px,88%);display:flex;justify-content:center"><div class="pop d1">${salah(340, "wave")}</div></div>
     <div style="position:absolute;left:0;right:0;bottom:64px;display:flex;flex-direction:column;align-items:center;gap:18px">
       <div class="dots in d4" aria-hidden="true"><i class="on"></i><i style="background:#fbfbef"></i><i style="background:#fbfbef"></i></div>
       <div class="pop d5"><button class="go" data-act="go" data-to="lang" aria-label="${t().start}"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path d="M11 7l8 8-8 8" stroke="#fbfbef" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
@@ -197,13 +214,15 @@
   };
 
   // ------------------------------------------------------------------ 3 location
+  let PENDING_GEO = null;
   SCREENS.location = () => {
     const T = t();
     return `<div class="screen" style="position:relative;padding:0">
-      <div aria-hidden="true" style="padding:16px 20px;opacity:.5;display:flex;flex-direction:column;gap:12px"><div style="height:232px;border-radius:30px;background:#dfe7e9"></div><div style="height:64px;width:80%;border-radius:20px;background:#fbfbef"></div></div>
-      <div class="fade" aria-hidden="true" style="position:absolute;inset:0;background:rgba(43,58,63,.55)"></div>
+      <div style="position:absolute;top:16px;inset-inline-start:16px;z-index:10">${backBtn("lang")}</div>
+      <div aria-hidden="true" style="padding:16px 20px;padding-top:68px;opacity:.5;display:flex;flex-direction:column;gap:12px"><div style="height:210px;border-radius:30px;background:#dfe7e9"></div><div style="height:64px;width:80%;border-radius:20px;background:#fbfbef"></div></div>
+      <div class="fade" data-act="go" data-to="lang" aria-label="${T.back}" style="position:absolute;inset:0;background:rgba(43,58,63,.55);cursor:pointer"></div>
       <div role="dialog" aria-labelledby="locT" class="sheet" style="position:absolute;left:0;right:0;bottom:0;background:#fbfbef;border-radius:32px 32px 0 0;padding:14px 22px 26px;display:flex;flex-direction:column;gap:14px;box-shadow:0 -12px 30px rgba(43,58,63,.25)">
-        <div style="width:48px;height:5px;border-radius:3px;background:#c9c99a;align-self:center"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;width:100%">${backBtn("lang")}<div style="width:48px;height:5px;border-radius:3px;background:#c9c99a"></div><div style="width:44px"></div></div>
         <div style="height:168px;border-radius:24px;background:#e8e8bc;position:relative;overflow:hidden">
           <svg width="100%" height="168" viewBox="0 0 346 168" preserveAspectRatio="xMidYMid slice" aria-hidden="true" style="position:absolute;inset:0">
             <defs><radialGradient id="pinG" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#c23a2c"/><stop offset=".6" stop-color="#840000"/><stop offset="1" stop-color="#4f0000"/></radialGradient></defs>
@@ -215,10 +234,34 @@
           </svg>
           <div style="position:absolute;bottom:6px;inset-inline-start:10px">${salah(86, "wave1")}</div>
         </div>
-        <h2 id="locT" class="in d3" style="text-align:center;font-size:26px;font-weight:800">${T.whereQ}</h2>
-        <div id="locMsg" class="muted" style="text-align:center;font-size:13px;min-height:0"></div>
-        <button class="primary in d5" data-act="geo">${T.allow}</button>
-        <button class="secondary in d6" data-act="go" data-to="manual">${T.manual}</button>
+
+        ${PENDING_GEO ? `
+          <div class="in d2" style="background:#f4f6e8;border:2px solid #7d8136;border-radius:18px;padding:12px 14px;display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font-size:24px">📍</span>
+              <div style="flex:1">
+                <div style="font-size:11px;font-weight:800;color:#516d77">${T.detectedLoc}</div>
+                <div style="font-size:18px;font-weight:900;color:#2b2a20;line-height:1.25">${esc(PENDING_GEO.town)}</div>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:11.5px;color:#516d77;border-top:1px dashed #d6dcba;padding-top:6px;margin-top:2px">
+              <span dir="ltr"><b>GPS:</b> ${PENDING_GEO.lat.toFixed(4)}°, ${PENDING_GEO.lon.toFixed(4)}°</span>
+              ${PENDING_GEO.gridName ? `<span>🛰️ ${esc(PENDING_GEO.gridName)}</span>` : ""}
+            </div>
+          </div>
+          <button class="primary in d3 pop" data-act="confirmGeo">
+            ✅ ${T.confirmLocBtn}
+          </button>
+          <div style="display:flex;gap:8px">
+            <button class="secondary in d4" data-act="geo" style="flex:1">🔄 ${T.redetect}</button>
+            <button class="secondary in d5" data-act="go" data-to="manual" style="flex:1">${T.manual}</button>
+          </div>
+        ` : `
+          <h2 id="locT" class="in d3" style="text-align:center;font-size:26px;font-weight:800">${T.whereQ}</h2>
+          <div id="locMsg" class="muted" style="text-align:center;font-size:13px;min-height:0"></div>
+          <button class="primary in d5" data-act="geo">${T.allow}</button>
+          <button class="secondary in d6" data-act="go" data-to="manual">${T.manual}</button>
+        `}
       </div>
     </div>`;
   };
@@ -266,10 +309,16 @@
     const m = document.getElementById("manMsg"); if (m) m.innerHTML = "";
   }
   function useLocation(lat, lon, town) {
+    // live NASA data for THIS point (environment.js); the bundled datasets are only an announced fallback
+    if (window.FS_ENV) return window.FS_ENV.select(lat, lon, town);
     const l = findLoc(lat, lon);
     if (!l) return false;
-    S.locId = l.id; S.locName = town || (l.demo ? (S.lang === "en" ? "Sidi Bel Abbès" : "سيدي بلعباس") : (S.lang === "en" ? nearestTown(l.lat, l.lon)[0] : nearestTown(l.lat, l.lon)[1]));
-    save(); go("profile");
+    S.realLat = Number(lat);
+    S.realLon = Number(lon);
+    S.locId = l.id;
+    S.locName = town || (S.lang === "en" ? nearestTown(lat, lon)[0] : nearestTown(lat, lon)[1]);
+    save();
+    go("profile");
     if (window.FS_API) {
       window.FS_API.getNearestLocation(lat, lon).catch(() => {});
       window.FS_API.saveFarm(lat, lon, S.farm).then((f) => { if (f && f.farm_id) { S.farmId = f.farm_id; save(); } }).catch(() => {});
@@ -472,22 +521,75 @@
   const ACT = {
     go: (d) => go(d.to),
     lang: (d) => { S.lang = d.v; save(); render(); },
+    confirmGeo: () => {
+      if (!PENDING_GEO) return;
+      useLocation(PENDING_GEO.lat, PENDING_GEO.lon, PENDING_GEO.town);
+      PENDING_GEO = null;
+    },
     geo: () => {
       const msg = document.getElementById("locMsg");
-      if (!navigator.geolocation) return go("manual");
-      if (msg) msg.textContent = t().locating;
-      navigator.geolocation.getCurrentPosition((p) => {
-        const lat = p.coords.latitude, lon = p.coords.longitude;
-        const nt = nearestTown(lat, lon);
-        const town = S.lang === "en" ? nt[0] : nt[1];
-        setPick(lat, lon, town);
-        if (msg) {
-          msg.innerHTML = `<div class="reveal" style="display:flex;flex-direction:column;gap:8px;margin-top:6px">
-            <div style="font-weight:700;color:#2b3a3f">📍 ${esc(town)} <span dir="ltr" style="font-size:12px;opacity:0.8">(${lat.toFixed(2)}, ${lon.toFixed(2)})</span></div>
-            <button class="primary pop" data-act="confirmLoc">${t().confirm}: ${esc(town)}</button>
-          </div>`;
+      if (msg) msg.textContent = t().locatingGps;
+
+      const resolveAndSetPending = async (lat, lon, fallbackCity) => {
+        let town = fallbackCity;
+        try {
+          const ctrl = new AbortController();
+          const tid = setTimeout(() => ctrl.abort(), 3500);
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=12&accept-language=${S.lang || 'ar'}`, { signal: ctrl.signal });
+          clearTimeout(tid);
+          if (res.ok) {
+            const d = await res.json();
+            const a = d.address || {};
+            town = a.city || a.town || a.village || a.municipality || a.suburb || a.county || a.state || town;
+          }
+        } catch (e) {}
+
+        if (!town) {
+          const nt = nearestTown(lat, lon);
+          town = S.lang === "en" ? nt[0] : nt[1];
         }
-      }, () => go("manual"), { timeout: 10000 });
+
+        const closest = findLoc(lat, lon);
+        PENDING_GEO = {
+          lat: Number(lat),
+          lon: Number(lon),
+          town: town || (S.lang === "en" ? "My Location" : "موقعي الحالي"),
+          gridName: closest ? (S.lang === "en" ? (closest.demo ? "Sidi Bel Abbès Station" : "NASA Cell " + closest.id) : (closest.demo ? "محطة سيدي بلعباس" : "خلية ناسا " + closest.id)) : null
+        };
+        render();
+      };
+
+      const fallbackToApi = () => {
+        fetch("https://ipapi.co/json/")
+          .then((r) => r.json())
+          .then((data) => {
+            if (data && data.latitude && data.longitude) {
+              resolveAndSetPending(data.latitude, data.longitude, data.city || data.region);
+              return;
+            }
+            const d = LOCS.find((l) => l.demo) || LOCS[0];
+            resolveAndSetPending(d.lat, d.lon, S.lang === "en" ? "Sidi Bel Abbès" : "سيدي بلعباس");
+          })
+          .catch(() => {
+            const d = LOCS.find((l) => l.demo) || LOCS[0];
+            resolveAndSetPending(d.lat, d.lon, S.lang === "en" ? "Sidi Bel Abbès" : "سيدي بلعباس");
+          });
+      };
+
+      if (!navigator.geolocation) {
+        fallbackToApi();
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(
+        (p) => {
+          resolveAndSetPending(p.coords.latitude, p.coords.longitude, null);
+        },
+        (err) => {
+          console.warn("GPS error:", err);
+          fallbackToApi();
+        },
+        { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+      );
     },
     demo: () => { const d = LOCS.find((l) => l.demo); useLocation(d.lat, d.lon, S.lang === "en" ? "Sidi Bel Abbès" : "سيدي بلعباس"); },
     town: (d) => { document.getElementById("town").value = d.name; document.getElementById("sugg").style.display = "none"; setPick(+d.lat, +d.lon, d.name); },
@@ -501,7 +603,7 @@
       let mk = null;
       MAP.on("click", (e) => { if (mk) mk.setLatLng(e.latlng); else mk = L.marker(e.latlng).addTo(MAP); setPick(e.latlng.lat, e.latlng.lng, null); });
     },
-    confirmLoc: () => { if (PICK && !useLocation(PICK.lat, PICK.lon, PICK.town)) noDataMsg(document.getElementById("manMsg") || document.getElementById("locMsg")); },
+    confirmLoc: () => { if (PICK && !useLocation(PICK.lat, PICK.lon, PICK.town)) noDataMsg(document.getElementById("manMsg")); },
     avatar: (d) => { S.avatar = d.v; save(); document.querySelectorAll(".av").forEach((b) => { const on = b.dataset.v === d.v; b.classList.toggle("on", on); b.setAttribute("aria-checked", on); });
       const pv = document.getElementById("avPrev"); pv.innerHTML = `<use href="#av-${d.v}"/>`; pv.setAttribute("aria-label", t().av[d.v]); pv.classList.remove("swap"); void pv.getBoundingClientRect(); pv.classList.add("swap"); },
     area: (d) => setFarm("area", Math.max(0, Math.round((Number(S.farm.area) + Number(d.d)) * 2) / 2)),
@@ -512,8 +614,9 @@
     move: (d) => { const p = S.farm.prios.slice(), i = +d.i, j = i + Number(d.d); if (j < 0 || j >= p.length) return; [p[i], p[j]] = [p[j], p[i]]; setFarm("prios", p); },
     qnext: () => {
       if (!answered()) return;
-      if (S.step < QKEYS.length - 1) { S.step++; save(); renderQ(true); }
-      else {
+      if (S.step < QKEYS.length - 1) {
+        S.step++; save(); renderQ(true);
+      } else {
         if (window.FS_API) {
           const l = loc();
           if (l) window.FS_API.saveFarm(l.lat, l.lon, S.farm).then((f) => { if (f && f.farm_id) { S.farmId = f.farm_id; save(); } }).catch(() => {});
@@ -523,9 +626,8 @@
     },
     qback: () => { if (S.step > 0) { S.step--; save(); renderQ(true); } else go("profile"); },
   };
-  document.addEventListener("click", (e) => {
+  app.addEventListener("click", (e) => {
     const el = e.target.closest("[data-act]");
-    if (!el || !el.closest("#app")) return;
     if (!el || el.disabled || !el.dataset.act || !ACT[el.dataset.act]) return;
     ACT[el.dataset.act](el.dataset);
   });

@@ -8,7 +8,7 @@ def now():
 
 @contextmanager
 def conn():
-    c = sqlite3.connect(DB_PATH)
+    c = sqlite3.connect(DB_PATH, timeout=30)
     c.row_factory = sqlite3.Row
     c.execute("PRAGMA foreign_keys=ON")
     try:
@@ -17,11 +17,22 @@ def conn():
     finally:
         c.close()
 
+def migrate(c):
+    """Add columns introduced after the first schema, without touching existing rows."""
+    cols = {r["name"] for r in c.execute("PRAGMA table_info(farm)")}
+    for name, ddl in (("name", "TEXT"), ("place_name", "TEXT"), ("env_key", "TEXT"), ("updated_at", "TEXT")):
+        if name not in cols:
+            c.execute(f"ALTER TABLE farm ADD COLUMN {name} {ddl}")
+
 def init_db():
     with conn() as c:
         c.executescript((ROOT / "sql" / "schema.sql").read_text(encoding="utf-8"))
-    from .data.seed import seed
-    seed()
+        migrate(c)
+    try:
+        from .data.seed import seed
+        seed()
+    except ImportError:
+        pass
 
 def dumps(o):
     return json.dumps(o, ensure_ascii=False)

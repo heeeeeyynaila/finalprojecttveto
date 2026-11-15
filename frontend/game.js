@@ -72,7 +72,7 @@
   const LVLNAME = { ok: ["مناسب", "Suitable"], adj: ["مناسب مع تعديلات", "Suitable with adjustments"], high: ["مخاطرة عالية", "High risk"], na: ["معلومات غير كافية", "Not enough information"] };
   const lvlBadge = (lv) => `<span class="badge b-${lv === "ok" ? "ok" : lv === "adj" ? "adj" : lv === "high" ? "high" : "na"}">${L(LVLNAME[lv][0], LVLNAME[lv][1])}</span>`;
 
-  // ---------------------------------------------------------------- sound & voice
+  // ---------------------------------------------------------------- sound & calm ambient music
   let AC = null;
   function snd(type) {
     if (G().mute) return;
@@ -95,9 +95,57 @@
       if (type === "rain") noise(0, 1.2, 0.05);
     } catch (e) { }
   }
+
+  // Calm ambient synthesizer (relaxing pentatonic acoustic-like pads)
+  let bgMusicGain = null, bgMusicInterval = null;
+  function initCalmMusic() {
+    if (bgMusicGain) return;
+    try {
+      AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+      bgMusicGain = AC.createGain();
+      bgMusicGain.gain.setValueAtTime(0.035, AC.currentTime);
+      bgMusicGain.connect(AC.destination);
+    } catch (e) {}
+  }
+  function playCalmMusic() {
+    if (G().mute) return stopCalmMusic();
+    try {
+      initCalmMusic();
+      if (!AC || !bgMusicGain) return;
+      if (AC.state === "suspended") AC.resume();
+      if (bgMusicInterval) return;
+      const notes = [174.61, 220.00, 261.63, 293.66, 349.23, 392.00, 440.00, 523.25];
+      let step = 0;
+      const chord = () => {
+        if (G().mute || !bgMusicGain) return;
+        const now = AC.currentTime;
+        const b = (step * 2) % notes.length;
+        [notes[b], notes[(b + 2) % notes.length], notes[(b + 4) % notes.length]].forEach((freq, idx) => {
+          const osc = AC.createOscillator(), g = AC.createGain(), flt = AC.createBiquadFilter();
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(freq, now + idx * 0.3);
+          flt.type = "lowpass";
+          flt.frequency.setValueAtTime(550, now);
+          const dur = 4.2;
+          g.gain.setValueAtTime(0.0001, now + idx * 0.3);
+          g.gain.exponentialRampToValueAtTime(0.02, now + idx * 0.3 + 1.2);
+          g.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.3 + dur);
+          osc.connect(flt); flt.connect(g); g.connect(bgMusicGain);
+          osc.start(now + idx * 0.3); osc.stop(now + idx * 0.3 + dur + 0.1);
+        });
+        step++;
+      };
+      chord();
+      bgMusicInterval = setInterval(chord, 4600);
+    } catch (e) {}
+  }
+  function stopCalmMusic() {
+    if (bgMusicInterval) { clearInterval(bgMusicInterval); bgMusicInterval = null; }
+  }
+
   function speak(text) {
-    if (G().mute) return;
-    try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text.replace(/<[^>]+>/g, "")); u.lang = S().lang === "en" ? "en-GB" : "ar-SA"; u.rate = S().lang === "en" ? 1 : 0.95; speechSynthesis.speak(u); } catch (e) { }
+    try { if (window.speechSynthesis) speechSynthesis.cancel(); } catch (e) { }
+    // Talking effect removed as requested; calm ambient music used instead.
   }
 
   // ---------------------------------------------------------------- Ammi Salah with moods
@@ -108,13 +156,61 @@
     return s;
   }
 
-  // ---------------------------------------------------------------- level runtime
+  // ---------------------------------------------------------------- level runtime & 60s timer
   let LV = null;
   const LEVELS = {};
   const ORDER = ["1", "2", "3", "4", "5", "6", "7", "F", "8", "9", "10", "11"];
   const CHAPTER = { 1: "start", 2: "start", 3: "climate", 4: "climate", 5: "climate", 6: "climate", 7: "climate", F: "failure", 8: "soil", 9: "soil", 10: "soil", 11: "soil" };
+
+  let levelTimerInterval = null;
+  function stopLevelTimer() {
+    if (levelTimerInterval) { clearInterval(levelTimerInterval); levelTimerInterval = null; }
+  }
+  function startLevelTimer() {
+    stopLevelTimer();
+    LV.timeLeft = 60;
+    LV.totalTime = 60;
+    levelTimerInterval = setInterval(() => {
+      if (!LV || LV.done) return stopLevelTimer();
+      LV.timeLeft = Math.max(0, LV.timeLeft - 1);
+      const txt = document.getElementById("timer-txt");
+      const bar = document.getElementById("timer-bar");
+      const box = document.getElementById("timer-box");
+      const pill = document.getElementById("timer-pill");
+      const m = Math.floor(LV.timeLeft / 60);
+      const s = LV.timeLeft % 60;
+      const str = (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
+      if (txt) txt.textContent = str;
+      if (bar) bar.style.width = (LV.timeLeft / 60 * 100) + "%";
+      if (pill) {
+        if (LV.timeLeft <= 15) pill.classList.add("urgent");
+        else pill.classList.remove("urgent");
+      }
+      if (box) {
+        if (LV.timeLeft <= 15) box.classList.add("timer-urgent");
+        else box.classList.remove("timer-urgent");
+      }
+      // Dynamic farm visual changes across the 60s
+      const elapsed = 60 - LV.timeLeft;
+      const stressLvl = Math.min(3, Math.floor(elapsed / 15));
+      document.querySelectorAll(".b3d").forEach(b => { b.dataset.stress = stressLvl; });
+      if (LV.timeLeft === 0) {
+        stopLevelTimer();
+        say(L("انتهت الدقيقة! اشتدت الظروف وتغيّرت التربة، اتخذ قرارك الآن لحماية مزرعتك!", "One minute passed! Conditions intensified and the soil changed—make your decision now to protect your farm!"), "worried", "warn");
+      }
+    }, 1000);
+  }
+
   function startLevel(id) {
-    LV = { id, hints: 0, hintStage: 0, good: [], risky: [], missed: [], st: {}, done: false, axeAt: 0, axeN: 0 };
+    const g = G(), done = (x) => !!(g.levels[x] && g.levels[x].attempts && g.levels[x].attempts.length);
+    const i = ORDER.indexOf(id);
+    if (i > 0 && !done(ORDER[i - 1])) {
+      id = ORDER.find((x) => !done(x)) || "1";
+    }
+    stopLevelTimer();
+    LV = { id, hints: 0, hintStage: 0, good: [], risky: [], missed: [], st: {}, done: false, axeAt: 0, axeN: 0, timeLeft: 60, totalTime: 60, showNasa: false };
+    startLevelTimer();
+    if (!G().mute) playCalmMusic();
     if (window.THREE && A.SCREENS["l" + id + "x"]) return A.go("l" + id + "x");
     A.go("lvl");
   }
@@ -122,15 +218,24 @@
 
   function head(def) {
     const nm = def.title();
-    return `<div class="ghead in">
-      <button class="iconbtn" data-act="g" data-a="leave" aria-label="${L("الخريطة", "Map")}"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M2 5l5-2 6 2 5-2v12l-5 2-6-2-5 2z M7 3v12 M13 5v12" stroke="#516d77" stroke-width="1.7" fill="none" stroke-linejoin="round"/></svg></button>
-      <h1><small>${L("المستوى", "Level")} ${LV.id === "F" ? L("خاص", "special") : LV.id}</small>${nm}</h1>
-      <button class="iconbtn" data-act="g" data-a="hint" aria-label="${L("اكشف السر", "Spill the tea")}" title="${L("اكشف السر", "Spill the tea")}"><svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M5 9h11v4a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5z M16 10h2a2 2 0 0 1 0 4h-2 M8 3c0 2 2 2 2 4 M12 3c0 2 2 2 2 4" stroke="#840000" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button>
-      <button class="iconbtn" data-act="g" data-a="mute" aria-label="${G().mute ? L("تشغيل الصوت", "Unmute") : L("كتم الصوت", "Mute")}">${G().mute
-        ? '<svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 8h3l4-3v10l-4-3H3z M13 7l5 6 M18 7l-5 6" stroke="#516d77" stroke-width="1.7" fill="none" stroke-linejoin="round"/></svg>'
-        : '<svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 8h3l4-3v10l-4-3H3z M13 7a4 4 0 0 1 0 6 M15.5 5a7 7 0 0 1 0 10" stroke="#516d77" stroke-width="1.7" fill="none" stroke-linejoin="round"/></svg>'}</button>
+    return `<div class="plug-head in">
+      <button class="iconbtn mini" data-act="g" data-a="leave" aria-label="${L("الخريطة", "Map")}"><svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M2 5l5-2 6 2 5-2v12l-5 2-6-2-5 2z M7 3v12 M13 5v12" stroke="#516d77" stroke-width="2" fill="none" stroke-linejoin="round"/></svg></button>
+      <div class="plug-title">
+        <b>${nm}</b>
+        <span class="timer-pill" id="timer-pill">⏱ <span id="timer-txt">01:00</span></span>
+      </div>
+      <div class="plug-tools">
+        <button type="button" class="nasapill" data-act="g" data-a="toggleNasa" title="${L("بيانات ناسا", "NASA Data")}">📊 ${L("رصد ناسا", "NASA")}</button>
+        <button class="iconbtn mini" data-act="g" data-a="hint" aria-label="${L("تلميح", "Hint")}" title="${L("تلميح", "Hint")}"><svg width="18" height="18" viewBox="0 0 22 22" aria-hidden="true"><path d="M5 9h11v4a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5z M16 10h2a2 2 0 0 1 0 4h-2 M8 3c0 2 2 2 2 4 M12 3c0 2 2 2 2 4" stroke="#840000" stroke-width="2" fill="none" stroke-linecap="round"/></svg></button>
+        <button class="iconbtn mini" data-act="g" data-a="mute" aria-label="${G().mute ? L("تشغيل الموسيقى", "Unmute Music") : L("كتم الموسيقى", "Mute Music")}">${G().mute
+          ? '<svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 8h3l4-3v10l-4-3H3z M13 7l5 6 M18 7l-5 6" stroke="#516d77" stroke-width="2" fill="none" stroke-linejoin="round"/></svg>'
+          : '<svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 8h3l4-3v10l-4-3H3z M13 7a4 4 0 0 1 0 6 M15.5 5a7 7 0 0 1 0 10" stroke="#516d77" stroke-width="2" fill="none" stroke-linejoin="round"/></svg>'}</button>
+      </div>
     </div>
-    <div class="dock in d1"><div class="who" id="who">${salahM(80, "happy")}</div><div class="say tone-n" id="say" aria-live="polite"></div></div>`;
+    <div class="plug-salah in d1">
+      <div class="who-mini" id="who">${salahM(28, "happy")}</div>
+      <div class="say-mini tone-n" id="say" aria-live="polite"></div>
+    </div>`;
   }
   let lastSay = "";
   function say(text, mood = "happy", tone = "n", silent) {
@@ -138,10 +243,11 @@
     if (window.__say3) return window.__say3(text, mood, tone, silent);
     const who = document.getElementById("who"), el = document.getElementById("say");
     if (!who || !el) return;
-    who.innerHTML = salahM(80, mood) + (mood === "angry" ? '<span class="steam">~</span>' : "");
-    who.className = "who mood-" + mood; void who.offsetWidth;
-    el.className = "say msg tone-" + tone;
-    el.innerHTML = `<div>${text}</div><div class="acts"><button data-act="g" data-a="replay">${L("إعادة", "Replay")}</button></div>`;
+    const isMini = who.classList.contains("who-mini") || (who.parentElement && who.parentElement.classList.contains("plug-salah"));
+    who.innerHTML = salahM(isMini ? 28 : 80, mood) + (mood === "angry" ? '<span class="steam">~</span>' : "");
+    who.className = (isMini ? "who-mini" : "who") + " mood-" + mood; void who.offsetWidth;
+    el.className = (isMini ? "say-mini" : "say") + " msg tone-" + tone;
+    el.innerHTML = text;
     if (!silent) speak(text);
   }
   function hint() {
@@ -158,26 +264,23 @@
     L("انتظر! قبل أن تفعل ذلك، هل راجعت تاريخ محاصيلك؟", "Wait! Before you do that, have you checked your crop history?")];
 
   // risk feedback card (mandatory after important decisions)
+  // risk feedback card (mandatory after important decisions)
   function risk(o, onContinue, onChange) {
-    const lvl = o.level, lvlTxt = { low: L("خطر منخفض", "Low risk"), moderate: L("خطر متوسط", "Moderate risk"), high: L("خطر مرتفع", "High risk") }[lvl];
-    const kind = o.kind === "game" ? `<span class="kindtag">${L("حدث افتراضي في اللعبة", "Hypothetical game event")}</span>` : `<span class="kindtag">${L("خطر علمي مبني على البيانات", "Data-based scientific risk")}</span>`;
-    const ov = document.createElement("div"); ov.className = "riskov fade"; ov.setAttribute("role", "dialog");
-    ov.innerHTML = `<div class="riskcard sheet">
-      <div style="display:flex;gap:10px;align-items:center">${`<span style="flex:none;width:64px;height:64px">${salahM(64, lvl === "high" ? "worried" : "happy")}</span>`}
-        <div style="flex:1"><span class="rlvl rl-${lvl}">${lvlTxt}</span> ${kind}<div style="font-size:16px;font-weight:800;margin-top:4px">${o.title}</div></div></div>
-      <div class="rrow"><b>${L("القرار", "Decision")}:</b> ${o.decision}</div>
-      <div class="rrow"><b>${L("لماذا يهم", "Why it matters")}:</b> ${o.why}</div>
-      <div class="rrow"><b>${L("العواقب المحتملة", "Possible consequences")}:</b> ${o.cons}</div>
-      <div class="rrow"><b>${L("كيف تخفّف الخطر", "How to reduce it")}:</b> ${o.mitig}</div>
-      <div style="display:flex;gap:8px;margin-top:6px">${onChange ? `<button class="secondary" data-r="change" style="flex:1">${L("أغيّر رأيي", "Change it")}</button>` : ""}<button class="primary" data-r="ok" style="flex:1">${o.okLabel || L("فهمت، أكمل", "Got it, continue")}</button></div></div>`;
-    document.body.appendChild(ov);
-    snd(lvl === "high" ? "bad" : lvl === "moderate" ? "tap" : "good");
-    speak(o.title + ". " + o.cons);
-    ov.addEventListener("click", (e) => {
-      const b = e.target.closest("[data-r]"); if (!b) return;
-      ov.remove(); try { speechSynthesis.cancel(); } catch (er) { }
-      if (b.dataset.r === "ok") { if (lvl !== "low") G().risks.push({ lvl: LV && LV.id, t: o.title, level: lvl }); onContinue && onContinue(); } else onChange && onChange();
-    });
+    const lvl = o.level || "moderate";
+    if (lvl !== "low") {
+      G().risks.push({
+        lvl: LV && LV.id,
+        t: o.title,
+        level: lvl,
+        why: o.why || "",
+        cons: o.cons || "",
+        mitig: o.mitig || "",
+        decision: o.decision || ""
+      });
+      A.save();
+    }
+    // Intermediate risk score cards withheld until the final report as requested
+    onContinue && onContinue();
   }
 
   // axe gag when the player leaves level 1 too early
@@ -194,11 +297,11 @@
       <div class="ang">${salahM(150, "angry")}</div>
       <svg class="axe" viewBox="0 0 100 100" aria-hidden="true"><rect x="46" y="20" width="8" height="74" rx="4" fill="#9a6a3c"/><path d="M50 18 C70 10 86 18 88 34 C76 32 64 36 54 44 Z" fill="#b9c4c9" stroke="#516d77" stroke-width="2"/><path d="M50 18 C36 14 26 20 24 30 C34 30 44 34 50 40Z" fill="#9aa7ad"/></svg>`;
     document.body.appendChild(ov);
-    const appEl = document.getElementById("app") || document.body;
-    appEl.classList.add("shake-all");
+    app.classList.add("shake-all");
     snd("whoosh"); setTimeout(() => snd("crack"), 1200);
-    setTimeout(() => { ov.remove(); appEl.classList.remove("shake-all"); say(lines[(LV.axeN - 1) % lines.length], "angry", "bad"); }, 2700);
+    setTimeout(() => { ov.remove(); app.classList.remove("shake-all"); say(lines[(LV.axeN - 1) % lines.length], "angry", "bad"); }, 2700);
   }
+  const app = document.getElementById("app");
 
   // ---------------------------------------------------------------- finishing a level
   function finish(o) {
@@ -210,59 +313,185 @@
     g.levels[LV.id] = rec;
     if (o.strategy) g.finalStrategy = o.strategy;
     LV.result = Object.assign({ learn: Math.round(learn), stars, score }, o);
+    if (window.FS_API) {
+      window.FS_API.recordAttempt(S().farmId, [lastCrop()], score, { level: LV.id, stars, learn: Math.round(learn) }).catch(() => {});
+    }
     A.save(); A.go("lvlResult");
   }
-  const star = (on, d) => `<svg viewBox="0 0 24 24" style="animation-delay:${d}s" aria-hidden="true"><path d="M12 2l3 6.6 7.2.8-5.4 4.9 1.5 7.1L12 17.8 5.7 21.4l1.5-7.1L1.8 9.4 9 8.6z" fill="${on ? "#d9a520" : "#e3e3bf"}" stroke="${on ? "#a37a12" : "#c9c99a"}" stroke-width="1"/></svg>`;
+
+  // Intermediate result screen: scoring and risk analysis hidden until final report; Ammi Salah comments preserved
   A.SCREENS.lvlResult = () => {
     const r = LV.result, def = LEVELS[LV.id], next = ORDER[ORDER.indexOf(LV.id) + 1];
-    const list = (arr, col) => arr.length ? arr.map((x) => `<div><span class="dot" style="background:${col}"></span><span>${x}</span></div>`).join("") : `<div class="muted">${L("لا شيء", "None")}</div>`;
     return `<div class="gscreen">
-      <div class="pop" style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px">
-        <div style="width:110px;height:110px">${salahM(110, r.learn >= 65 ? "happy" : "worried")}</div>
+      <div class="pop" style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:10px">
+        <div style="width:115px;height:115px">${salahM(115, "happy")}</div>
         <div style="font-size:14px;font-weight:800;color:var(--mute)">${L("المستوى", "Level")} ${LV.id === "F" ? "" : LV.id} · ${def.title()}</div>
-        <div class="bigscore count" id="cnt" data-to="${r.learn}">0</div><div style="font-size:12px;font-weight:700" class="muted">/ 100</div>
-        <div class="starrow">${[0, 1, 2].map((i) => star(i < r.stars, 0.6 + i * 0.25)).join("")}</div>
-        <div class="note">${L("نقطة القرار", "Decision score")}: ${r.score} · ${L("التلميحات", "Hints")}: ${LV.hints} ${LV.hints ? L("(−5 لكل تلميح، حد أقصى −15)", "(−5 each, max −15)") : L("(حلّ مستقل!)", "(solved independently!)")}</div>
+        <div style="font-size:22px;font-weight:900;color:var(--ink)">${L("تمت الخطوة بنجاح!", "Step Completed!")}</div>
       </div>
-      <div class="panel2 in d2 rsum">${r.explain ? `<p style="margin:0;font-size:13.5px;line-height:1.55">${r.explain}</p>` : ""}<div class="rcount"><span class="g">✔ ${LV.good.length}</span><span class="w">⚠ ${LV.risky.length}</span><span class="m">✕ ${LV.missed.length}</span></div></div>
-      <details class="rdet in d3"><summary>${L("التفاصيل: القرارات والتحسينات", "Details: decisions and improvements")}</summary><div style="display:flex;flex-direction:column;gap:10px;padding-top:8px">
-      ${r.dims ? `<div class="panel2 in d2" style="display:flex;flex-direction:column;gap:6px">${Object.entries(r.dims).map(([k, v]) => `<div class="dimrow"><span style="width:120px">${k}</span><span class="pbar"><i style="width:${clamp(v)}%"></i></span><span dir="ltr" style="width:30px">${Math.round(v)}</span></div>`).join("")}</div>` : ""}
-      <div class="in d3"><b>${L("قرارات صحيحة", "Correct decisions")}</b><div class="rlist">${list(LV.good, "#7d8136")}</div></div>
-      <div class="in d4"><b>${L("قرارات فيها مخاطرة", "Risky decisions")}</b><div class="rlist">${list(LV.risky, "#c48a1c")}</div></div>
-      <div class="in d4"><b>${L("فرص ضائعة", "Missed opportunities")}</b><div class="rlist">${list(LV.missed, "#b8423a")}</div></div>
       
-      ${r.improve ? `<div class="panel2 in d5"><b>${L("لتحسين نتيجتك", "To improve")}</b><p style="margin:4px 0 0;font-size:13.5px;line-height:1.6">${r.improve}</p></div>` : ""}
-      </div></details>
-      <div class="note">${L("نقطة اللعبة تقيس أداءك حسب قواعد اللعبة، وليست تقييمًا رسميًا لصمود مزرعتك.", "A game score measures performance against the game's rules, not a certified farm resilience rating.")}</div>
-      <div style="display:flex;gap:8px"><button class="secondary" data-act="g" data-a="retry">${L("أعد المحاولة", "Retry")}</button><button class="secondary" data-act="go" data-to="map">${L("الخريطة", "Map")}</button></div>
-      ${next ? `<button class="primary" data-act="g" data-a="start" data-id="${next}">${L("المستوى التالي", "Next level")} ${A.fwd()}</button>` : `<button class="primary" data-act="go" data-to="report">${L("تقرير صمود المزرعة", "Farm Resilience Report")} ${A.fwd()}</button>`}
+      <div class="dock in d1" style="margin:8px 0;background:var(--paper);border-radius:18px;border:1.5px solid #d4dec4;padding:16px">
+        <div style="font-size:13px;font-weight:900;color:#516d77;margin-bottom:6px">🌾 ${L("تعليق عمّي صالح:", "Ammi Salah's comments:")}</div>
+        <div style="font-size:15px;line-height:1.65;color:#2b2a20;font-weight:600">
+          ${r.explain || L(`أحسنت يا ${pname()}! سجّلتُ قراراتك لهذا الموسم. خطوة جيدة إلى الأمام، وسنكتشف صمود المزرعة الشامل وتحليل المخاطر عند إكمال باقي التحديات.`, `Well done, ${pname()}! I recorded your decisions for this season. A solid step forward; your full farm resilience score and risk breakdown will be revealed once all challenges are completed.`)}
+        </div>
+      </div>
+
+      <div class="panel2 in d2" style="display:flex;align-items:center;gap:12px;background:#fbfbef;border:1.5px dashed #c9c99a;border-radius:16px;padding:12px 14px">
+        <span style="font-size:24px">🛡️</span>
+        <div style="font-size:12px;line-height:1.5;color:#516d77;font-weight:700">
+          ${L("نقاط التقييم، تفاصيل المخاطر، والأدلة العلمية محجوبة الآن، وستظهر بالتفصيل في تقرير صمود المزرعة النهائي بعد إنهاء كل التحديات.", "Scores, risk breakdowns, and evidence are withheld now, and will be displayed in full in the final Farm Resilience Report upon finishing all challenges.")}
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="secondary" data-act="go" data-to="map" style="flex:1">${L("الخريطة", "Challenges Map")}</button>
+        ${next ? `<button class="primary" data-act="g" data-a="start" data-id="${next}" style="flex:2">${L("التحدي التالي", "Next Challenge")} ${A.fwd()}</button>` : `<button class="primary" data-act="go" data-to="report" style="flex:2">${L("عرض التقرير النهائي", "View Final Report")} ${A.fwd()}</button>`}
+      </div>
     </div>`;
   };
   A.AFTER.lvlResult = () => {
-    const el = document.getElementById("cnt"), to = +el.dataset.to; let v = 0;
-    snd(LV.result.stars >= 2 ? "level" : "tap");
-    const iv = setInterval(() => { v = Math.min(to, v + Math.max(1, Math.round(to / 30))); el.textContent = v; if (v >= to) clearInterval(iv); }, 30);
-    speak(LV.result.stars >= 2 ? L(`أحسنت يا ${pname()}!`, `Well done, ${pname()}!`) : L(`لا بأس يا ${pname()}، كل محاولة تجعلك أذكى.`, `That's okay, ${pname()}. Every retry makes you smarter.`));
+    stopLevelTimer();
+    snd("good");
   };
 
-  // ---------------------------------------------------------------- generic level screen
-  A.SCREENS.lvl = () => `<div class="gscreen">${head(LEVELS[LV.id])}<div id="lv" style="display:flex;flex-direction:column;gap:12px;flex:1"></div></div>`;
-  A.AFTER.lvl = () => { const d = LEVELS[LV.id]; d.init && d.init(); draw(); setTimeout(() => say(d.intro(), "happy", "n"), 450); };
-  const draw = () => { if (window.__draw3) return window.__draw3(); const el = document.getElementById("lv"); if (el) { el.innerHTML = LEVELS[LV.id].view(); LEVELS[LV.id].after && LEVELS[LV.id].after(); if (!el.dataset.first) { el.dataset.first = 1; setTimeout(() => el.classList.add("settled"), 900); } } };
+  // ---------------------------------------------------------------- generic level screen & NASA toggle
+  function renderNasaModal() {
+    const l = loc();
+    if (!l) return "";
+    return `<div class="riskov fade" id="nasaModal" style="display:${LV.showNasa ? "flex" : "none"}">
+      <div class="sheet pop" style="max-height:85vh;overflow-y:auto;display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1.5px solid #dcdcb8;padding-bottom:8px">
+          <span style="font-weight:900;font-size:15px;color:#516d77">📊 ${L("تقرير رصد ناسا الحقيقي للموقع", "Real NASA Observation Report")}</span>
+          <button type="button" class="secondary" style="width:auto;min-height:32px;padding:3px 10px;font-size:12px" data-act="g" data-a="toggleNasa">❌ ${L("إخفاء", "Hide")}</button>
+        </div>
+        <div style="font-size:12px;color:var(--mute)">📍 ${esc(A.placeName())} (${l.lat ? l.lat.toFixed(2) : ""}°, ${l.lon ? l.lon.toFixed(2) : ""}°) · ⛰️ ${Math.round(l.elev || 450)}m (${L("الارتفاع", "elevation")})</div>
+        <div class="nasa-drawer-grid">
+          <div class="nasa-cell-box">
+            <small>${L("متوسط أمطار الموسم (أكتوبر–ماي)", "Mean Season Rain (Oct–May)")}</small>
+            <b>${l.summary.rain_mean} mm</b>
+          </div>
+          <div class="nasa-cell-box">
+            <small>${L("أيام الحر عند الإزهار", "Hot Days at Flowering")}</small>
+            <b>${l.trends && l.trends.hot_flowering ? l.trends.hot_flowering.late : 4} ${L("أيام", "days")}</b>
+          </div>
+          <div class="nasa-cell-box">
+            <small>${L("نوع التربة (SoilGrids)", "Soil Texture (SoilGrids)")}</small>
+            <b>${l.soil.texture === "clay loam" ? L("طميية طينية", "Clay loam") : l.soil.texture}</b>
+          </div>
+          <div class="nasa-cell-box">
+            <small>${L("سعة احتفاظ الماء (PAW100)", "Plant-Available Water (PAW100)")}</small>
+            <b>${l.soil.paw100} mm/m</b>
+          </div>
+        </div>
+        <div class="nasa-citation">
+          📊 <b>${L("المصدر العلمي:", "Scientific Sources:")}</b> NASA POWER 0.5° (1995–2025) · ISRIC SoilGrids 250m · NASADEM.
+        </div>
+        <button type="button" class="primary" style="margin-top:6px;min-height:42px" data-act="g" data-a="toggleNasa">${L("إخفاء والعودة للعبة", "Hide & Return to Game")}</button>
+      </div>
+    </div>`;
+  }
+
+  A.SCREENS.lvl = () => `<div class="gscreen plugged">${head(LEVELS[LV.id])}<div id="lv" style="display:flex;flex-direction:column;gap:6px;flex:1;min-height:0;overflow:hidden"></div>${renderNasaModal()}</div>`;
+  A.AFTER.lvl = () => { const d = LEVELS[LV.id]; d.init && d.init(); draw(); setTimeout(() => say(d.intro(), "happy", "n"), 450); if (!G().mute) playCalmMusic(); };
+  const draw = () => {
+    const el = document.getElementById("lv");
+    if (!el) return;
+    let content = LEVELS[LV.id].view();
+    
+    // Separate primary action button into fixed plug-foot
+    let footHtml = "";
+    const btnRegex = /<button class="primary[^"]*"[^>]*>[\s\S]*?<\/button>\s*$/;
+    const btnMatch = content.match(btnRegex);
+    if (btnMatch) {
+      footHtml = `<div class="plug-foot">${btnMatch[0]}</div>`;
+      content = content.slice(0, btnMatch.index);
+    }
+    
+    // Separate the 3D board from the control deck
+    const b3dIdx = content.indexOf('<div class="b3d');
+    if (b3dIdx !== -1) {
+      let depth = 0, b3dEnd = -1;
+      for (let pos = b3dIdx; pos < content.length; ) {
+        const nextOpen = content.indexOf('<div', pos + 1);
+        const nextClose = content.indexOf('</div>', pos + 1);
+        if (nextClose === -1) break;
+        if (nextOpen !== -1 && nextOpen < nextClose) {
+          depth++;
+          pos = nextOpen;
+        } else {
+          if (depth === 0) {
+            b3dEnd = nextClose + 6;
+            break;
+          }
+          depth--;
+          pos = nextClose;
+        }
+      }
+      if (b3dEnd !== -1) {
+        let start = b3dIdx;
+        const prefix = content.slice(0, b3dIdx);
+        const wrapMatch = prefix.match(/<div class="in [^"]*">\s*$/);
+        if (wrapMatch) {
+          start = wrapMatch.index;
+          const closeWrap = content.indexOf('</div>', b3dEnd);
+          if (closeWrap !== -1 && closeWrap - b3dEnd < 15) b3dEnd = closeWrap + 6;
+        }
+        const boardHtml = `<div class="plug-board in d2">${content.slice(b3dIdx, b3dEnd)}</div>`;
+        const deckHtml = `<div class="plug-deck in d3">${content.slice(0, start) + content.slice(b3dEnd)}</div>`;
+        el.innerHTML = boardHtml + deckHtml + footHtml;
+      } else {
+        el.innerHTML = `<div class="plug-deck in d2">${content}</div>${footHtml}`;
+      }
+    } else {
+      el.innerHTML = `<div class="plug-deck in d2">${content}</div>${footHtml}`;
+    }
+    
+    const modalEl = document.getElementById("nasaModal");
+    if (modalEl) modalEl.style.display = LV.showNasa ? "flex" : "none";
+    
+    LEVELS[LV.id].after && LEVELS[LV.id].after();
+    if (!el.dataset.first) { el.dataset.first = 1; setTimeout(() => el.classList.add("settled"), 900); }
+  };
 
   A.ACT.g = (d) => {
     const a = d.a;
     if (a === "start") return startLevel(d.id);
-    if (a === "mute") { G().mute = !G().mute; A.save(); try { speechSynthesis.cancel(); } catch (e) { } return A.render(); }
-    if (a === "replay") return speak(lastSay);
+    if (a === "mute") {
+      G().mute = !G().mute;
+      A.save();
+      if (G().mute) stopCalmMusic();
+      else playCalmMusic();
+      return A.render();
+    }
+    if (a === "replay") return say(lastSay, "happy", "n", true);
     if (a === "hint") return hint();
     if (a === "retry") return startLevel(LV.id);
+    if (a === "toggleNasa") {
+      LV.showNasa = !LV.showNasa;
+      draw();
+      return;
+    }
     if (a === "leave") {
       const def = LEVELS[LV.id];
-      if (def.mustFinish && !LV.done) return axe();
-      try { speechSynthesis.cancel(); } catch (e) { } return A.go("map");
+      if (def && def.mustFinish && !LV.done) return axe();
+      stopLevelTimer();
+      return A.go("map");
+    }
+    if (a === "tile") {
+      const tileEl = document.querySelector(`.t3[data-i="${d.i}"]`);
+      if (tileEl) {
+        tileEl.classList.remove("pop-anim");
+        void tileEl.offsetWidth;
+        tileEl.classList.add("pop-anim");
+      }
+      snd("tap");
+      if (LEVELS[LV.id] && LEVELS[LV.id].on) {
+        LEVELS[LV.id].on("tile", d);
+      }
+      return;
     }
     snd("tap");
+    if (!G().mute && !bgMusicInterval) playCalmMusic();
     LEVELS[LV.id].on(a, d);
   };
 
@@ -365,7 +594,7 @@
       const hl = typeof health === "function" ? health(i, c, r) : health;
       return { fill: mixC(soilCol(), "#c9b38a", Math.max(0, 0.6 - hl) * 0.8), flat: (o.flat ? o.flat(i, c, r) : "") + (hl < 0.35 ? FLAT.cracks : "") + (o.noIrrig ? "" : irrigFlat(c, r)),
         deco: (crop ? plantDeco(typeof crop === "function" ? crop(i, c, r) : crop, 4, "", hl) : "") + (o.noIrrig ? "" : irrigDeco(c, r)) + (o.deco ? o.deco(i, c, r) : ""), label: o.label || "" };
-    }, Object.assign({ extras: farmExtras(cols, rows), act: "noop" }, o));
+    }, Object.assign({ extras: farmExtras(cols, rows), act: "g", action: "tile" }, o));
   }
   A.ACT.noop = () => { };
   const cropArt = (k, w = 120) => {
@@ -462,7 +691,7 @@
     view() {
       const st = LV.st, prev0 = lastCrop();
       const prevFor = (i) => (i === 0 ? prev0 : st.plan[0] || prev0);
-      const cards = CROPS.map((k) => { const su = suitability(k, prevFor(st.active)); return `<button class="ccard" data-act="g" data-a="open" data-v="${k}"><div class="art">${cropArt(k)}</div><b>${cname(k)}</b><small>${E.CROPS[CK[k]].family === "cereal" ? L("حبوب", "Cereal") : E.CROPS[CK[k]].family === "legume" ? L("بقوليات", "Legume") : L("خليط", "Mix")} · ${L("الماء الكافي", "Water met")} ${pct(su.st.ws)}</small>${lvlBadge(su.level)}</button>`; }).join("");
+      const cards = CROPS.map((k) => { return `<button class="ccard" data-act="g" data-a="open" data-v="${k}"><div class="art">${cropArt(k)}</div><b>${cname(k)}</b><small>${E.CROPS[CK[k]].family === "cereal" ? L("حبوب", "Cereal") : E.CROPS[CK[k]].family === "legume" ? L("بقوليات", "Legume") : L("خليط", "Mix")}</small></button>`; }).join("");
       return `<div class="slotbar in d2">${[0, 1].map((i) => `<button class="slotc ${st.plan[i] ? "full" : ""} ${st.active === i ? "active" : ""}" data-act="g" data-a="slot" data-i="${i}"><span>${L("الموسم", "Season")} ${i + 1}</span><b style="font-size:15px">${st.plan[i] ? cname(st.plan[i]) : L("اختر محصولًا", "Pick a crop")}</b></button>`).join("")}</div>
         <div class="note in d2">${L("قبل ذلك", "Before")}: ${cname(prev0)} · ${L("التقييم على 30 موسمًا من بيانات ناسا لموقعك", "Rated over 30 NASA seasons at your location")}</div>
         <div class="cgrid stagger">${cards}</div>
@@ -476,7 +705,7 @@
       const fact = (t, v, na) => `<div class="fact ${na ? "na" : ""}">${t}<b>${v}</b></div>`;
       const why = { water: L("قد يحتاج ماءً أكثر مما يوفّره مطرك وتربتك عادة.", "It may need more water than your rain and soil usually provide."), heat: L("إزهاره يقع غالبًا في أيام حارة في موقعك.", "Its flowering often meets hot days at your location."), rotation: L(`من نفس عائلة ${cname(prev)}: خطر تراكم الأمراض.`, `Same family as ${cname(prev).toLowerCase()}: disease build-up risk.`), broomrape: L("بقولي بعد بقولي: خطر الهالوك (Orobanche).", "Legume after legume: broomrape (Orobanche) risk."), salt: L("حساس للملوحة.", "Sensitive to salinity."), system: L("النتائج مصمّمة للحقل المفتوح فقط.", "Results are designed for open fields only.") };
       return `<div class="riskcard sheet" role="dialog">
-        <div style="display:flex;gap:10px;align-items:center"><div style="width:120px;border-radius:14px;overflow:hidden;background:linear-gradient(#dfe7e9,#eef0d6)">${cropArt(k)}</div><div style="flex:1"><div style="font-size:20px;font-weight:900">${cname(k)}</div>${lvlBadge(su.level)}</div></div>
+        <div style="display:flex;gap:10px;align-items:center"><div style="width:120px;border-radius:14px;overflow:hidden;background:linear-gradient(#dfe7e9,#eef0d6)">${cropArt(k)}</div><div style="flex:1"><div style="font-size:20px;font-weight:900">${cname(k)}</div></div></div>
         <div class="facts">
           ${fact(L("العائلة", "Family"), fam)}
           ${fact(L("موسم النمو", "Growing season"), `${mName(c.sow)} → ${mName(harvestM)}`)}
@@ -497,6 +726,14 @@
     },
     on(a, d) {
       const st = LV.st;
+      if (a === "tile") {
+        const i = +d.i;
+        const currentCrop = st.plan[st.active] || lastCrop();
+        snd("good");
+        say(L(`القطعة ${i + 1}: زرعت ${cname(currentCrop)} على الحقل مباشرة! 🌱`, `Plot ${i + 1}: planted ${cname(currentCrop)} directly on the field! 🌱`), "happy", "good");
+        draw();
+        return;
+      }
       if (a === "slot") { st.active = +d.i; draw(); return; }
       if (a === "open") {
         const k = d.v, ov = document.createElement("div"); ov.className = "riskov fade"; ov.innerHTML = this.detail(k); document.body.appendChild(ov);
@@ -607,6 +844,15 @@
     },
     on(a, d) {
       const st = LV.st, used = Object.values(st.alloc).reduce((x, y) => x + y, 0);
+      if (a === "tile") {
+        const i = +d.i;
+        st.watered = st.watered || {};
+        st.watered[i] = !st.watered[i];
+        snd("good");
+        say(st.watered[i] ? L("سقيت هذه القطعة مباشرة! رطوبة التربة ترتفع.", "Directly watered this plot! Soil moisture rises.") : L("أوقفت السقي عن هذه القطعة.", "Stopped watering this plot."), "happy", "good");
+        draw();
+        return;
+      }
       if (a === "tok") {
         const m = +d.m, rec = st.mulch ? st.mul : st.base, mo = rec.months[m];
         if (used >= st.tokens) { if (st.alloc[m]) { st.alloc[m]--; if (!st.alloc[m]) delete st.alloc[m]; } else say(L("انتهت حصصك! اضغط على شهر فيه حصة لإزالتها.", "You're out of shares! Tap a month with a share to remove it."), "worried", "warn"); draw(); return; }
@@ -676,6 +922,13 @@
     },
     on(a, d) {
       const st = LV.st;
+      if (a === "tile") {
+        st.mist = !st.mist;
+        snd("good");
+        say(st.mist ? L("رذاذ تبريد خفيف على الحقل يخفّف حرارة الظهيرة!", "Cooling mist spray on the field eases midday heat!") : L("أوقفت رذاذ التبريد.", "Turned off cooling mist."), "happy", "good");
+        draw();
+        return;
+      }
       if (a === "crop" || a === "sow" || a === "water") {
         const before = this.run(st);
         if (a === "crop") st.crop = d.v; if (a === "sow") st.sowing = d.v; if (a === "water") st.water = !st.water;
@@ -798,6 +1051,17 @@
     },
     on(a, d) {
       const st = LV.st, i = +d.i;
+      if (a === "tile") {
+        const r = Math.min(3, Math.floor(i / 4));
+        const cycle = [null, "manure", "drip", "n"];
+        const cur = cycle.indexOf(st.inp[r]);
+        st.inp[r] = cycle[(cur + 1) % cycle.length];
+        snd("tap");
+        const names = { manure: L("سماد عضوي", "manure"), drip: L("ري بالتنقيط", "drip"), n: L("سماد آزوتي", "N fertilizer") };
+        say(st.inp[r] ? L(`الموسم ${r + 1}: أضفت ${names[st.inp[r]]}.`, `Season ${r + 1}: added ${names[st.inp[r]]}.`) : L(`الموسم ${r + 1}: بدون مدخلات إضافية.`, `Season ${r + 1}: no extra inputs.`), "happy", "n");
+        draw();
+        return;
+      }
       if (a === "open") { st.open = st.open === i ? null : i; draw(); return; }
       if (a === "crop") { st.seq[i] = d.v; st.open = null; if (i > 0 && E.CROPS[CK[st.seq[i - 1]]].family === E.CROPS[CK[d.v]].family) say(L("لم نزرع هذه العائلة هنا للتو؟ فكّر في فوائد تنويع دورتك.", "Didn't we just grow that family here? Think about diversifying your rotation."), "worried", "warn"); draw(); return; }
       if (a === "inp") {
@@ -848,6 +1112,11 @@
     },
     on(a, d) {
       const st = LV.st, p = st.pick;
+      if (a === "tile") {
+        snd("tap");
+        if (st.round < 3) return this.on("play", d);
+        return;
+      }
       if (a === "crop") { p.crop = d.v; if (E.CROPS[CK[d.v]].family === E.CROPS[CK[st.prev]].family) say(L(`${cname(st.prev)} قبله… نفس العائلة؟ همم.`, `${cname(st.prev)} before it… same family? Hmm.`), "worried", "warn"); draw(); return; }
       if (a === "sow") { p.sowing = d.v; draw(); return; }
       if (a === "water") { p.water = !p.water; draw(); return; }
@@ -908,9 +1177,12 @@
       LV.st = { crop, prev, s, rec, ev, sel: {}, phase: "investigate", fix: { crop: crop === "barley" ? "chickpea" : "barley", sowing: "early", residue: "kept" } };
     },
     scene(dead) {
-      if (dead) return board3d(4, 3, (i) => ({ fill: "#a98a62", flat: FLAT.cracks, deco: `<g>${[...Array(4)].map((_, k) => `<g class="wilt" style="animation-delay:${(i * 0.08 + k * 0.05).toFixed(2)}s"><path d="M${-12 + k * 8} 0 v-14" stroke="#8a7a4a" stroke-width="1.6"/><ellipse cx="${-12 + k * 8}" cy="-16" rx="2" ry="4" fill="#a99060"/></g>`).join("")}</g>` }), { env: "dead", act: "noop", extras: farmExtras(4, 3), label: L("حقل جاف ومحاصيل ميتة", "Dry field with dead crops"), badge: `${cname(LV.st.crop)} · ${pct(LV.st.rec.yieldIdx)}` });
+      if (dead) return board3d(4, 3, (i) => {
+        const rev = LV.st.revived && LV.st.revived[i];
+        return { fill: rev ? "#7a5638" : "#a98a62", flat: rev ? "" : FLAT.cracks, deco: rev ? plantDeco("lentil", 4, "grow") : `<g>${[...Array(4)].map((_, k) => `<g class="wilt" style="animation-delay:${(i * 0.08 + k * 0.05).toFixed(2)}s"><path d="M${-12 + k * 8} 0 v-14" stroke="#8a7a4a" stroke-width="1.6"/><ellipse cx="${-12 + k * 8}" cy="-16" rx="2" ry="4" fill="#a99060"/></g>`).join("")}</g>` };
+      }, { env: "dead", act: "g", action: "tile", height: 165, extras: farmExtras(4, 3), label: L("حقل جاف ومحاصيل ميتة", "Dry field with dead crops"), badge: `${cname(LV.st.crop)} · ${pct(LV.st.rec.yieldIdx)}` });
       const r2 = seasonRun(LV.st.fix.crop, LV.st.s, { prev: LV.st.prev, sowing: LV.st.fix.sowing, residue: LV.st.fix.residue });
-      return fieldBoard(LV.st.fix.crop, Math.min(1, r2.yieldIdx * 1.4), { env: r2.yieldIdx > 0.4 ? "day" : "drought", flat: () => (LV.st.fix.residue === "kept" ? FLAT.straw : ""), label: L("الحقل بعد خطة التعافي", "The field after the recovery plan"), badge: `${cname(LV.st.fix.crop)} · ${pct(r2.yieldIdx)}` });
+      return fieldBoard(LV.st.fix.crop, Math.min(1, r2.yieldIdx * 1.4), { env: r2.yieldIdx > 0.4 ? "day" : "drought", height: 165, act: "g", action: "tile", flat: () => (LV.st.fix.residue === "kept" ? FLAT.straw : ""), label: L("الحقل بعد خطة التعافي", "The field after the recovery plan"), badge: `${cname(LV.st.fix.crop)} · ${pct(r2.yieldIdx)}` });
     },
     view() {
       const st = LV.st;
@@ -930,6 +1202,7 @@
     },
     on(a, d) {
       const st = LV.st;
+      if (a === "tile") { const i = +d.i; st.revived = st.revived || {}; st.revived[i] = true; snd("good"); say(L("أنبتّ برعمًا أخضر جديدًا في هذه القطعة! 🌱", "Sprouted a new green shoot in this plot! 🌱"), "happy", "good"); draw(); return; }
       if (a === "sel") { st.sel[d.v] = !st.sel[d.v]; draw(); return; }
       if (a === "conclude") {
         let right = 0, wrong = 0; st.ev.forEach((e) => { const s = !!st.sel[e.k]; if (e.unknown) { if (s) { wrong++; riskyLog(L("الآفات: لا دليل عليها في البيانات.", "Pests: no evidence in the data.")); } } else if (s && e.ok) { right++; goodLog(L(`${e.t}: سبب مدعوم بالأدلة.`, `${e.t}: supported by evidence.`)); } else if (s && !e.ok) { wrong++; riskyLog(L(`${e.t}: الأدلة لا تدعمه هنا.`, `${e.t}: not supported by the evidence here.`)); } else if (!s && e.ok) missLog(L(`فاتك سبب: ${e.t}.`, `You missed a cause: ${e.t}.`)); });
@@ -1034,6 +1307,13 @@
     },
     on(a, d) {
       const st = LV.st, before = this.ev(st).scores.erosion;
+      if (a === "tile") {
+        st.residue = st.residue === "kept" ? "grazed" : "kept";
+        snd("tap");
+        say(st.residue === "kept" ? L("تركت التبن لحماية التربة من الانجراف!", "Kept residue to shield soil from runoff!") : L("رعت الأغنام التبن.", "Sheep grazed residue."), "happy", "n");
+        draw();
+        return;
+      }
       if (a === "res") st.residue = d.v; if (a === "till") st.till = d.v === "1"; if (a === "cover") st.cover = d.v === "1";
       if (a === "res" || a === "till" || a === "cover") { const after = this.ev(st).scores.erosion; say(after > before ? L(`الحماية ارتفعت إلى ${after}. التربة تشكرك!`, `Protection rose to ${after}. The soil thanks you!`) : after < before ? L(`الحماية انخفضت إلى ${after}. التربة صارت مكشوفة أكثر.`, `Protection fell to ${after}. More soil is exposed.`) : L("لا تغيير.", "No change."), after >= before ? "happy" : "worried", after > before ? "good" : after < before ? "warn" : "n"); if (a === "res" && d.v === "removed") risk({ level: "high", kind: "science", title: L("إزالة كل البقايا", "Removing all residue"), decision: L("إزالة البقايا", "Removing residue"), why: L("أمطار الخريف الغزيرة تسقط قبل نمو المحصول.", "Heavy autumn rain falls before the crop grows."), cons: L("تربة عارية تنجرف على الانحدار.", "Bare soil washes away on the slope."), mitig: L("اترك ثلث البقايا على الأقل.", "Leave at least a third of the residue.") }); draw(); return; }
       if (a === "end") {
@@ -1067,6 +1347,15 @@
     },
     on(a, d) {
       const st = LV.st;
+      if (a === "tile") {
+        if (!st.sel.includes("residue")) st.sel.push("residue");
+        else if (!st.sel.includes("cover")) st.sel.push("cover");
+        else st.sel = st.sel.filter(x => x !== "burn");
+        snd("tap");
+        say(L("تطبيق ممارسات حماية المادة العضوية على القطعة!", "Applying organic matter conservation to plot!"), "happy", "good");
+        draw();
+        return;
+      }
       if (a === "sel") { const i = st.sel.indexOf(d.v); if (i >= 0) st.sel.splice(i, 1); else if (st.sel.length < 3) { st.sel.push(d.v); const p = this.P().find((x) => x[0] === d.v); if (p[2] < 0) say(d.v === "burn" ? L("حرق؟! المادة العضوية تتحوّل دخانًا يا صديقي.", "Burning?! Your organic matter turns into smoke, my friend.") : L("دخل اليوم… وتربة أفقر غدًا.", "Income today… poorer soil tomorrow."), "angry", "bad"); else say(L(`${p[1]}: إيجابي، لكن ${p[3]}.`, `${p[1]}: positive, but ${p[3]}.`), "happy", "good"); } draw(); return; }
       if (a === "end") {
         const P = this.P(), sum = st.sel.reduce((x, k) => x + P.find((p) => p[0] === k)[2], 0);
@@ -1101,6 +1390,17 @@
     after() { const r = document.querySelector("[data-ec]"); if (r) r.addEventListener("change", () => { LV.st.ec = +r.value; draw(); }); },
     on(a, d) {
       const st = LV.st;
+      if (a === "tile") {
+        const i = +d.i, c = i % 3;
+        const crops = ["barley", "oat", "vetch", "wheat"];
+        const curIdx = crops.indexOf(st.plots[c] || "barley");
+        st.plots[c] = crops[(curIdx + 1) % crops.length];
+        snd("good");
+        const y = this.yieldAt(st.plots[c], st.ec);
+        say(L(`القطعة ${c + 1}: ${cname(st.plots[c])} (المردود المتوقع: ${pct(y)})`, `Plot ${c + 1}: ${cname(st.plots[c])} (expected yield: ${pct(y)})`), y > 0.6 ? "happy" : "worried", y > 0.6 ? "good" : "warn");
+        draw();
+        return;
+      }
       if (a === "plot") { st.plots[+d.i] = d.v; const th = E.SALT[CK[d.v]][0]; if (st.ec > th) say(L(`${cname(d.v)} يبدأ بالتضرّر فوق ${th} dS/m تقريبًا. انتبه!`, `${cname(d.v)} starts to suffer above about ${th} dS/m. Careful!`), "worried", "warn"); else say(L(`${cname(d.v)} يتحمّل هذه الملوحة.`, `${cname(d.v)} tolerates this salinity.`), "happy", "good"); draw(); return; }
       if (a === "mg") { const i = st.mg.indexOf(d.v); if (i >= 0) st.mg.splice(i, 1); else { st.mg.push(d.v); if (d.v === "more") risk({ level: "high", kind: "science", title: L("سقي أكثر بماء مالح", "More irrigation with salty water"), decision: L("زيادة السقي بنفس الماء", "Watering more with the same water"), why: L("كل سقية تضيف أملاحًا.", "Each watering adds salts."), cons: L("بدون صرف جيد تتراكم الأملاح في منطقة الجذور.", "Without good drainage salts build up in the root zone."), mitig: L("الغسيل يعمل فقط مع صرف جيد وماء أقل ملوحة.", "Leaching only works with good drainage and less salty water.") }); } draw(); return; }
       if (a === "end") {
@@ -1119,32 +1419,42 @@
   // ---------------------------------------------------------------- map
   const LTITLE = (id) => LEVELS[id].title();
   A.SCREENS.map = () => {
-    const g = G(), done = (id) => !!(g.levels[id] && g.levels[id].attempts.length);
+    const g = G(), done = (id) => !!(g.levels[id] && g.levels[id].attempts && g.levels[id].attempts.length);
     const unlocked = (id) => { const i = ORDER.indexOf(id); return i === 0 || done(ORDER[i - 1]); };
     const nextId = ORDER.find((id) => !done(id));
+    const allDone = ORDER.every(done);
     const chapters = { start: L("البداية", "Getting started"), climate: L("تحديات المناخ", "Climate challenges"), failure: L("فصل خاص", "Special chapter"), soil: L("تحديات التربة", "Soil challenges") };
     let cur = "", html = "";
     ORDER.forEach((id, k) => {
       if (CHAPTER[id] !== cur) { cur = CHAPTER[id]; html += `<div class="chap">${chapters[cur]}</div>`; }
-      const rec = g.levels[id], ok = unlocked(id), st = rec ? rec.stars || 0 : 0;
-      html += `<button class="node zig ${ok ? "" : "locked"} ${done(id) ? "done" : ""} ${id === nextId ? "next" : ""} in" style="animation-delay:${k * 0.05}s" ${ok ? `data-act="g" data-a="start" data-id="${id}"` : 'aria-disabled="true"'}>
-        <span class="num">${ok ? (id === "F" ? "!" : id) : '<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><rect x="4" y="8" width="10" height="8" rx="2" fill="#fbfbef"/><path d="M6 8V6a3 3 0 0 1 6 0v2" stroke="#fbfbef" stroke-width="2" fill="none"/></svg>'}</span>
-        <span style="flex:1"><b>${LTITLE(id)}</b><small>${rec ? L(`أفضل نتيجة ${rec.best} · ${rec.attempts.length} محاولة`, `Best ${rec.best} · ${rec.attempts.length} attempt(s)`) : ok ? L("جاهز", "Ready") : L("مغلق", "Locked")}</small></span>
-        <span class="stars">${[0, 1, 2].map((i) => `<span class="${i < st ? "" : "off"}">★</span>`).join("")}</span></button>`;
+      const isDone = done(id), isUnlocked = unlocked(id), rec = g.levels[id];
+      let statusLabel = L("مغلق", "Locked");
+      let icon = '<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><rect x="4" y="8" width="10" height="8" rx="2" fill="#fbfbef"/><path d="M6 8V6a3 3 0 0 1 6 0v2" stroke="#fbfbef" stroke-width="2" fill="none"/></svg>';
+      if (isDone) {
+        statusLabel = L("✓ تم الإنجاز", "✓ Completed");
+        icon = (id === "F" ? "!" : id);
+      } else if (isUnlocked) {
+        statusLabel = L("جاهز للبدء", "Ready to play");
+        icon = (id === "F" ? "!" : id);
+      }
+      html += `<button class="node zig ${isUnlocked ? "" : "locked"} ${isDone ? "done" : ""} ${id === nextId ? "next" : ""} in" style="animation-delay:${k * 0.05}s" ${isUnlocked ? `data-act="g" data-a="start" data-id="${id}"` : 'aria-disabled="true"'}>
+        <span class="num">${icon}</span>
+        <span style="flex:1"><b>${LTITLE(id)}</b><small>${statusLabel}</small></span>
+        ${allDone && rec ? `<span class="stars">${[0, 1, 2].map((i) => `<span class="${i < (rec.stars || 0) ? "" : "off"}">★</span>`).join("")}</span>` : ""}
+      </button>`;
     });
-    const allDone = ORDER.every(done);
     return `<div class="gscreen">
       <div class="ghead in"><button class="iconbtn" data-act="go" data-to="hub" aria-label="${L("رجوع", "Back")}">${S().lang === "en" ? '<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M11 4l-5 5 5 5" stroke="#516d77" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>' : '<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M7 4l5 5-5 5" stroke="#516d77" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>'}</button>
         <h1><small>${esc(A.placeName())} · ${esc(pname())}</small>${L("مغامرة المزرعة", "The farm adventure")}</h1></div>
-      <div class="dock in d1"><div class="who">${salahM(80, "happy")}</div><div class="say tone-n">${L("مزرعتك لها مستقبل يجب حمايته. في المواسم القادمة ستواجه قرارات صعبة حول المحاصيل والماء والمناخ والتربة. كل قرار يغيّر رحلة مزرعتك. هل تستطيع إبقاءها منتجة وصامدة؟", "Your farm has a future to protect. Over the coming seasons you will face difficult decisions about crops, water, climate and soil. Every decision changes your farm's journey. Can you keep it productive and resilient?")}</div></div>
+      <div class="dock in d1"><div class="who">${salahM(80, "happy")}</div><div class="say tone-n">${L("كل مستوى مقفل حتى تكمل المستوى الذي قبله. أتمم كل التحديات لتكتشف تقرير صمود مزرعتك الشامل!", "Each level is locked until you complete the one before it. Finish all challenges to unlock your comprehensive Farm Resilience Report!")}</div></div>
       <div class="mapw">${html}</div>
-      <button class="primary" ${allDone ? 'data-act="go" data-to="report"' : "disabled"}>${L("تقرير صمود المزرعة", "Farm Resilience Report")}${allDone ? " " + A.fwd() : ""}</button>
+      <button class="primary" ${allDone ? 'data-act="go" data-to="report"' : "disabled"} style="${allDone ? "" : "opacity:0.6;cursor:not-allowed"}">${L("تقرير صمود المزرعة", "Farm Resilience Report")}${allDone ? " " + A.fwd() : " 🔒"}</button>
       <div class="note">${L("البيانات: ناسا POWER 1995–2025 لنقطة واحدة قرب حقلك، SoilGrids، NASADEM.", "Data: NASA POWER 1995–2025 for one point near your field, SoilGrids, NASADEM.")}</div>
     </div>`;
   };
-  A.AFTER.map = () => { speak(L("مزرعتك لها مستقبل يجب حمايته. هل تستطيع إبقاءها منتجة وصامدة؟", "Your farm has a future to protect. Can you keep it productive and resilient?")); };
+  A.AFTER.map = () => { if (!G().mute) playCalmMusic(); };
 
-  // ---------------------------------------------------------------- final report
+  // ---------------------------------------------------------------- final report (Reveals all scores, risks & evidence)
   A.SCREENS.report = () => {
     const g = G(), l = loc(), recs = ORDER.map((id) => ({ id, r: g.levels[id] })).filter((x) => x.r);
     const overall = recs.length ? Math.round(recs.reduce((s, x) => s + x.r.best, 0) / recs.length) : 0;
@@ -1152,27 +1462,41 @@
     const evS = (seq) => { const fm = farmE(); const ev = E.evaluate(l, { seq: seq.map((k) => CK[k] || "fallow_grazed"), sowing: "normal", residue: "grazed", irrigation: fm.water }, fm); return E.total(ev.scores, [...new Set((S().farm.prios || []).map((p) => A.PK[p] || (E.PRIORITIES.includes(p) ? p : null)).filter(Boolean))].slice(0, 3)); };
     const tr = l.trends;
     const vul = [];
-    if (tr.onset.p < 0.05) vul.push(L(`مطر البذر يتأخر ${Math.round(tr.onset.per_decade)} يومًا كل عقد (دال إحصائيًا).`, `Sowing rain arrives ${Math.round(tr.onset.per_decade)} days later per decade (significant).`));
-    if (tr.et0.p < 0.05) vul.push(L(`حاجة المحاصيل للماء ترتفع ${Math.round(tr.et0.per_decade)} ملم كل عقد.`, `Crop water demand rises ${Math.round(tr.et0.per_decade)} mm per decade.`));
-    if (tr.hot_flowering.per_decade > 0) vul.push(L(`أيام الحر عند الإزهار: ${tr.hot_flowering.early} ← ${tr.hot_flowering.late}.`, `Hot days at flowering: ${tr.hot_flowering.early} → ${tr.hot_flowering.late}.`));
-    vul.push(L(`أجف 3 مواسم: ${l.summary.driest.map((i) => DATA.seasons[i]).join("، ")}.`, `3 driest seasons: ${l.summary.driest.map((i) => DATA.seasons[i]).join(", ")}.`));
-    const risks = g.risks.slice(-5).map((r) => `${r.t} (${r.level === "high" ? L("مرتفع", "high") : L("متوسط", "moderate")})`);
+    if (tr.onset && tr.onset.p < 0.05) vul.push(L(`مطر البذر يتأخر ${Math.round(tr.onset.per_decade)} يومًا كل عقد (دال إحصائيًا).`, `Sowing rain arrives ${Math.round(tr.onset.per_decade)} days later per decade (significant).`));
+    if (tr.et0 && tr.et0.p < 0.05) vul.push(L(`حاجة المحاصيل للماء ترتفع ${Math.round(tr.et0.per_decade)} ملم كل عقد.`, `Crop water demand rises ${Math.round(tr.et0.per_decade)} mm per decade.`));
+    if (tr.hot_flowering && tr.hot_flowering.per_decade > 0) vul.push(L(`أيام الحر عند الإزهار: ${tr.hot_flowering.early} ← ${tr.hot_flowering.late}.`, `Hot days at flowering: ${tr.hot_flowering.early} → ${tr.hot_flowering.late}.`));
+    if (l.summary && l.summary.driest) vul.push(L(`أجف 3 مواسم: ${l.summary.driest.map((i) => DATA.seasons[i]).join("، ")}.`, `3 driest seasons: ${l.summary.driest.map((i) => DATA.seasons[i]).join(", ")}.`));
+
+    // Full risks analysis with evidence & consequences
+    const allRisks = (g.risks || []).slice(-8);
+
     return `<div class="gscreen">
       <div class="ghead in"><button class="iconbtn" data-act="go" data-to="map" aria-label="${L("الخريطة", "Map")}"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M2 5l5-2 6 2 5-2v12l-5 2-6-2-5 2z" stroke="#516d77" stroke-width="1.7" fill="none"/></svg></button><h1><small>${esc(pname())} · ${esc(A.placeName())}</small>${L("تقرير صمود المزرعة", "Farm Resilience Report")}</h1></div>
-      <div class="panel2 pop" style="display:flex;align-items:center;gap:14px"><div style="width:90px;height:90px">${salahM(90, overall >= 65 ? "happy" : "worried")}</div><div><div class="note">${L("النتيجة الإجمالية", "Overall score")}</div><div class="bigscore" style="font-size:52px">${overall}</div><div class="note">${recs.length}/${ORDER.length} ${L("مستويات", "levels")}</div></div></div>
-      <div class="panel2 in d2" style="display:flex;flex-direction:column;gap:5px"><b>${L("الأداء حسب المستوى", "Level-by-level")}</b>${recs.map((x) => `<div class="dimrow"><span style="width:150px;font-size:12px">${LTITLE(x.id)}</span><span class="pbar"><i style="width:${x.r.best}%"></i></span><span dir="ltr">${x.r.best}</span></div>`).join("")}</div>
-      <div class="panel2 in d3"><b>${L("نقاط ضعف مزرعتك (بيانات ناسا)", "Your farm's main vulnerabilities (NASA data)")}</b><ul style="margin:4px 0 0;padding-inline-start:18px;font-size:13px;line-height:1.6">${vul.map((v) => `<li>${v}</li>`).join("")}</ul></div>
-      <div class="panel2 in d3"><b>${L("أهم المخاطر التي اخترتها", "Most important risks you took")}</b><ul style="margin:4px 0 0;padding-inline-start:18px;font-size:13px;line-height:1.6">${risks.length ? risks.map((r) => `<li>${r}</li>`).join("") : `<li>${L("لا شيء", "None")}</li>`}</ul></div>
-      <div class="panel2 in d4"><b>${L("استراتيجيتك: البداية مقابل النهاية", "Your strategy: start vs end")}</b>
-        <div class="result" style="margin-top:6px"><span style="flex:1">${L("البداية", "Start")}: ${initSeq.map(cname).join(A.arrow())}</span><b>${evS(initSeq)}</b></div>
-        <div class="result" style="margin-top:6px"><span style="flex:1">${L("النهاية", "End")}: ${finSeq.map(cname).join(A.arrow())}</span><b style="color:#7d8136">${evS(finSeq)}</b></div>
-        <div class="note">${L("النقطة /100 من المحرك حسب أولوياتك على 30 موسمًا.", "Engine score /100 for your priorities over 30 seasons.")}</div></div>
-      <div class="panel2 in d5"><b>${L("اقتراحات للتحسين", "Suggested improvements")}</b><ul style="margin:4px 0 0;padding-inline-start:18px;font-size:13px;line-height:1.6">
+      <div class="panel2 pop" style="display:flex;align-items:center;gap:14px"><div style="width:90px;height:90px">${salahM(90, overall >= 65 ? "happy" : "worried")}</div><div><div class="note">${L("النتيجة الإجمالية لصمود المزرعة", "Overall Resilience Score")}</div><div class="bigscore" style="font-size:52px">${overall}</div><div class="note">${recs.length}/${ORDER.length} ${L("مستويات مكتملة", "completed levels")}</div></div></div>
+      <div class="panel2 in d2" style="display:flex;flex-direction:column;gap:5px"><b>📊 ${L("تقييم الأداء حسب المستوى", "Level-by-level resilience scores")}</b>${recs.map((x) => `<div class="dimrow"><span style="width:150px;font-size:12px">${LTITLE(x.id)}</span><span class="pbar"><i style="width:${x.r.best}%"></i></span><span dir="ltr">${x.r.best}/100</span></div>`).join("")}</div>
+      <div class="panel2 in d3"><b>🔍 ${L("تحليل المخاطر والأدلة العلمية لقراراتك", "Full Risk Analysis & Evidence")}</b>
+        ${allRisks.length ? `<div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">${allRisks.map(r => `
+          <div style="background:#fff;border:1px solid #dcdcb8;border-radius:12px;padding:10px;font-size:12.5px;line-height:1.5">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <b>${r.t}</b>
+              <span class="rlvl rl-${r.level || 'moderate'}" style="font-size:10.5px">${r.level === 'high' ? L('خطر مرتفع', 'High Risk') : L('خطر متوسط', 'Moderate Risk')}</span>
+            </div>
+            ${r.cons ? `<div style="margin-top:3px;color:#516d77"><b>${L("العواقب:", "Consequences:")}</b> ${r.cons}</div>` : ""}
+            ${r.mitig ? `<div style="margin-top:2px;color:#2c3f45"><b>${L("كيف تخفف الخطر:", "Mitigation:")}</b> ${r.mitig}</div>` : ""}
+          </div>
+        `).join("")}</div>` : `<p style="font-size:12.5px;color:#516d77;margin:4px 0">${L("لم تُسجّل أي مخاطر حرجة أثناء التحديات.", "No critical risks registered.")}</p>`}
+      </div>
+      <div class="panel2 in d3"><b>🛰️ ${L("نقاط ضعف مزرعتك المناخية (بيانات ناسا POWER 1995–2025)", "Climate vulnerabilities (NASA POWER 1995–2025)")}</b><ul style="margin:4px 0 0;padding-inline-start:18px;font-size:13px;line-height:1.6">${vul.map((v) => `<li>${v}</li>`).join("")}</ul></div>
+      <div class="panel2 in d4"><b>🌾 ${L("استراتيجيتك الزراعية: البداية مقابل النهاية", "Your farming strategy: start vs end")}</b>
+        <div class="result" style="margin-top:6px"><span style="flex:1">${L("الدورة المبدئية", "Initial")}: ${initSeq.map(cname).join(A.arrow())}</span><b>${evS(initSeq)}</b></div>
+        <div class="result" style="margin-top:6px"><span style="flex:1">${L("الدورة المقترحة", "Final")}: ${finSeq.map(cname).join(A.arrow())}</span><b style="color:#7d8136">${evS(finSeq)}</b></div>
+        <div class="note">${L("التقييم من 100 محسوب حسب أولوياتك على 30 موسمًا حقيقيًا.", "Score /100 calculated against your farm priorities over 30 real NASA seasons.")}</div></div>
+      <div class="panel2 in d5"><b>🌱 ${L("توصيات عمّي صالح العلمية للتحسين", "Ammi Salah's scientific recommendations")}</b><ul style="margin:4px 0 0;padding-inline-start:18px;font-size:13px;line-height:1.6">
         <li>${L("نوّع العائلات (حبوب ← بقوليات) لتكسر الأمراض وتساعد إدارة الآزوت.", "Alternate families (cereal ↔ legume) to break disease and help nitrogen.")}</li>
         <li>${L("اترك البقايا وغطِّ التربة في الخريف ضد المطر الغزير.", "Keep residue and cover the soil in autumn against heavy rain.")}</li>
         <li>${L("راقب موعد مطر البذر وابذر مبكرًا عندما يسمح ذلك لتتجنّب حر ماي.", "Watch the sowing-rain date and sow early when possible to avoid May heat.")}</li>
         <li>${L("حلّل التربة (pH، الملوحة، المادة العضوية، الفوسفور والبوتاسيوم) لتأكيد التقديرات.", "Test the soil (pH, salinity, organic matter, P and K) to confirm the estimates.")}</li></ul></div>
-      <div class="note">${L("نقطة اللعبة تقيس أداءك حسب قواعد اللعبة، وليست تقييمًا رسميًا لصمود مزرعتك. البيانات: ناسا POWER 1995–2025، SoilGrids، NASADEM، FAO-56/33.", "A game score measures performance against the game's rules, not a certified farm resilience rating. Data: NASA POWER 1995–2025, SoilGrids, NASADEM, FAO-56/33.")}</div>
+      <div class="note">${L("البيانات: ناسا POWER 1995–2025، SoilGrids، NASADEM، FAO-56/33.", "Data: NASA POWER 1995–2025, SoilGrids, NASADEM, FAO-56/33.")}</div>
       <button class="primary" data-act="go" data-to="map">${L("العودة للخريطة", "Back to the map")}</button>
     </div>`;
   };
@@ -1181,32 +1505,32 @@
   const NBAG = '<g class="grow"><rect x="-8" y="-18" width="16" height="18" rx="3" fill="#e8e8bc" stroke="#516d77"/><text x="0" y="-6" text-anchor="middle" font-size="9" font-weight="900" fill="#516d77">N</text></g>';
   const SCENE = {
     2: () => { const st = LV.st, k = st.plan[st.active] || st.plan[0];
-      return fieldBoard(k || null, 1, { env: "day", rows: 2, height: 175, flat: () => (k ? "" : FLAT.straw), badge: k ? `${L("الموسم", "Season")} ${st.plan[st.active] ? st.active + 1 : 1} · ${cname(k)}` : L("الحقل جاهز للبذر", "Field ready for sowing") }); },
+      return fieldBoard(k || null, 1, { env: "day", rows: 2, height: 165, act: "g", action: "tile", flat: () => (k ? "" : FLAT.straw), badge: k ? `${L("الموسم", "Season")} ${st.plan[st.active] ? st.active + 1 : 1} · ${cname(k)}` : L("المس الحقل للبذر", "Touch field to sow") }); },
     3: () => { const st = LV.st, y = LEVELS["3"].calc(st), w = Object.keys(st.alloc).length;
-      return fieldBoard(st.crop, Math.min(1, y * 1.35), { env: "drought", noIrrig: true, height: 210, badge: `${cname(st.crop)} · ${L("المردود", "yield")} ${pct(y)}`,
-        flat: (i, c) => (st.mulch ? FLAT.mulch : "") + (w ? (st.method === "drip" ? FLAT.drip : st.method === "flood" && c === 0 ? FLAT.flood : "") : ""),
-        deco: (i, c, r) => (w && st.method === "sprinkler" && (r + c) % 3 === 1 ? XTRA.sprinkler : "") }); },
+      return fieldBoard(st.crop, Math.min(1, y * 1.35), { env: "drought", noIrrig: true, height: 165, act: "g", action: "tile", badge: `${cname(st.crop)} · ${L("المردود", "yield")} ${pct(y)}`,
+        flat: (i, c) => (st.mulch ? FLAT.mulch : "") + (st.watered && st.watered[i] ? '<rect width="50" height="50" fill="#3a5a70" opacity=".45"/>' : "") + (w ? (st.method === "drip" ? FLAT.drip : st.method === "flood" && c === 0 ? FLAT.flood : "") : ""),
+        deco: (i, c, r) => (st.watered && st.watered[i] ? '<g class="splash"><circle cx="0" cy="-10" r="4" fill="#3a8ac9"/><circle cx="-8" cy="-6" r="2.5" fill="#58a6de"/><circle cx="8" cy="-6" r="2.5" fill="#58a6de"/></g>' : "") + (w && st.method === "sprinkler" && (r + c) % 3 === 1 ? XTRA.sprinkler : "") }); },
     4: () => { const st = LV.st, rec = LEVELS["4"].run(st);
-      return fieldBoard(st.crop, Math.min(1, rec.yieldIdx * 1.3), { env: "heat", height: 210, badge: `${L("ضرر الحر", "Heat damage")} ${pct(rec.heat)} · ${pct(rec.yieldIdx)}` }); },
+      return fieldBoard(st.crop, Math.min(1, rec.yieldIdx * 1.3), { env: st.mist ? "day" : "heat", height: 165, act: "g", action: "tile", badge: `${L("ضرر الحر", "Heat damage")} ${pct(rec.heat)} · ${pct(rec.yieldIdx)}` }); },
     6: () => { const st = LV.st;
       return board3d(4, 3, (i, c, r) => ({ fill: soilCol(), flat: (st.inp[r] === "manure" ? FLAT.manure : "") + (st.inp[r] === "drip" ? FLAT.drip : ""), deco: plantDeco(st.seq[r], 4) + (st.inp[r] === "n" && c === 0 ? NBAG : ""), label: `${L("الموسم", "Season")} ${r + 1}` }),
-        { env: "day", act: "noop", height: 220, extras: farmExtras(4, 3), badge: L("كل صف = موسم", "Each row = one season") }); },
+        { env: "day", act: "g", action: "tile", height: 165, extras: farmExtras(4, 3), badge: L("المس أي صف لتغيير التسميد", "Touch any row to change inputs") }); },
     7: () => { const st = LV.st, last = st.results[st.results.length - 1];
-      if (!last) return fieldBoard(st.pick.crop, 0.9, { env: "day", height: 190, badge: L("الطقس مخفي…", "Weather hidden…") });
+      if (!last) return fieldBoard(st.pick.crop, 0.9, { env: "day", height: 165, act: "g", action: "tile", badge: L("المس الحقل لبدء الموسم", "Touch field to start season") });
       const env = last.rec.heat > 0.1 ? "heat" : last.y < 0.45 ? "drought" : "day";
-      return fieldBoard(last.crop, Math.min(1, last.y * 1.3), { env, height: 190, badge: `${DATA.seasons[last.s]} · ${cname(last.crop)} · ${pct(last.y)}` }); },
+      return fieldBoard(last.crop, Math.min(1, last.y * 1.3), { env, height: 165, act: "g", action: "tile", badge: `${DATA.seasons[last.s]} · ${cname(last.crop)} · ${pct(last.y)}` }); },
     9: () => { const st = LV.st, sc = LEVELS["9"].ev(st).scores.erosion;
-      return fieldBoard(null, 1, { env: "storm", rain: sc < 50, height: 200, noIrrig: true, badge: `${L("الحماية", "Protection")} ${sc}/100`,
+      return fieldBoard(null, 1, { env: "storm", rain: sc < 50, height: 165, noIrrig: true, act: "g", action: "tile", badge: `${L("الحماية", "Protection")} ${sc}/100`,
         flat: (i) => (st.till ? FLAT_FURROW : "") + (st.residue === "kept" ? FLAT.straw : st.residue === "grazed" && i % 2 ? FLAT.straw : "") + (sc < 50 && i % 3 === 0 ? FLAT.runoff : ""),
         deco: (i) => (st.cover && st.plan.includes("fallow") && i % 2 === 0 ? plantDeco("vetch", 3) : st.residue === "kept" ? stubble() : "") }); },
     10: () => { const sel = LV.st.sel;
-      return fieldBoard(null, 1, { env: sel.includes("burn") ? "dead" : "soil", height: 190, noIrrig: true,
+      return fieldBoard(null, 1, { env: sel.includes("burn") ? "dead" : "soil", height: 165, noIrrig: true, act: "g", action: "tile",
         flat: (i) => (sel.includes("residue") ? FLAT.straw : "") + (sel.includes("manure") && i % 2 ? FLAT.manure : "") + (sel.includes("burn") ? '<rect width="50" height="50" fill="#3a2e26" opacity=".7"/>' : "") + (!sel.includes("notill") && !sel.includes("residue") ? FLAT_FURROW : ""),
         deco: (i) => (sel.includes("cover") && i % 2 === 0 ? plantDeco("vetch", 3, "grow") : sel.includes("legume") && i % 2 ? plantDeco("lentil", 3, "grow") : "") }); },
     11: () => { const st = LV.st;
       return board3d(3, 2, (i, c) => { const k = st.plots[c], y = k ? LEVELS["11"].yieldAt(k, st.ec) : 1;
         return { fill: mixC(soilCol(), "#d9d2bd", Math.min(1, st.ec / 10)), flat: st.ec >= 4 ? FLAT.salt : "", deco: k ? plantDeco(k, 4, "", Math.min(1, y * 1.3)) : "", label: `${L("القطعة", "Plot")} ${c + 1}` }; },
-        { env: "salt", act: "noop", height: 190, extras: farmExtras(3, 2), badge: `${st.ec} dS/m · ${L("افتراضي", "hypothetical")}` }); },
+        { env: "salt", act: "g", action: "tile", height: 165, extras: farmExtras(3, 2), badge: `${st.ec} dS/m · ${L("المس لتغيير المحصول", "Touch to switch crop")}` }); },
   };
   Object.keys(SCENE).forEach((id) => { const v = LEVELS[id].view; LEVELS[id].view = function () { return `<div class="in d2">${SCENE[id]()}</div>` + v.call(this); }; });
 
@@ -1222,8 +1546,9 @@
     const irr = { rain: L("مطري", "Rainfed"), drip: L("تنقيط", "Drip"), sprinkler: L("رش", "Sprinkler"), flood: L("غمر", "Flood") }[f.irrig] || "—";
     const soilN = { sandy: L("رملية", "Sandy"), clay: L("طينية", "Clay"), loam: L("طميية", "Loam") }[f.soil] || (l.soil.texture);
     return `<div class="gscreen hub">
-      <div class="ghead in"><button class="iconbtn" data-act="editFarm" aria-label="${L("تعديل معلومات المزرعة", "Edit farm answers")}"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 17h4l9-9-4-4-9 9z M11 5l4 4" stroke="#516d77" stroke-width="1.8" fill="none" stroke-linejoin="round"/></svg></button>
+      <div class="ghead in">${A.backBtn("farm").replace('class="back"', 'class="iconbtn"')}
         <h1><small>${esc(A.placeName())}</small>${L(`مزرعة ${esc(pname())}`, `${esc(pname())}'s farm`)}</h1>
+        <button class="iconbtn" data-act="editFarm" aria-label="${L("تعديل معلومات المزرعة", "Edit farm answers")}"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 17h4l9-9-4-4-9 9z M11 5l4 4" stroke="#516d77" stroke-width="1.8" fill="none" stroke-linejoin="round"/></svg></button>
         <button class="iconbtn" data-act="g" data-a="mute" aria-label="${G().mute ? L("تشغيل الصوت", "Unmute") : L("كتم الصوت", "Mute")}">${G().mute ? "🔇" : "🔊"}</button></div>
       <div class="in d1">${fieldBoard(crop, 1, { cols, rows: 3, env: "day", act: "hub3", height: 250, badge: `${area} ${L("هكتار", "ha")} · ${cname(crop)}` })}</div>
       <div class="farmchips in d2"><span>${soilN}</span><span>${irr}</span><span>${L("ماء", "Water")}: ${{ low: L("قليل", "low"), medium: L("متوسط", "medium"), high: L("كافٍ", "good") }[f.water] || "—"}</span><span>${L("انحدار", "Slope")} ${l.slope}%</span></div>
@@ -1316,26 +1641,24 @@
   // ---------------------------------------------------------------- CROP CHARACTERISTICS
   let CF = { fam: "all", cmp: [] };
   A.SCREENS.crops = () => {
-    const prev = lastCrop(), fam = (k) => E.CROPS[CK[k]].family;
-    const list = CROPS.filter((k) => CF.fam === "all" || fam(k) === CF.fam).map((k) => ({ k, su: suitability(k, prev) })).sort((a, b) => b.su.st.ws - a.su.st.ws);
-    const cmp = CF.cmp.length === 2 ? (() => { const [a, b] = CF.cmp, ca = E.CROPS[CK[a]], cb = E.CROPS[CK[b]], sa = suitability(a, prev), sb = suitability(b, prev);
+    const fam = (k) => E.CROPS[CK[k]].family;
+    const list = CROPS.filter((k) => CF.fam === "all" || fam(k) === CF.fam);
+    const cmp = CF.on && CF.cmp.length === 2 ? (() => { const [a, b] = CF.cmp, ca = E.CROPS[CK[a]], cb = E.CROPS[CK[b]], sa = cropStats(a), sb = cropStats(b);
       const row = (t, x, y, better) => `<tr><th>${t}</th><td class="${better === 0 ? "win" : ""}">${x}</td><td class="${better === 1 ? "win" : ""}">${y}</td></tr>`;
       return `<div class="panel2 pop"><b>${L("مقارنة", "Comparison")}</b><table class="cmpt"><tr><th></th><th>${cname(a)}</th><th>${cname(b)}</th></tr>
-        ${row(L("الماء الكافي", "Water met"), pct(sa.st.ws), pct(sb.st.ws), sa.st.ws > sb.st.ws ? 0 : 1)}
-        ${row(L("في سنوات الجفاف", "In dry years"), pct(sa.st.dry), pct(sb.st.dry), sa.st.dry > sb.st.dry ? 0 : 1)}
+        ${row(L("الماء الكافي", "Water met"), pct(sa.ws), pct(sb.ws), sa.ws > sb.ws ? 0 : 1)}
+        ${row(L("في سنوات الجفاف", "In dry years"), pct(sa.dry), pct(sb.dry), sa.dry > sb.dry ? 0 : 1)}
         ${row(L("حاجة الماء", "Water need"), demandMm(a) + " " + L("ملم", "mm"), demandMm(b) + " " + L("ملم", "mm"), demandMm(a) < demandMm(b) ? 0 : 1)}
         ${row(L("عمق الجذور", "Root depth"), ca.root + " cm", cb.root + " cm", ca.root > cb.root ? 0 : 1)}
         ${row("Ky", ca.ky, cb.ky, ca.ky < cb.ky ? 0 : 1)}
-        ${row(L("تثبيت الآزوت", "N fixation"), ca.n ? "✓" : "—", cb.n ? "✓" : "—", ca.n > cb.n ? 0 : cb.n > ca.n ? 1 : -1)}
-        ${row(L("الملاءمة", "Suitability"), L(LVLNAME[sa.level][0], LVLNAME[sa.level][1]), L(LVLNAME[sb.level][0], LVLNAME[sb.level][1]), -1)}</table>
+        ${row(L("تثبيت الآزوت", "N fixation"), ca.n ? "✓" : "—", cb.n ? "✓" : "—", ca.n > cb.n ? 0 : cb.n > ca.n ? 1 : -1)}</table>
         <div class="note">${L("الخلية المظللة = الأفضل في هذا المعيار.", "Shaded cell = better on that criterion.")}</div></div>`; })() : "";
     return `<div class="gscreen">
-      <div class="ghead in">${A.backBtn("hub").replace('class="back"', 'class="iconbtn"')}<h1><small>${L(`بعد ${cname(prev)} · ${esc(A.placeName())}`, `After ${cname(prev).toLowerCase()} · ${esc(A.placeName())}`)}</small>${L("خصائص المحاصيل", "Crop characteristics")}</h1></div>
+      <div class="ghead in">${A.backBtn("hub").replace('class="back"', 'class="iconbtn"')}<h1><small>${esc(A.placeName())}</small>${L("خصائص المحاصيل", "Crop characteristics")}</h1></div>
       <div class="dock in d1"><div class="who">${salahM(80, "happy")}</div><div class="say tone-n">${L("افتح أي بطاقة لترى خصائصه العلمية. فعّل \"قارن\" واختر محصولين لتقارن بينهما.", "Open any card to see its scientific traits. Turn on \"Compare\" and pick two crops to put them side by side.")}</div></div>
       <div class="chiprow in d2">${[["all", L("الكل", "All")], ["cereal", L("حبوب", "Cereals")], ["legume", L("بقوليات", "Legumes")]].map((o) => `<button class="chip ${CF.fam === o[0] ? "on" : ""}" data-act="cf" data-v="${o[0]}">${o[1]}</button>`).join("")}<button class="chip ${CF.on ? "on" : ""}" data-act="cfc">${CF.on ? '<span class="ck"></span>' : ""}${L("قارن", "Compare")} ${CF.on ? CF.cmp.length + "/2" : ""}</button></div>
       ${cmp}
-      <div class="cgrid stagger">${list.map(({ k }) => `<button class="ccard tilt ${CF.cmp.includes(k) ? "picked" : ""}" data-act="cropOpen" data-v="${k}"><div class="art">${cropArt(k)}</div><b>${cname(k)}</b><small>${fam(k) === "cereal" ? L("حبوب", "Cereal") : L("بقوليات", "Legume")}</small></button>`).join("")}</div>
-      <div class="note">${L("الترتيب حسب نسبة الماء الكافي من المطر على 30 موسمًا. المصادر: FAO-56، FAO-33/66، ناسا POWER.", "Sorted by share of water needs met by rain over 30 seasons. Sources: FAO-56, FAO-33/66, NASA POWER.")}</div>
+      <div class="cgrid stagger">${list.map((k) => `<button class="ccard tilt ${CF.on && CF.cmp.includes(k) ? "picked" : ""}" data-act="cropOpen" data-v="${k}"><div class="art">${cropArt(k)}</div><b>${cname(k)}</b><small>${fam(k) === "cereal" ? L("حبوب", "Cereal") : L("بقوليات", "Legume")}</small></button>`).join("")}</div>
       <button class="primary" data-act="go" data-to="map">${L("جرّبها في اللعبة", "Try them in the game")} ${A.fwd()}</button>
     </div>`;
   };
@@ -1353,7 +1676,7 @@
     if (!c || e.pointerType === "touch") return; const r = c.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
     c.classList.add("tilting"); c.style.transform = `perspective(700px) rotateY(${(x * 12).toFixed(1)}deg) rotateX(${(-y * 10).toFixed(1)}deg) translateZ(6px)`; });
 
-  window.FS_GAME = { get LV() { return LV; }, LEVELS, ORDER, startLevel, finish, say, hint, axe, risk, snd, speak, L, cname, lastCrop, loc, farmE, pname, cropStats, pct, salahM, G, QUIPS, esc, suitability, lvlBadge, LVLNAME, seasonRun, mName, planCrop, demandMm, CK };
+  window.FS_GAME = { get LV() { return LV; }, LEVELS, ORDER, startLevel, finish, say, hint, axe, risk, snd, speak, L, cname, lastCrop, loc, farmE, pname, cropStats, pct, salahM, G, QUIPS, esc };
   // migrate old saves that ended on the removed simulation
   if (["sim", "rotations"].includes(S().screen)) S().screen = "hub";
 
