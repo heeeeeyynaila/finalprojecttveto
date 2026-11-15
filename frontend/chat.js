@@ -223,11 +223,29 @@
   function close() { const ov = document.getElementById("chatOv"); if (!ov) return; ov.classList.remove("on"); setTimeout(() => ov.remove(), 250); }
   A.ACT.chatOpen = () => open();
 
-  // Ammi Salah chat callable via A.ACT.chatOpen or FS_CHAT.open()
-  try {
-    const oldFab = document.getElementById("chFab");
-    if (oldFab) oldFab.remove();
-  } catch (e) {}
+  // Floating "Ask Ammi Salah" button only on the first page (welcome / lang)
+  const FAB_ON = /^(welcome|lang)?$/;
+  function syncFab() {
+    let b = document.getElementById("chFab");
+    const scr = (S && S().screen) || "welcome";
+    const show = FAB_ON.test(scr);
+    if (!show) {
+      if (b) b.remove();
+      return;
+    }
+    if (!b) {
+      b = document.createElement("button");
+      b.id = "chFab";
+      b.className = "chfab";
+      b.addEventListener("click", open);
+      document.body.appendChild(b);
+    }
+    b.setAttribute("aria-label", L("تحدث مع عمّي صالح", "Talk to Ammi Salah"));
+    b.innerHTML = `${A.salah(44)}<span>${L("اسأل عمّي صالح", "Ask Ammi Salah")}</span>`;
+  }
+  const app = document.getElementById("app");
+  if (app) new MutationObserver(() => syncFab()).observe(app, { childList: true });
+  setTimeout(syncFab, 50);
 
   window.FS_CHAT = { open, close, ask, intentOf, LIB, ANS };
 })();

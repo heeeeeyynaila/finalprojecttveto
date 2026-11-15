@@ -208,6 +208,7 @@
       <div class="pop d1" style="display:flex;flex-direction:column;align-items:center;gap:6px">${salah(140, "wave2")}
         <div class="bubble" style="text-align:center;border-radius:20px"><div style="font-size:17px;font-weight:800">${TXT.ar.langQ}</div><div dir="ltr" style="font-size:14px;font-weight:700;color:#516d77">${TXT.en.langQ}</div></div></div>
       <div role="radiogroup" class="in d3" style="display:flex;flex-direction:column;gap:12px">${card("ar", "ع", "العربية", "Arabic", "rtl")}${card("en", "En", "English", "الإنجليزية", "ltr")}</div>
+      <button class="in d4 chtalk" data-act="chatOpen">💬 ${S.lang ? T.voice : TXT.ar.voice + " · " + TXT.en.voice}</button>
       <div class="spacer"></div>
       ${S.lang ? `<button class="primary pop" data-act="go" data-to="location">${T.cont} ${fwd()}</button>` : `<button class="primary" disabled>${TXT.ar.pickLang} · ${TXT.en.pickLang}</button>`}
     </div>`;

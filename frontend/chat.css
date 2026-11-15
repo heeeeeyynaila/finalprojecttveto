@@ -3,7 +3,13 @@
   background:linear-gradient(180deg,#fffef8,#fdf1d6);box-shadow:inset 0 2px 0 #fff,0 4px 0 #c9c99a,0 8px 14px -8px rgba(43,42,32,.4);animation:chPulse 2.6s ease-in-out infinite}
 .chtalk:active{transform:translateY(3px);box-shadow:0 1px 0 #c9c99a}
 @keyframes chPulse{50%{box-shadow:inset 0 2px 0 #fff,0 4px 0 #c9c99a,0 0 0 7px rgba(255,200,58,.28)}}
-.chfab{display:none !important}
+.chfab{position:fixed;z-index:60;bottom:16px;inset-inline-end:max(14px,calc(50vw - 200px));display:flex;align-items:center;gap:6px;border:0;cursor:pointer;
+  padding:4px 14px 4px 4px;border-radius:999px;font:inherit;font-weight:800;font-size:13px;color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.2);
+  background:linear-gradient(180deg,#a51a1a,#840000);box-shadow:inset 0 2px 0 rgba(255,255,255,.35),0 5px 0 #5e0000,0 12px 22px -8px rgba(132,0,0,.5);animation:chBob 3s ease-in-out infinite}
+[dir=rtl] .chfab,.chfab:dir(rtl){padding:4px 4px 4px 14px}
+.chfab>span:first-child{background:#fbfbef;border-radius:50%;overflow:hidden;box-shadow:inset 0 0 0 2px #fff}
+.chfab:active{transform:translateY(3px)}
+@keyframes chBob{50%{transform:translateY(-4px)}}
 .chov{position:fixed;inset:0;z-index:80;background:rgba(43,58,63,.32);backdrop-filter:blur(3px);display:flex;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .22s}
 .chov.on{opacity:1}
 .chsheet{width:100%;max-width:430px;height:min(86dvh,720px);display:flex;flex-direction:column;border-radius:28px 28px 0 0;overflow:hidden;
