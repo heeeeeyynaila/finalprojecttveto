@@ -391,6 +391,7 @@
     </div>`;
   };
   const after = () => {
+    cleanup();
     const id = LVd().id, def = LEV(id), D3 = DEF[id];
     def.init && def.init();
     document.body.classList.add("x3on");

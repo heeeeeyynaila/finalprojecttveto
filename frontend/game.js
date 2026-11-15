@@ -261,11 +261,7 @@
   }
 
   function startLevel(id) {
-    const g = G(), done = (x) => !!(g.levels[x] && g.levels[x].attempts && g.levels[x].attempts.length);
-    const i = ORDER.indexOf(id);
-    if (i > 0 && !done(ORDER[i - 1])) {
-      id = ORDER.find((x) => !done(x)) || "1";
-    }
+    const g = G();
     stopLevelTimer();
     LV = { id, hints: 0, hintStage: 0, good: [], risky: [], missed: [], st: {}, done: false, axeAt: 0, axeN: 0, timeLeft: 60, totalTime: 60, showNasa: false };
     startLevelTimer();
@@ -453,6 +449,7 @@
   A.SCREENS.lvl = () => `<div class="gscreen plugged">${head(LEVELS[LV.id])}<div id="lv" style="display:flex;flex-direction:column;gap:6px;flex:1;min-height:0;overflow:hidden"></div>${renderNasaModal()}</div>`;
   A.AFTER.lvl = () => { const d = LEVELS[LV.id]; d.init && d.init(); draw(); setTimeout(() => say(d.intro(), "happy", "n"), 450); if (!G().mute) playCalmMusic(); };
   const draw = () => {
+    if (window.__draw3) window.__draw3();
     const el = document.getElementById("lv");
     if (!el) return;
     let content = LEVELS[LV.id].view();
@@ -668,7 +665,6 @@
 
   // ================================================================ LEVEL 1 – harvest
   LEVELS["1"] = {
-    mustFinish: true,
     title: () => L("تعرّف على مزرعتك: الحصاد", "Meet your farm: the harvest"),
     intro: () => L(`آه، مرحبًا يا ${pname()}! إذن أنت من سيعتني بهذه المزرعة؟ لنرَ ما لدينا! أولًا: احصد ${cname(LV.st.crop)} قبل الموسم الجديد. اختر الأداة المناسبة ثم اضغط على كل قطعة.`,
       `Ah, welcome, ${pname()}! So you're the one who's going to take care of this farm? Let's see what we're working with! First: harvest the ${cname(LV.st.crop).toLowerCase()} before the new season. Pick the right tool, then tap every plot.`),
@@ -1480,7 +1476,7 @@
   const LTITLE = (id) => LEVELS[id].title();
   A.SCREENS.map = () => {
     const g = G(), done = (id) => !!(g.levels[id] && g.levels[id].attempts && g.levels[id].attempts.length);
-    const unlocked = (id) => { const i = ORDER.indexOf(id); return i === 0 || done(ORDER[i - 1]); };
+    const unlocked = () => true;
     const nextId = ORDER.find((id) => !done(id));
     const allDone = ORDER.every(done);
     const chapters = { start: L("البداية", "Getting started"), climate: L("تحديات المناخ", "Climate challenges"), failure: L("فصل خاص", "Special chapter"), soil: L("تحديات التربة", "Soil challenges") };
@@ -1500,15 +1496,15 @@
       html += `<button class="node zig ${isUnlocked ? "" : "locked"} ${isDone ? "done" : ""} ${id === nextId ? "next" : ""} in" style="animation-delay:${k * 0.05}s" ${isUnlocked ? `data-act="g" data-a="start" data-id="${id}"` : 'aria-disabled="true"'}>
         <span class="num">${icon}</span>
         <span style="flex:1"><b>${LTITLE(id)}</b><small>${statusLabel}</small></span>
-        ${allDone && rec ? `<span class="stars">${[0, 1, 2].map((i) => `<span class="${i < (rec.stars || 0) ? "" : "off"}">★</span>`).join("")}</span>` : ""}
+        ${rec ? `<span class="stars">${[0, 1, 2].map((i) => `<span class="${i < (rec.stars || 0) ? "" : "off"}">★</span>`).join("")}</span>` : ""}
       </button>`;
     });
     return `<div class="gscreen">
       <div class="ghead in"><button class="iconbtn" data-act="go" data-to="hub" aria-label="${L("رجوع", "Back")}">${S().lang === "en" ? '<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M11 4l-5 5 5 5" stroke="#2f9bd6" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>' : '<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M7 4l5 5-5 5" stroke="#2f9bd6" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>'}</button>
         <h1><small>${esc(A.placeName())} · ${esc(pname())}</small>${L("مغامرة المزرعة", "The farm adventure")}</h1></div>
-      <div class="dock in d1"><div class="who">${salahM(80, "happy")}</div><div class="say tone-n">${L("كل مستوى مقفل حتى تكمل المستوى الذي قبله. أتمم كل التحديات لتكتشف تقرير صمود مزرعتك الشامل!", "Each level is locked until you complete the one before it. Finish all challenges to unlock your comprehensive Farm Resilience Report!")}</div></div>
+      <div class="dock in d1"><div class="who">${salahM(80, "happy")}</div><div class="say tone-n">${L("اختر أي مستوى لتبدأ التحدي مباشرة! أكمل التحديات لبناء تقرير صمود مزرعتك الشامل.", "Pick any level to start the challenge directly! Complete challenges to build your comprehensive Farm Resilience Report.")}</div></div>
       <div class="mapw">${html}</div>
-      <button class="primary" ${allDone ? 'data-act="go" data-to="report"' : "disabled"} style="${allDone ? "" : "opacity:0.6;cursor:not-allowed"}">${L("تقرير صمود المزرعة", "Farm Resilience Report")}${allDone ? " " + A.fwd() : " 🔒"}</button>
+      <button class="primary" data-act="go" data-to="report">${L("تقرير صمود المزرعة", "Farm Resilience Report")} ${A.fwd()}</button>
       <div class="note">${L("البيانات: ناسا POWER 1995–2025 لنقطة واحدة قرب حقلك، SoilGrids، NASADEM.", "Data: NASA POWER 1995–2025 for one point near your field, SoilGrids, NASADEM.")}</div>
     </div>`;
   };

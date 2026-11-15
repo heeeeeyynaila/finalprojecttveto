@@ -436,6 +436,7 @@
   };
 
   A.AFTER.l1x = () => {
+    cleanup();
     const def = GM.LEVELS["1"]; def.init();
     const st = GM.LV.st, f = S().farm, area = +f.area || 5, big = area >= 5;
     document.body.classList.add("x3on");
