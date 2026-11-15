@@ -207,7 +207,6 @@
       <div class="pop d1" style="display:flex;flex-direction:column;align-items:center;gap:6px">${salah(140, "wave2")}
         <div class="bubble" style="text-align:center;border-radius:20px"><div style="font-size:17px;font-weight:800">${TXT.ar.langQ}</div><div dir="ltr" style="font-size:14px;font-weight:700;color:#516d77">${TXT.en.langQ}</div></div></div>
       <div role="radiogroup" class="in d3" style="display:flex;flex-direction:column;gap:12px">${card("ar", "ع", "العربية", "Arabic", "rtl")}${card("en", "En", "English", "الإنجليزية", "ltr")}</div>
-      <button class="in d4 chtalk" data-act="chatOpen">💬 ${S.lang ? T.voice : TXT.ar.voice + " · " + TXT.en.voice}</button>
       <div class="spacer"></div>
       ${S.lang ? `<button class="primary pop" data-act="go" data-to="location">${T.cont} ${fwd()}</button>` : `<button class="primary" disabled>${TXT.ar.pickLang} · ${TXT.en.pickLang}</button>`}
     </div>`;
@@ -246,7 +245,6 @@
             </div>
             <div style="display:flex;justify-content:space-between;align-items:center;font-size:11.5px;color:#516d77;border-top:1px dashed #d6dcba;padding-top:6px;margin-top:2px">
               <span dir="ltr"><b>GPS:</b> ${PENDING_GEO.lat.toFixed(4)}°, ${PENDING_GEO.lon.toFixed(4)}°</span>
-              ${PENDING_GEO.gridName ? `<span>🛰️ ${esc(PENDING_GEO.gridName)}</span>` : ""}
             </div>
           </div>
           <button class="primary in d3 pop" data-act="confirmGeo">
@@ -549,12 +547,10 @@
           town = S.lang === "en" ? nt[0] : nt[1];
         }
 
-        const closest = findLoc(lat, lon);
         PENDING_GEO = {
           lat: Number(lat),
           lon: Number(lon),
-          town: town || (S.lang === "en" ? "My Location" : "موقعي الحالي"),
-          gridName: closest ? (S.lang === "en" ? (closest.demo ? "Sidi Bel Abbès Station" : "NASA Cell " + closest.id) : (closest.demo ? "محطة سيدي بلعباس" : "خلية ناسا " + closest.id)) : null
+          town: town || (S.lang === "en" ? "My Location" : "موقعي الحالي")
         };
         render();
       };
@@ -567,12 +563,12 @@
               resolveAndSetPending(data.latitude, data.longitude, data.city || data.region);
               return;
             }
-            const d = LOCS.find((l) => l.demo) || LOCS[0];
-            resolveAndSetPending(d.lat, d.lon, S.lang === "en" ? "Sidi Bel Abbès" : "سيدي بلعباس");
+            const msg = document.getElementById("locMsg");
+            if (msg) msg.textContent = t().enterLocTip;
           })
           .catch(() => {
-            const d = LOCS.find((l) => l.demo) || LOCS[0];
-            resolveAndSetPending(d.lat, d.lon, S.lang === "en" ? "Sidi Bel Abbès" : "سيدي بلعباس");
+            const msg = document.getElementById("locMsg");
+            if (msg) msg.textContent = t().enterLocTip;
           });
       };
 

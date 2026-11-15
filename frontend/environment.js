@@ -252,7 +252,7 @@
       : m.mode === "live" ? `<span class="envbadge live">🛰️ ${L("بيانات ناسا لموقعك", "NASA data for your location")} · ${esc(m.period || "")}</span>`
       : m.mode === "wilaya" ? `<span class="envbadge warn">🛰️ ${L(`بيانات ناسا لولاية ${esc(m.wilayaAr || "")} (المقر على ${m.distanceKm} كم)`, `NASA data for ${esc(m.wilayaEn || "")} wilaya (seat ${m.distanceKm} km away)`)}</span>`
       : m.mode === "fallback" ? `<span class="envbadge warn">⚠ ${L(`بيانات محفوظة من نقطة على بُعد ${m.distanceKm} كم، وليست موقعك`, `Saved data from a point ${m.distanceKm} km away, not your location`)}</span>`
-      : `<span class="envbadge warn">⚠ ${L("بيانات المثال (سيدي بلعباس)", "Example data (Sidi Bel Abbès)")}</span>`;
+      : `<span class="envbadge warn">⚠ ${L("بيانات تجريبية", "Demo data")}</span>`;
     const bar = `<div class="farmbar in"><button class="farmbtn" data-act="farmsOpen" aria-haspopup="dialog">🌾 <b>${esc(S().locName || L("مزرعتي", "My farm"))}</b><span>▾</span></button>${badge}</div>`;
     return html.replace('<div class="gscreen hub">', '<div class="gscreen hub">' + bar);
   };

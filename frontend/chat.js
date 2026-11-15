@@ -53,7 +53,7 @@
     const s = S(), m = s.dataMeta || {};
     const src = m.mode === "wilaya" ? L(`بيانات ناسا لمقر ولاية ${m.wilayaAr || ""}`, `NASA data for the ${m.wilayaEn || ""} wilaya seat`)
       : m.source === "ERA5" ? L("بيانات ERA5 (ليست ناسا)", "ERA5 data (not NASA)") : m.mode === "live" ? L("بيانات ناسا لموقعك", "NASA data for your location")
-      : m.mode === "fallback" ? L("بيانات نقطة أخرى", "data from another point") : L("بيانات المثال (سيدي بلعباس)", "example data (Sidi Bel Abbès)");
+      : m.mode === "fallback" ? L("بيانات نقطة أخرى", "data from another point") : L("بيانات تجريبية", "demo data");
     return { l, s, src, ready: !!(l && l.summary && s.locId) };
   }
   const sig = (t) => !!t && (t.significant != null ? t.significant : t.p < 0.05);
@@ -223,19 +223,11 @@
   function close() { const ov = document.getElementById("chatOv"); if (!ov) return; ov.classList.remove("on"); setTimeout(() => ov.remove(), 250); }
   A.ACT.chatOpen = () => open();
 
-  // floating "talk to Ammi Salah" button on the calm screens (not inside a running level, which has its own Hint)
-  const FAB_ON = /^(lang|location|manual|profile|farm|hub|nasa|crops|map|report|lvlResult)$/;
-  function syncFab() {
-    let b = document.getElementById("chFab");
-    const show = S().lang && FAB_ON.test(S().screen || "");
-    if (!show) { if (b) b.remove(); return; }
-    if (!b) { b = document.createElement("button"); b.id = "chFab"; b.className = "chfab"; b.addEventListener("click", open); document.body.appendChild(b); }
-    b.setAttribute("aria-label", L("تحدث مع عمّي صالح", "Talk to Ammi Salah"));
-    b.innerHTML = `${A.salah(44)}<span>${L("اسأل عمّي صالح", "Ask Ammi Salah")}</span>`;
-  }
-  const app = document.getElementById("app");
-  if (app) new MutationObserver(() => syncFab()).observe(app, { childList: true });
-  setTimeout(syncFab, 50);
+  // Ammi Salah chat callable via A.ACT.chatOpen or FS_CHAT.open()
+  try {
+    const oldFab = document.getElementById("chFab");
+    if (oldFab) oldFab.remove();
+  } catch (e) {}
 
   window.FS_CHAT = { open, close, ask, intentOf, LIB, ANS };
 })();
