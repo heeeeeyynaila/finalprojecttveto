@@ -4,6 +4,7 @@
   "private": true,
   "description": "Field Shift – Adapting Farms with NASA Data (NASA Space Apps Challenge 2026)",
   "scripts": {
+    "build": "node build.js",
     "start": "npm --prefix frontend start",
     "dev": "npm --prefix frontend run dev",
     "frontend:dev": "npm --prefix frontend run dev",
