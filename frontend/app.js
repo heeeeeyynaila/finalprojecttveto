@@ -155,6 +155,7 @@
     const fn = SCREENS[S.screen] || SCREENS.welcome;
     app.innerHTML = fn();
     if (AFTER[S.screen]) AFTER[S.screen]();
+    if (window.FS_GAME && window.FS_GAME.syncAudio) window.FS_GAME.syncAudio(S.screen);
   }
 
   // ------------------------------------------------------------------ data helpers

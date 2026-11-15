@@ -29,9 +29,9 @@
     const add = (m, x, y, z) => { m.position.set(x, y, z); m.castShadow = true; g.add(m); return m; };
     if (kind === "sprinkler") { add(new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 1.8, 6), std(X.PAL.jeanD)), 1.5, 0.9, 1.5); add(new THREE.Mesh(new THREE.SphereGeometry(0.14, 8, 6), std(X.PAL.jean)), 1.5, 1.8, 1.5); }
     if (kind === "drip") for (let k = -1; k <= 1; k++) { const t = add(new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 4, 6), std(0x1e2e33)), 0, 0.06, k * 1.3); t.rotation.z = Math.PI / 2; }
-    if (kind === "flood") add(new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.08, 0.8), std(0x4f86b8, { roughness: 0.15, metalness: 0.3 })), 0, 0.05, -1.6);
+    if (kind === "flood") add(new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.08, 0.8), std(0x4fb2f0, { roughness: 0.15, metalness: 0.3 })), 0, 0.05, -1.6);
     if (kind === "nbag") { add(new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.0, 0.5), std(X.PAL.core)), -1.3, 0.5, -1.3); add(new THREE.Mesh(new THREE.BoxGeometry(0.82, 0.25, 0.52), std(X.PAL.jean)), -1.3, 0.75, -1.3); }
-    if (kind === "manure" || kind === "compost") [[-1, -0.8], [0.9, 0.4], [-0.3, 1.2], [1.2, -1.2]].forEach(([x, z]) => { const m = add(new THREE.Mesh(new THREE.SphereGeometry(0.55, 10, 6, 0, Math.PI * 2, 0, Math.PI / 2), std(kind === "manure" ? 0x4a3220 : 0x5a3d27, { flatShading: true })), x, 0, z); m.scale.y = 0.55; });
+    if (kind === "manure" || kind === "compost") [[-1, -0.8], [0.9, 0.4], [-0.3, 1.2], [1.2, -1.2]].forEach(([x, z]) => { const m = add(new THREE.Mesh(new THREE.SphereGeometry(0.55, 10, 6, 0, Math.PI * 2, 0, Math.PI / 2), std(kind === "manure" ? 0x4a3220 : 0x6e4527, { flatShading: true })), x, 0, z); m.scale.y = 0.55; });
     if (kind === "barrier") for (let k = -3; k <= 3; k++) { const b = add(new THREE.Mesh(new THREE.IcosahedronGeometry(0.42, 0), std(k % 2 ? X.PAL.appleD : X.PAL.apple, { flatShading: true })), k * 0.6, 0.35, 1.7); b.scale.y = 1.2; }
     if (kind === "contour") { const r = add(new THREE.Mesh(new THREE.BoxGeometry(4.3, 0.28, 0.35), std(0x5f7d36, { flatShading: true })), 0, 0.14, 0); r.receiveShadow = true; }
     if (kind === "ring") { const r = new THREE.Mesh(new THREE.TorusGeometry(2.5, 0.12, 8, 40), new THREE.MeshBasicMaterial({ color: 0xffe9a8 })); r.rotation.x = Math.PI / 2; r.position.y = 0.25; g.add(r); g.userData.spin = r; }
@@ -46,8 +46,8 @@
       const P = this.P, G = this.gap, W = this.W = this.cols * (P + G) - G, Dd = this.D = this.rows * (P + G) - G, n = this.n = this.cols * this.rows;
       this.slope = o.slope || 0;
       this.texs = { furrow: tex("furrow"), flat: tex("flat"), crack: tex("crack"), salt: tex("salt"), dots: tex("dots") };
-      const bed = new THREE.Mesh(new THREE.BoxGeometry(W + 1.4, 0.22, Dd + 1.4), std(0x6b4a30, { roughness: 1 })); bed.position.y = 0.11; bed.receiveShadow = true; w.scene.add(bed);
-      this.soilHex = X.SOILC[S().farm.soil] || 0x9a6a43;
+      const bed = new THREE.Mesh(new THREE.BoxGeometry(W + 1.4, 0.22, Dd + 1.4), std(0x8a5a33, { roughness: 1 })); bed.position.y = 0.11; bed.receiveShadow = true; w.scene.add(bed);
+      this.soilHex = X.SOILC[S().farm.soil] || 0xb8743f;
       this.plots = []; this.centers = []; this.decor = []; this.decorKey = []; this.soilKey = [];
       for (let r = 0; r < this.rows; r++) for (let c = 0; c < this.cols; c++) {
         const h = 0.3 + this.slope * (this.rows - 1 - r);
@@ -60,7 +60,7 @@
       this.crop = Array(n).fill(null); this.health = new Float32Array(n).fill(1); this.hShow = new Float32Array(n).fill(1); this.growth = new Float32Array(n).fill(1);
       this.sets = []; this.dummy = new THREE.Object3D(); this.m4 = new THREE.Matrix4(); this.tTop = new THREE.Matrix4(); this.col = new THREE.Color(); this.col2 = new THREE.Color();
       // straw
-      const SN = 24 * n; this.straw = new THREE.InstancedMesh(new THREE.BoxGeometry(0.75, 0.035, 0.07), std(0xe0c27a), SN); this.straw.receiveShadow = true; w.scene.add(this.straw);
+      const SN = 24 * n; this.straw = new THREE.InstancedMesh(new THREE.BoxGeometry(0.75, 0.035, 0.07), std(0xf5cf6a), SN); this.straw.receiveShadow = true; w.scene.add(this.straw);
       this.strawBase = []; this.strawVis = new Float32Array(n); this.strawShow = new Float32Array(n);
       this.centers.forEach((c) => { for (let k = 0; k < 24; k++) this.strawBase.push({ x: c.x + (Math.random() - 0.5) * (P - 0.5), z: c.z + (Math.random() - 0.5) * (P - 0.5), ry: Math.random() * 3.14, y: c.y + 0.02 + Math.random() * 0.04 }); });
       this.dirty = true;
@@ -82,7 +82,7 @@
         [stems, heads].forEach((m) => { m.castShadow = true; m.receiveShadow = true; m.instanceMatrix.setUsage(THREE.DynamicDrawUsage); this.w.scene.add(m); });
         const base = []; const side = Math.round(Math.sqrt(per));
         plots.forEach((pi) => { const c = this.centers[pi]; for (let k = 0; k < per; k++) { const gx = (k % side + 0.5) / side - 0.5, gz = (Math.floor(k / side) + 0.5) / Math.ceil(per / side) - 0.5; base.push({ pi, x: c.x + gx * (this.P - 0.6) + (Math.random() - 0.5) * 0.25, y: c.y, z: c.z + gz * (this.P - 0.6) + (Math.random() - 0.5) * 0.25, ry: Math.random() * 6, s: 0.85 + Math.random() * 0.3, ph: Math.random() * 6, lean: (Math.random() - 0.5) * 0.12 }); } });
-        this.sets.push({ crop, cer, stems, heads, base, stemC: new THREE.Color(cer ? 0xb59a45 : 0x6f7a34), headC: new THREE.Color(X.HEADC[crop] || 0xe0b44a), stemH: cer ? 1.25 : 0.5 });
+        this.sets.push({ crop, cer, stems, heads, base, stemC: new THREE.Color(cer ? 0xb59a45 : 0x6f7a34), headC: new THREE.Color(X.HEADC[crop] || 0xffc83a), stemH: cer ? 1.25 : 0.5 });
       });
       this.dirty = true;
     }
@@ -114,7 +114,7 @@
           const sc = b.s * Math.max(0.02, g) * (0.65 + 0.35 * h);
           dm.position.set(b.x, b.y, b.z); dm.rotation.set(sway * 0.6 + b.lean, b.ry, sway + droop); dm.scale.set(sc, sc, sc); dm.updateMatrix(); s.stems.setMatrixAt(k, dm.matrix);
           this.m4.copy(dm.matrix); this.tTop.makeTranslation(0, s.cer ? s.stemH + 0.12 : s.stemH, 0); this.m4.multiply(this.tTop); s.heads.setMatrixAt(k, this.m4);
-          if (anim) { this.col.copy(s.stemC).lerp(this.col2.setHex(0x8a7a4a), dead * 0.95); s.stems.setColorAt(k, this.col); this.col.copy(s.headC).lerp(this.col2.setHex(0xa99060), dead * 0.95); s.heads.setColorAt(k, this.col); }
+          if (anim) { this.col.copy(s.stemC).lerp(this.col2.setHex(0xa8915a), dead * 0.95); s.stems.setColorAt(k, this.col); this.col.copy(s.headC).lerp(this.col2.setHex(0xc9a66a), dead * 0.95); s.heads.setColorAt(k, this.col); }
         });
         s.stems.instanceMatrix.needsUpdate = true; s.heads.instanceMatrix.needsUpdate = true;
         if (anim && s.stems.instanceColor) { s.stems.instanceColor.needsUpdate = true; s.heads.instanceColor.needsUpdate = true; }
@@ -132,8 +132,8 @@
   const step = (a, txt, enabled = true) => enabled ? `<button class="x3go x3full alt" data-act="g" data-a="${a}">${txt} ${A.fwd()}</button>` : `<button class="x3go x3full" disabled>${txt}</button>`;
   const stat = (k, v, cls = "") => `<span class="x3stat ${cls}"><small>${k}</small><b>${v}</b></span>`;
   const obs = () => `<span class="obs">${L("رصد ناسا", "NASA observed")}</span>`, hyp = () => `<span class="hyp">${L("افتراضي", "Hypothetical")}</span>`;
-  const cropIco = (k) => { const cer = X.CEREAL.includes(k), c = { wheat: "#e0b44a", barley: "#dcc770", oat: "#c8cc6a", lentil: "#9ca047", chickpea: "#b5b862", faba: "#8a9140", vetch: "#7a5fa0" }[k];
-    return `<svg width="34" height="30" viewBox="0 0 34 30" aria-hidden="true">${cer ? [8, 17, 26].map((x) => `<path d="M${x} 29V12" stroke="#a8903a" stroke-width="2"/><ellipse cx="${x}" cy="9" rx="3" ry="7" fill="${c}"/>`).join("") : `<path d="M17 29V16" stroke="#6f7a34" stroke-width="2"/><circle cx="11" cy="16" r="7" fill="#7d8136"/><circle cx="22" cy="13" r="8" fill="${c}"/><circle cx="16" cy="8" r="6" fill="#b5b862"/>`}</svg>`; };
+  const cropIco = (k) => { const cer = X.CEREAL.includes(k), c = { wheat: "#ffc83a", barley: "#dcc770", oat: "#b5ea86", lentil: "#6cc04a", chickpea: "#9be070", faba: "#58ad38", vetch: "#7a5fa0" }[k];
+    return `<svg width="34" height="30" viewBox="0 0 34 30" aria-hidden="true">${cer ? [8, 17, 26].map((x) => `<path d="M${x} 29V12" stroke="#d9a93a" stroke-width="2"/><ellipse cx="${x}" cy="9" rx="3" ry="7" fill="${c}"/>`).join("") : `<path d="M17 29V16" stroke="#6f7a34" stroke-width="2"/><circle cx="11" cy="16" r="7" fill="#4a9e2f"/><circle cx="22" cy="13" r="8" fill="${c}"/><circle cx="16" cy="8" r="6" fill="#9be070"/>`}</svg>`; };
   const prevOf = (i, plan) => (i === 0 ? GM.lastCrop() : plan[0] || GM.lastCrop());
 
   // ============================================================ LEVEL DEFINITIONS (scene + dock + data)
@@ -164,7 +164,7 @@
       f.setCrops(() => s.crop); f.setHealth(() => Math.min(1, y * 1.35));
       for (let i = 0; i < f.n; i++) { f.setSoil(i, f.soilHex, y < 0.3 ? "crack" : "furrow"); f.setStraw(i, s.mulch ? 1.6 : 0);
         f.setDecor(i, used ? (s.method === "drip" ? ["drip"] : s.method === "sprinkler" ? (i % 3 === 1 ? ["sprinkler"] : []) : i % 4 === 0 ? ["flood"] : []) : []); }
-      if (rt.lastUsed != null && used > rt.lastUsed) f.centers.forEach((c) => rt.parts.emit(c.x, 3.5, c.z, 14, 0x4f86b8, 3, 0.5, 12, 0.9));
+      if (rt.lastUsed != null && used > rt.lastUsed) f.centers.forEach((c) => rt.parts.emit(c.x, 3.5, c.z, 14, 0x4fb2f0, 3, 0.5, 12, 0.9));
       rt.lastUsed = used;
     },
     ctl() {
@@ -199,8 +199,8 @@
       const s = st(), l = GM.loc(), r = LEV("4").run(s), hot = l.hot[s.s].slice(0, 10), mx = Math.max(...hot, 1);
       const start = r.months.findIndex((x) => x.kc !== null), end = r.months.reduce((a, x, i) => (x.kc !== null ? i : a), start);
       return `<b>${L(`أيام فوق 31° · ${D.seasons[s.s]}`, `Days above 31°C · ${D.seasons[s.s]}`)} ${obs()}</b>
-        <div class="x3heat">${hot.map((h, m) => `<div><span class="hb" style="height:${Math.round(h / mx * 52) + 2}px;background:${h >= 10 ? "#b8423a" : h >= 4 ? "#e08a3a" : "#e8d9a8"}"></span><span class="cb" style="background:${m >= start && m <= end ? (m === r.flowerMonth ? "#840000" : "#9ca047") : "transparent"}"></span><small>${mName(m).slice(0, 3)}</small><em>${h}</em></div>`).join("")}</div>
-        <div class="legend2"><span><i style="background:#9ca047"></i>${L("المحصول في الحقل", "Crop in field")}</span><span><i style="background:#840000"></i>${L("الإزهار", "Flowering")}</span></div>
+        <div class="x3heat">${hot.map((h, m) => `<div><span class="hb" style="height:${Math.round(h / mx * 52) + 2}px;background:${h >= 10 ? "#e8483d" : h >= 4 ? "#ff9a3d" : "#e8d9a8"}"></span><span class="cb" style="background:${m >= start && m <= end ? (m === r.flowerMonth ? "#e8552f" : "#6cc04a") : "transparent"}"></span><small>${mName(m).slice(0, 3)}</small><em>${h}</em></div>`).join("")}</div>
+        <div class="legend2"><span><i style="background:#6cc04a"></i>${L("المحصول في الحقل", "Crop in field")}</span><span><i style="background:#e8552f"></i>${L("الإزهار", "Flowering")}</span></div>
         <div class="note">${L("الملاءمة الحرارية = المحصول يناسب مناخك عمومًا. إجهاد الحر = الحر يصادف مرحلة حساسة كالإزهار.", "Temperature suitability = the crop fits your climate overall. Heat stress = heat hits a sensitive stage like flowering.")}</div>`;
     },
   };
@@ -327,7 +327,7 @@
     },
     data() {
       const l = GM.loc(), n = l.rain.length, hv = Array(12).fill(0); for (let s2 = 0; s2 < n; s2++) for (let m = 0; m < 12; m++) hv[m] += l.heavy[s2][m] / n; const mx = Math.max(...hv, 1);
-      return `<b>${L("المطر الغزير حسب الشهر", "Heavy rain by month")} ${obs()}</b><div class="x3heat">${hv.map((h, m) => `<div><span class="hb" style="height:${Math.round(h / mx * 52) + 2}px;background:#2f5884"></span><small>${mName(m).slice(0, 3)}</small><em>${Math.round(h)}</em></div>`).join("")}</div><div class="note">${L(`متوسط 30 موسمًا (ملم) · الانحدار ${l.slope}% (NASADEM). الانجراف يبدأ عندما يلتقي المطر الغزير بتربة عارية.`, `30-season average (mm) · slope ${l.slope}% (NASADEM). Erosion starts when heavy rain meets bare soil.`)}</div>`;
+      return `<b>${L("المطر الغزير حسب الشهر", "Heavy rain by month")} ${obs()}</b><div class="x3heat">${hv.map((h, m) => `<div><span class="hb" style="height:${Math.round(h / mx * 52) + 2}px;background:#2b8fe0"></span><small>${mName(m).slice(0, 3)}</small><em>${Math.round(h)}</em></div>`).join("")}</div><div class="note">${L(`متوسط 30 موسمًا (ملم) · الانحدار ${l.slope}% (NASADEM). الانجراف يبدأ عندما يلتقي المطر الغزير بتربة عارية.`, `30-season average (mm) · slope ${l.slope}% (NASADEM). Erosion starts when heavy rain meets bare soil.`)}</div>`;
     },
   };
 
@@ -346,7 +346,7 @@
         <div class="x3wrap">${P.map(([k, n, v, tr]) => `<button class="x3chip ${s.sel.includes(k) ? "on" : ""} ${v < 0 ? "neg" : ""}" data-act="g" data-a="sel" data-v="${k}" title="${tr}">${s.sel.includes(k) ? '<span class="ck"></span>' : ""}${n}</button>`).join("")}</div>
         ${go("end", L("ثبّت الخطة", "Lock in the plan"), s.sel.length === 3)}`;
     },
-    data() { const so = GM.loc().soil, v = [1, 0.57, 0.44, 0.3, 0.17]; return `<b>${L("الكربون العضوي (SoilGrids)", "Organic carbon (SoilGrids)")} ${obs()}</b><div class="x3heat">${v.map((k, i) => `<div><span class="hb" style="height:${Math.round(k * 52)}px;background:#5a3d27"></span><small>${["0–5", "5–15", "15–30", "30–60", "60–100"][i]}</small></div>`).join("")}</div><div class="note">${L(`السطح ≈ ${so.soc} غ/كغ (خلية 250 م)، والشكل تقريبي. التأثيرات نوعية؛ لا نموذج ديناميكي للكربون.`, `Topsoil ≈ ${so.soc} g/kg (250 m cell); depth shape approximate. Effects are qualitative; no dynamic carbon model.`)}</div>`; },
+    data() { const so = GM.loc().soil, v = [1, 0.57, 0.44, 0.3, 0.17]; return `<b>${L("الكربون العضوي (SoilGrids)", "Organic carbon (SoilGrids)")} ${obs()}</b><div class="x3heat">${v.map((k, i) => `<div><span class="hb" style="height:${Math.round(k * 52)}px;background:#6e4527"></span><small>${["0–5", "5–15", "15–30", "30–60", "60–100"][i]}</small></div>`).join("")}</div><div class="note">${L(`السطح ≈ ${so.soc} غ/كغ (خلية 250 م)، والشكل تقريبي. التأثيرات نوعية؛ لا نموذج ديناميكي للكربون.`, `Topsoil ≈ ${so.soc} g/kg (250 m cell); depth shape approximate. Effects are qualitative; no dynamic carbon model.`)}</div>`; },
   };
 
   DEF["11"] = {
@@ -429,7 +429,7 @@
       const hits = w.pick(ev, [salah.hit, ...f.plots]); if (!hits.length) return; const o = hits[0].object;
       if (o === salah.hit) { salah.play("wave", 1.5); GM.say(D3.goal() + L(" · زر الشاي للتلميح!", " · The teapot gives hints!"), "happy", "n"); return; }
       const i = f.plotOf(o); if (i < 0) return;
-      const c = f.centers[i]; parts.emit(c.x, c.y + 0.3, c.z, 10, 0xe8e8bc, 2, 2, 6, 0.6); GM.snd("tap");
+      const c = f.centers[i]; parts.emit(c.x, c.y + 0.3, c.z, 10, 0xffe9a8, 2, 2, 6, 0.6); GM.snd("tap");
       if (D3.tap) D3.tap(i); else { salah.lookAt = c; salah.play("point", 1.6); }
     });
     cv.addEventListener("wheel", (ev) => { ev.preventDefault(); w.orbGoal.radius = Math.max(14, Math.min(70, w.orbGoal.radius + ev.deltaY * 0.03)); w.flySpeed = 6; }, { passive: false });
@@ -454,7 +454,7 @@
   A.ACT.x3data = () => { if (!RT) return; RT.dataOpen = !RT.dataOpen; const el = $("x3data"), b = $("x3db"); el.hidden = !RT.dataOpen; b.setAttribute("aria-expanded", RT.dataOpen); b.classList.toggle("on", RT.dataOpen); $("x3goal").hidden = RT.dataOpen; GM.snd("tap"); RT.api.render(); };
   A.ACT.x3end = (d) => {
     if (!RT) return; const w = RT.w, id = RT.id; RT.salah.play("celebrate", 2.4); GM.snd("level");
-    [0x9ca047, 0x840000, 0x516d77, 0xe8e8bc].forEach((c) => RT.parts.emit(0, 8, 0, 90, c, 16, 5, 5, 2.2));
+    [0x6cc04a, 0xe8552f, 0x2f9bd6, 0xffe9a8].forEach((c) => RT.parts.emit(0, 8, 0, 90, c, 16, 5, 5, 2.2));
     w.flyTo({ radius: w.orbGoal.radius * 1.25, phi: 0.75, theta: w.orbGoal.theta + 1.2 }, 1.4);
     $("x3dock").classList.add("leaving");
     setTimeout(() => { if (RT && RT.w === w) A.ACT.g({ a: d.a }); }, X.RM ? 100 : 1500);

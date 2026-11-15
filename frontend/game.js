@@ -96,96 +96,71 @@
     } catch (e) { }
   }
 
-  // Calm ambient synthesizer (relaxing pentatonic acoustic-like pads)
-  let bgMusicGain = null, bgMusicInterval = null;
-  function initCalmMusic() {
-    if (bgMusicGain) return;
-    try {
-      AC = AC || new (window.AudioContext || window.webkitAudioContext)();
-      bgMusicGain = AC.createGain();
-      bgMusicGain.gain.setValueAtTime(0.035, AC.currentTime);
-      bgMusicGain.connect(AC.destination);
-    } catch (e) {}
+  // ---------------------------------------------------------------- Background game audio
+  // Plays user-provided game audio (game_audio.mp3) during game screens only, respecting mute.
+  const GAME_SCREENS = /^(lvl|l\d+x|lfx|map|lvlResult|report)$/;
+  let gameAudio = null;
+
+  function initGameAudio() {
+    if (!gameAudio) {
+      gameAudio = new Audio("game_audio.mp3");
+      gameAudio.loop = true;
+      gameAudio.volume = 0.45;
+      gameAudio.preload = "auto";
+    }
+    return gameAudio;
   }
+
   function playCalmMusic() {
-    if (G().mute) return stopCalmMusic();
+    const scr = (A.S && A.S.screen) || (S() && S().screen) || "";
+    if (G().mute || !GAME_SCREENS.test(scr)) {
+      return stopCalmMusic();
+    }
     try {
-      initCalmMusic();
-      if (!AC || !bgMusicGain) return;
-      if (AC.state === "suspended") AC.resume();
-      if (bgMusicInterval) { startAmbient(); return; }
-      const notes = [174.61, 220.00, 261.63, 293.66, 349.23, 392.00, 440.00, 523.25];
-      let step = 0;
-      const chord = () => {
-        if (G().mute || !bgMusicGain) return;
-        const now = AC.currentTime;
-        const b = (step * 2) % notes.length;
-        [notes[b], notes[(b + 2) % notes.length], notes[(b + 4) % notes.length]].forEach((freq, idx) => {
-          const osc = AC.createOscillator(), g = AC.createGain(), flt = AC.createBiquadFilter();
-          osc.type = "sine";
-          osc.frequency.setValueAtTime(freq, now + idx * 0.3);
-          flt.type = "lowpass";
-          flt.frequency.setValueAtTime(550, now);
-          const dur = 4.2;
-          g.gain.setValueAtTime(0.0001, now + idx * 0.3);
-          g.gain.exponentialRampToValueAtTime(0.02, now + idx * 0.3 + 1.2);
-          g.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.3 + dur);
-          osc.connect(flt); flt.connect(g); g.connect(bgMusicGain);
-          osc.start(now + idx * 0.3); osc.stop(now + idx * 0.3 + dur + 0.1);
-        });
-        step++;
-      };
-      chord();
-      bgMusicInterval = setInterval(chord, 4600);
-      startAmbient();
+      const audio = initGameAudio();
+      if (audio.paused) {
+        audio.play().catch(() => {});
+      }
     } catch (e) {}
   }
+
   function stopCalmMusic() {
-    if (bgMusicInterval) { clearInterval(bgMusicInterval); bgMusicInterval = null; }
-    stopAmbient();
-  }
-
-
-  // ---------------------------------------------------------------- farm ambience under the calm music
-  // All synthesised (no audio files): a soft breeze bed, birdsong, crickets, now and then a distant sheep or a hen.
-  // Plays only on game screens, follows the mute button, and adapts to the level weather (rain hiss in storms,
-  // fewer birds in drought/heat).
-  const GAME_SCREENS = /^(lvl|l\d+x|map|lvlResult|report)$/;
-  let ambBus = null, ambWind = null, ambTimer = null;
-  function noiseBuf(sec) { const b = AC.createBuffer(1, AC.sampleRate * sec, AC.sampleRate), ch = b.getChannelData(0); let last = 0;
-    for (let i = 0; i < ch.length; i++) { const w = Math.random() * 2 - 1; last = (last + 0.02 * w) / 1.02; ch[i] = last * 3.5; } return b; } // brown-ish noise
-  let AMB_ENV = "day";
-  function ambWeather() { return /^l\d+x$/.test(A.S.screen || "") ? "harvest" : AMB_ENV; }
-  function startAmbient() {
-    if (G().mute || ambTimer || !AC) return;
     try {
-      ambBus = AC.createGain(); ambBus.gain.setValueAtTime(0.0001, AC.currentTime); ambBus.gain.exponentialRampToValueAtTime(1, AC.currentTime + 2.5); ambBus.connect(AC.destination);
-      // breeze: looping noise through a slowly swaying low-pass filter
-      const src = AC.createBufferSource(); src.buffer = noiseBuf(4); src.loop = true;
-      const lp = AC.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 420; lp.Q.value = 0.4;
-      const g = AC.createGain(); g.gain.value = 0.018;
-      const lfo = AC.createOscillator(), lfoG = AC.createGain(); lfo.frequency.value = 0.07; lfoG.gain.value = 260; lfo.connect(lfoG); lfoG.connect(lp.frequency);
-      const lfo2 = AC.createOscillator(), lfo2G = AC.createGain(); lfo2.frequency.value = 0.11; lfo2G.gain.value = 0.009; lfo2.connect(lfo2G); lfo2G.connect(g.gain);
-      src.connect(lp); lp.connect(g); g.connect(ambBus); src.start(); lfo.start(); lfo2.start();
-      ambWind = [src, lfo, lfo2];
-      let t = 0;
-      ambTimer = setInterval(() => {
-        if (G().mute || !GAME_SCREENS.test(A.S.screen || "")) return stopAmbient();
-        t++; const w = ambWeather(), dry = /drought|heat|dead|salt/.test(w), wet = /storm/.test(w);
-        if (wet && t % 3 === 0) rainHiss();
-        if (!wet && Math.random() < (dry ? 0.18 : 0.42)) bird();
-        if (Math.random() < 0.25) crickets();
-        if (Math.random() < 0.05) sheep();
-        if (Math.random() < 0.03) hen();
-      }, 1700);
-    } catch (e) { }
+      if (gameAudio && !gameAudio.paused) {
+        gameAudio.pause();
+      }
+    } catch (e) {}
   }
-  function stopAmbient() {
-    if (ambTimer) { clearInterval(ambTimer); ambTimer = null; }
-    if (ambBus && AC) { const b = ambBus, w = ambWind; try { b.gain.cancelScheduledValues(AC.currentTime); b.gain.setValueAtTime(Math.max(0.0001, b.gain.value), AC.currentTime); b.gain.exponentialRampToValueAtTime(0.0001, AC.currentTime + 1.2); } catch (e) { }
-      setTimeout(() => { try { w && w.forEach((n) => n.stop()); b.disconnect(); } catch (e) { } }, 1400); }
-    ambBus = null; ambWind = null;
+
+  function syncAudio(screen) {
+    const scr = screen || (A.S && A.S.screen) || (S() && S().screen) || "";
+    if (GAME_SCREENS.test(scr) && !G().mute) {
+      playCalmMusic();
+    } else {
+      stopCalmMusic();
+    }
   }
+
+  document.addEventListener("pointerdown", () => {
+    const scr = (A.S && A.S.screen) || (S() && S().screen) || "";
+    if (GAME_SCREENS.test(scr) && !G().mute) {
+      playCalmMusic();
+    }
+  }, { passive: true });
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      if (gameAudio && !gameAudio.paused) gameAudio.pause();
+    } else {
+      const scr = (A.S && A.S.screen) || (S() && S().screen) || "";
+      if (GAME_SCREENS.test(scr) && !G().mute && gameAudio && gameAudio.paused) {
+        gameAudio.play().catch(() => {});
+      }
+    }
+  });
+
+  function startAmbient() { }
+  function stopAmbient() { }
   const pan = (x) => { if (!AC.createStereoPanner) return null; const p = AC.createStereoPanner(); p.pan.value = x; return p; };
   function out(node, x) { const p = pan(x); if (p) { node.connect(p); p.connect(ambBus); } else node.connect(ambBus); }
   function bird() { // 2–5 quick whistles, random pitch and side
@@ -1765,11 +1740,15 @@
   // ---------------------------------------------------------------- the sunny 3D-farm look is for the game only
   // body.fs-game switches on game_theme.css while a game screen is showing; the rest of the app keeps its original style.
   const GAME_LOOK = /^(map|lvl|l\d+x|lvlResult|report)$/;
-  const syncLook = () => document.body.classList.toggle("fs-game", GAME_LOOK.test(A.S.screen || ""));
+  const syncLook = () => {
+    const isGame = GAME_LOOK.test(A.S.screen || "");
+    document.body.classList.toggle("fs-game", isGame);
+    syncAudio(A.S.screen);
+  };
   const appEl = document.getElementById("app");
   if (appEl) new MutationObserver(syncLook).observe(appEl, { childList: true });
   syncLook();
-  window.FS_GAME = { get LV() { return LV; }, LEVELS, ORDER, startLevel, finish, say, hint, axe, risk, snd, speak, suitability, playCalmMusic, stopCalmMusic, L, cname, lastCrop, loc, farmE, pname, cropStats, pct, salahM, G, QUIPS, esc };
+  window.FS_GAME = { get LV() { return LV; }, LEVELS, ORDER, startLevel, finish, say, hint, axe, risk, snd, speak, suitability, lvlBadge, LVLNAME, seasonRun, mName, planCrop, demandMm, CK, playCalmMusic, stopCalmMusic, syncAudio, L, cname, lastCrop, loc, farmE, pname, cropStats, pct, salahM, G, QUIPS, esc };
   // migrate old saves that ended on the removed simulation
   if (["sim", "rotations"].includes(S().screen)) S().screen = "hub";
 
