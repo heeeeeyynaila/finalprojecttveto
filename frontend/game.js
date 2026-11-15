@@ -113,7 +113,7 @@
       initCalmMusic();
       if (!AC || !bgMusicGain) return;
       if (AC.state === "suspended") AC.resume();
-      if (bgMusicInterval) return;
+      if (bgMusicInterval) { startAmbient(); return; }
       const notes = [174.61, 220.00, 261.63, 293.66, 349.23, 392.00, 440.00, 523.25];
       let step = 0;
       const chord = () => {
@@ -137,10 +137,94 @@
       };
       chord();
       bgMusicInterval = setInterval(chord, 4600);
+      startAmbient();
     } catch (e) {}
   }
   function stopCalmMusic() {
     if (bgMusicInterval) { clearInterval(bgMusicInterval); bgMusicInterval = null; }
+    stopAmbient();
+  }
+
+
+  // ---------------------------------------------------------------- farm ambience under the calm music
+  // All synthesised (no audio files): a soft breeze bed, birdsong, crickets, now and then a distant sheep or a hen.
+  // Plays only on game screens, follows the mute button, and adapts to the level weather (rain hiss in storms,
+  // fewer birds in drought/heat).
+  const GAME_SCREENS = /^(lvl|l\d+x|map|lvlResult|report)$/;
+  let ambBus = null, ambWind = null, ambTimer = null;
+  function noiseBuf(sec) { const b = AC.createBuffer(1, AC.sampleRate * sec, AC.sampleRate), ch = b.getChannelData(0); let last = 0;
+    for (let i = 0; i < ch.length; i++) { const w = Math.random() * 2 - 1; last = (last + 0.02 * w) / 1.02; ch[i] = last * 3.5; } return b; } // brown-ish noise
+  let AMB_ENV = "day";
+  function ambWeather() { return /^l\d+x$/.test(A.S.screen || "") ? "harvest" : AMB_ENV; }
+  function startAmbient() {
+    if (G().mute || ambTimer || !AC) return;
+    try {
+      ambBus = AC.createGain(); ambBus.gain.setValueAtTime(0.0001, AC.currentTime); ambBus.gain.exponentialRampToValueAtTime(1, AC.currentTime + 2.5); ambBus.connect(AC.destination);
+      // breeze: looping noise through a slowly swaying low-pass filter
+      const src = AC.createBufferSource(); src.buffer = noiseBuf(4); src.loop = true;
+      const lp = AC.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 420; lp.Q.value = 0.4;
+      const g = AC.createGain(); g.gain.value = 0.018;
+      const lfo = AC.createOscillator(), lfoG = AC.createGain(); lfo.frequency.value = 0.07; lfoG.gain.value = 260; lfo.connect(lfoG); lfoG.connect(lp.frequency);
+      const lfo2 = AC.createOscillator(), lfo2G = AC.createGain(); lfo2.frequency.value = 0.11; lfo2G.gain.value = 0.009; lfo2.connect(lfo2G); lfo2G.connect(g.gain);
+      src.connect(lp); lp.connect(g); g.connect(ambBus); src.start(); lfo.start(); lfo2.start();
+      ambWind = [src, lfo, lfo2];
+      let t = 0;
+      ambTimer = setInterval(() => {
+        if (G().mute || !GAME_SCREENS.test(A.S.screen || "")) return stopAmbient();
+        t++; const w = ambWeather(), dry = /drought|heat|dead|salt/.test(w), wet = /storm/.test(w);
+        if (wet && t % 3 === 0) rainHiss();
+        if (!wet && Math.random() < (dry ? 0.18 : 0.42)) bird();
+        if (Math.random() < 0.25) crickets();
+        if (Math.random() < 0.05) sheep();
+        if (Math.random() < 0.03) hen();
+      }, 1700);
+    } catch (e) { }
+  }
+  function stopAmbient() {
+    if (ambTimer) { clearInterval(ambTimer); ambTimer = null; }
+    if (ambBus && AC) { const b = ambBus, w = ambWind; try { b.gain.cancelScheduledValues(AC.currentTime); b.gain.setValueAtTime(Math.max(0.0001, b.gain.value), AC.currentTime); b.gain.exponentialRampToValueAtTime(0.0001, AC.currentTime + 1.2); } catch (e) { }
+      setTimeout(() => { try { w && w.forEach((n) => n.stop()); b.disconnect(); } catch (e) { } }, 1400); }
+    ambBus = null; ambWind = null;
+  }
+  const pan = (x) => { if (!AC.createStereoPanner) return null; const p = AC.createStereoPanner(); p.pan.value = x; return p; };
+  function out(node, x) { const p = pan(x); if (p) { node.connect(p); p.connect(ambBus); } else node.connect(ambBus); }
+  function bird() { // 2–5 quick whistles, random pitch and side
+    const now = AC.currentTime + 0.05, base = 2300 + Math.random() * 1800, n = 2 + (Math.random() * 4 | 0), x = Math.random() * 1.6 - 0.8;
+    for (let i = 0; i < n; i++) {
+      const o = AC.createOscillator(), g = AC.createGain(), t0 = now + i * (0.09 + Math.random() * 0.07), d = 0.06 + Math.random() * 0.06;
+      o.type = "sine"; o.frequency.setValueAtTime(base * (0.9 + Math.random() * 0.3), t0); o.frequency.exponentialRampToValueAtTime(base * (1.2 + Math.random() * 0.4), t0 + d * 0.6); o.frequency.exponentialRampToValueAtTime(base * 0.85, t0 + d);
+      g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(0.012, t0 + 0.012); g.gain.exponentialRampToValueAtTime(0.0001, t0 + d);
+      o.connect(g); out(g, x); o.start(t0); o.stop(t0 + d + 0.02);
+    }
+  }
+  function crickets() {
+    const now = AC.currentTime, x = Math.random() * 1.2 - 0.6, f = 4200 + Math.random() * 600;
+    for (let k = 0; k < 3; k++) for (let i = 0; i < 4; i++) {
+      const o = AC.createOscillator(), g = AC.createGain(), t0 = now + k * 0.32 + i * 0.035;
+      o.type = "square"; o.frequency.value = f; g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(0.0025, t0 + 0.005); g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.025);
+      o.connect(g); out(g, x); o.start(t0); o.stop(t0 + 0.03);
+    }
+  }
+  function sheep() { // distant "baa": buzzy tone with vibrato through a vowel-ish band-pass
+    const now = AC.currentTime, o = AC.createOscillator(), vib = AC.createOscillator(), vg = AC.createGain(), bp = AC.createBiquadFilter(), g = AC.createGain();
+    o.type = "sawtooth"; o.frequency.setValueAtTime(340, now); o.frequency.linearRampToValueAtTime(300, now + 0.7);
+    vib.frequency.value = 7; vg.gain.value = 14; vib.connect(vg); vg.connect(o.frequency);
+    bp.type = "bandpass"; bp.frequency.value = 900; bp.Q.value = 3;
+    g.gain.setValueAtTime(0.0001, now); g.gain.exponentialRampToValueAtTime(0.01, now + 0.08); g.gain.exponentialRampToValueAtTime(0.0001, now + 0.75);
+    o.connect(bp); bp.connect(g); out(g, Math.random() * 1.4 - 0.7); o.start(now); vib.start(now); o.stop(now + 0.8); vib.stop(now + 0.8);
+  }
+  function hen() { // a few soft clucks
+    const now = AC.currentTime, x = Math.random() * 1.4 - 0.7;
+    for (let i = 0; i < 3; i++) { const o = AC.createOscillator(), g = AC.createGain(), t0 = now + i * 0.18;
+      o.type = "triangle"; o.frequency.setValueAtTime(700, t0); o.frequency.exponentialRampToValueAtTime(380, t0 + 0.08);
+      g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(0.008, t0 + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.09);
+      o.connect(g); out(g, x); o.start(t0); o.stop(t0 + 0.1); }
+  }
+  function rainHiss() {
+    const now = AC.currentTime, s = AC.createBufferSource(), hp = AC.createBiquadFilter(), g = AC.createGain();
+    s.buffer = noiseBuf(5.5); hp.type = "highpass"; hp.frequency.value = 1500;
+    g.gain.setValueAtTime(0.0001, now); g.gain.exponentialRampToValueAtTime(0.02, now + 1); g.gain.exponentialRampToValueAtTime(0.0001, now + 5.3);
+    s.connect(hp); hp.connect(g); out(g, 0); s.start(now); s.stop(now + 5.5);
   }
 
   function speak(text) {
@@ -503,6 +587,7 @@
   setRZ(RZ);
   const mixC = (a, b, t) => { const h = (x) => [1, 3, 5].map((i) => parseInt(x.slice(i, i + 2), 16)); const A2 = h(a), B2 = h(b); return "#" + A2.map((v, i) => Math.round(v + (B2[i] - v) * t).toString(16).padStart(2, "0")).join(""); };
   const soilCol = () => ({ sandy: "#e8b878", clay: "#a65f34", loam: "#b8743f" }[S().farm.soil] || "#b8743f");
+  const SKY_APP = { day: ["#bcd3da", "#eaf7dc"], harvest: ["#f1d79a", "#f6efd2"], drought: ["#f3dcae", "#f8f1dc"], heat: ["#f2a65a", "#f8dcb0"], storm: ["#7f8f96", "#c4ccc9"], dead: ["#b8a58a", "#e2d8c2"], soil: ["#cdbfa0", "#efe8d2"], salt: ["#d9e2e4", "#f4f4ea"] }; // original look (hub)
   const SKY = { day: ["#45b8f0", "#dff5ff"], harvest: ["#56bff2", "#fff0c8"], drought: ["#ffcf7a", "#fff1d6"], heat: ["#ff9a4d", "#ffe0b0"], storm: ["#7f9aab", "#cfdde6"], dead: ["#c9a97a", "#f1e3c8"], soil: ["#8fd0f0", "#f6ecd2"], salt: ["#9fdcf5", "#f4fbff"] };
   function board3d(cols, rows, tile, o = {}) {
     let tiles = "";
@@ -512,7 +597,7 @@
         <div class="tp" style="background:${t.fill}">${t.flat ? `<svg class="fl" viewBox="0 0 50 50" aria-hidden="true">${t.flat}</svg>` : ""}</div>
         ${t.deco ? `<div class="up"><svg viewBox="-24 -31 48 35" width="64" height="46" aria-hidden="true">${t.deco}</svg></div>` : ""}</div>`;
     }
-    const W = cols * T3, H = rows * T3, sky = SKY[o.env || "day"];
+    const W = cols * T3, H = rows * T3, sky = (GAME_LOOK.test(A.S.screen || "") ? SKY : SKY_APP)[o.env || "day"]; AMB_ENV = o.env || "day";
     let slabs = "";
     for (let k = 7; k >= 0; k--) slabs += `<div class="slab" style="left:${-YARD}px;top:${-YARD}px;width:${W + 2 * YARD}px;height:${H + 2 * YARD}px;transform:translateZ(${-k * 3 - 1}px);background:${k === 0 ? (o.yard || "#6cc04a") : k < 2 ? "#4a9e2f" : k < 4 ? "#9a5b2e" : "#6e4527"}"></div>`;
     const xtra = (o.extras || []).map((x) => `<div class="up xtra" style="left:${x.x}px;top:${x.y}px"><svg viewBox="-26 -36 52 40" width="${(x.w || 64) * 1.3}" height="${(x.w || 64) * 1.3 * 40 / 52}" style="margin-inline-start:${-(x.w || 64) * 0.15}px" aria-hidden="true">${x.svg}</svg></div>`).join("");
@@ -1548,7 +1633,7 @@
     return `<div class="gscreen hub">
       <div class="ghead in">${A.backBtn("farm").replace('class="back"', 'class="iconbtn"')}
         <h1><small>${esc(A.placeName())}</small>${L(`مزرعة ${esc(pname())}`, `${esc(pname())}'s farm`)}</h1>
-        <button class="iconbtn" data-act="editFarm" aria-label="${L("تعديل معلومات المزرعة", "Edit farm answers")}"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 17h4l9-9-4-4-9 9z M11 5l4 4" stroke="#2f9bd6" stroke-width="1.8" fill="none" stroke-linejoin="round"/></svg></button>
+        <button class="iconbtn" data-act="editFarm" aria-label="${L("تعديل معلومات المزرعة", "Edit farm answers")}"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 17h4l9-9-4-4-9 9z M11 5l4 4" stroke="#516d77" stroke-width="1.8" fill="none" stroke-linejoin="round"/></svg></button>
         <button class="iconbtn" data-act="g" data-a="mute" aria-label="${G().mute ? L("تشغيل الصوت", "Unmute") : L("كتم الصوت", "Mute")}">${G().mute ? "🔇" : "🔊"}</button></div>
       <div class="in d1">${fieldBoard(crop, 1, { cols, rows: 3, env: "day", act: "hub3", height: 250, badge: `${area} ${L("هكتار", "ha")} · ${cname(crop)}` })}</div>
       <div class="farmchips in d2"><span>${soilN}</span><span>${irr}</span><span>${L("ماء", "Water")}: ${{ low: L("قليل", "low"), medium: L("متوسط", "medium"), high: L("كافٍ", "good") }[f.water] || "—"}</span><span>${L("انحدار", "Slope")} ${l.slope}%</span></div>
@@ -1557,7 +1642,7 @@
         <button class="hubc tilt c-nasa in d3" data-act="go" data-to="nasa"><span class="hico">${ICO.sat}</span><span class="htx"><small>1</small><b>${L("تقرير ناسا لموقعك", "Your NASA location report")}</b><span>${L(`30 موسمًا من المطر والحرارة والتربة · المتوسط ${l.summary.rain_mean} ملم`, `30 seasons of rain, heat and soil · ${l.summary.rain_mean} mm average`)}</span></span></button>
         <button class="hubc tilt c-crop in d4" data-act="go" data-to="crops"><span class="hico">${ICO.sprout}</span><span class="htx"><small>2</small><b>${L("خصائص المحاصيل", "Crop characteristics")}</b><span>${L(`${CROPS.length} محاصيل · مدى ملاءمتها لمزرعتك`, `${CROPS.length} crops · how each one fits your farm`)}</span></span></button>
         <button class="hubc tilt c-game in d5" data-act="go" data-to="map"><span class="hico">${ICO.play}</span><span class="htx"><small>3</small><b>${pr.n ? L("أكمل مغامرة المزرعة", "Continue the farm adventure") : L("ابدأ اتخاذ القرارات: اللعبة", "Start making decisions: the game")}</b><span>${pr.n}/${ORDER.length} ${L("مستويات", "levels")} · ★ ${pr.stars}</span></span>
-          <span class="hring"><svg viewBox="0 0 36 36" width="44" height="44" aria-hidden="true"><circle cx="18" cy="18" r="15" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="4"/><circle cx="18" cy="18" r="15" fill="none" stroke="#ffe9a8" stroke-width="4" stroke-dasharray="${(94 * pr.n / ORDER.length).toFixed(1)} 94" transform="rotate(-90 18 18)" stroke-linecap="round"/></svg></span></button>
+          <span class="hring"><svg viewBox="0 0 36 36" width="44" height="44" aria-hidden="true"><circle cx="18" cy="18" r="15" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="4"/><circle cx="18" cy="18" r="15" fill="none" stroke="#e8e8bc" stroke-width="4" stroke-dasharray="${(94 * pr.n / ORDER.length).toFixed(1)} 94" transform="rotate(-90 18 18)" stroke-linecap="round"/></svg></span></button>
       </div>
     </div>`;
   };
@@ -1581,29 +1666,29 @@
     const l = loc(), v = l.summary.rain_oct_may, n = v.length, W = 340, H = 150, P = 26, mx = Math.max(...v) * 1.05, bw = (W - P - 6) / n;
     let b = "";
     v.forEach((x, i) => { const h = x / mx * (H - 22), dry = l.summary.driest.includes(i);
-      b += `<rect class="gbar" style="animation-delay:${i * 0.02}s" x="${(P + i * bw + 1).toFixed(1)}" y="${(H - 16 - h).toFixed(1)}" width="${(bw - 2).toFixed(1)}" height="${h.toFixed(1)}" rx="2" fill="${dry ? "#e8552f" : "#6cc04a"}" data-tip="${DATA.seasons[i]}: ${x} ${L("ملم", "mm")}${dry ? " · " + L("من الأجف", "among the driest") : ""}"/>`; });
+      b += `<rect class="gbar" style="animation-delay:${i * 0.02}s" x="${(P + i * bw + 1).toFixed(1)}" y="${(H - 16 - h).toFixed(1)}" width="${(bw - 2).toFixed(1)}" height="${h.toFixed(1)}" rx="2" fill="${dry ? "#840000" : "#9ca047"}" data-tip="${DATA.seasons[i]}: ${x} ${L("ملم", "mm")}${dry ? " · " + L("من الأجف", "among the driest") : ""}"/>`; });
     const ym = H - 16 - l.summary.rain_mean / mx * (H - 22);
-    const ticks = [0, 200, 400, 600, 800].filter((t) => t < mx).map((t) => { const y = H - 16 - t / mx * (H - 22); return `<line x1="${P}" x2="${W}" y1="${y}" y2="${y}" stroke="#f3e2b6" stroke-width="1"/><text x="${P - 4}" y="${y + 3}" text-anchor="end" font-size="8" fill="#8a7158">${t}</text>`; }).join("");
+    const ticks = [0, 200, 400, 600, 800].filter((t) => t < mx).map((t) => { const y = H - 16 - t / mx * (H - 22); return `<line x1="${P}" x2="${W}" y1="${y}" y2="${y}" stroke="#e3e3bf" stroke-width="1"/><text x="${P - 4}" y="${y + 3}" text-anchor="end" font-size="8" fill="#6b706a">${t}</text>`; }).join("");
     return `<svg viewBox="0 0 ${W} ${H}" class="chartsvg" role="img" aria-label="${L("المطر لكل موسم", "Rain per season")}">${ticks}${b}
-      <line x1="${P}" x2="${W}" y1="${ym}" y2="${ym}" stroke="#3a2a18" stroke-width="1.2" stroke-dasharray="4 3"/><text x="${W - 2}" y="${ym - 4}" text-anchor="end" font-size="8.5" font-weight="800" fill="#3a2a18">${L("المتوسط", "avg")} ${l.summary.rain_mean}</text>
-      <text x="${P}" y="${H - 3}" font-size="8" fill="#8a7158">${DATA.seasons[0]}</text><text x="${W}" y="${H - 3}" text-anchor="end" font-size="8" fill="#8a7158">${DATA.seasons[n - 1]}</text></svg>`;
+      <line x1="${P}" x2="${W}" y1="${ym}" y2="${ym}" stroke="#2b2a20" stroke-width="1.2" stroke-dasharray="4 3"/><text x="${W - 2}" y="${ym - 4}" text-anchor="end" font-size="8.5" font-weight="800" fill="#2b2a20">${L("المتوسط", "avg")} ${l.summary.rain_mean}</text>
+      <text x="${P}" y="${H - 3}" font-size="8" fill="#6b706a">${DATA.seasons[0]}</text><text x="${W}" y="${H - 3}" text-anchor="end" font-size="8" fill="#6b706a">${DATA.seasons[n - 1]}</text></svg>`;
   }
   function chartMonths() {
     const l = loc(), n = l.rain.length, R = Array(12).fill(0), Et = Array(12).fill(0);
     for (let s = 0; s < n; s++) for (let m = 0; m < 12; m++) { R[m] += l.rain[s][m] / n; Et[m] += l.et0[s][m] / n; }
     const W = 340, H = 160, P = 26, mx = Math.max(...R, ...Et) * 1.08, bw = (W - P - 6) / 12, y = (v) => H - 18 - v / mx * (H - 26);
-    let s = [0, 50, 100, 150, 200].filter((t) => t < mx).map((t) => `<line x1="${P}" x2="${W}" y1="${y(t)}" y2="${y(t)}" stroke="#f3e2b6"/><text x="${P - 4}" y="${y(t) + 3}" text-anchor="end" font-size="8" fill="#8a7158">${t}</text>`).join("");
-    R.forEach((v, m) => { s += `<rect class="gbar" style="animation-delay:${m * 0.04}s" x="${P + m * bw + 4}" y="${y(v)}" width="${bw - 8}" height="${y(0) - y(v)}" rx="3" fill="#2f9bd6" data-tip="${mName(m)} · ${L("مطر", "rain")} ${Math.round(v)} ${L("ملم", "mm")} · ET0 ${Math.round(Et[m])} ${L("ملم", "mm")}"/><text x="${P + m * bw + bw / 2}" y="${H - 5}" text-anchor="middle" font-size="7.5" fill="#8a7158">${mName(m).slice(0, S().lang === "en" ? 3 : 4)}</text>`; });
-    s += `<path class="gline" d="${Et.map((v, m) => `${m ? "L" : "M"}${(P + m * bw + bw / 2).toFixed(1)} ${y(v).toFixed(1)}`).join(" ")}" fill="none" stroke="#e8552f" stroke-width="2" stroke-linejoin="round"/>`;
-    s += Et.map((v, m) => `<circle cx="${P + m * bw + bw / 2}" cy="${y(v)}" r="4" fill="#e8552f" stroke="#fffdf4" stroke-width="2" data-tip="${mName(m)} · ET0 ${Math.round(v)} ${L("ملم", "mm")} · ${L("مطر", "rain")} ${Math.round(R[m])} ${L("ملم", "mm")}"/>`).join("");
+    let s = [0, 50, 100, 150, 200].filter((t) => t < mx).map((t) => `<line x1="${P}" x2="${W}" y1="${y(t)}" y2="${y(t)}" stroke="#e3e3bf"/><text x="${P - 4}" y="${y(t) + 3}" text-anchor="end" font-size="8" fill="#6b706a">${t}</text>`).join("");
+    R.forEach((v, m) => { s += `<rect class="gbar" style="animation-delay:${m * 0.04}s" x="${P + m * bw + 4}" y="${y(v)}" width="${bw - 8}" height="${y(0) - y(v)}" rx="3" fill="#516d77" data-tip="${mName(m)} · ${L("مطر", "rain")} ${Math.round(v)} ${L("ملم", "mm")} · ET0 ${Math.round(Et[m])} ${L("ملم", "mm")}"/><text x="${P + m * bw + bw / 2}" y="${H - 5}" text-anchor="middle" font-size="7.5" fill="#6b706a">${mName(m).slice(0, S().lang === "en" ? 3 : 4)}</text>`; });
+    s += `<path class="gline" d="${Et.map((v, m) => `${m ? "L" : "M"}${(P + m * bw + bw / 2).toFixed(1)} ${y(v).toFixed(1)}`).join(" ")}" fill="none" stroke="#840000" stroke-width="2" stroke-linejoin="round"/>`;
+    s += Et.map((v, m) => `<circle cx="${P + m * bw + bw / 2}" cy="${y(v)}" r="4" fill="#840000" stroke="#fbfbef" stroke-width="2" data-tip="${mName(m)} · ET0 ${Math.round(v)} ${L("ملم", "mm")} · ${L("مطر", "rain")} ${Math.round(R[m])} ${L("ملم", "mm")}"/>`).join("");
     return `<svg viewBox="0 0 ${W} ${H}" class="chartsvg" role="img" aria-label="${L("المطر والتبخر الشهري", "Monthly rain and evaporative demand")}">${s}</svg>`;
   }
   function chartHot() {
     const l = loc(), n = l.hot.length, Hh = Array(12).fill(0);
     for (let s = 0; s < n; s++) for (let m = 0; m < 12; m++) Hh[m] += l.hot[s][m] / n;
     const W = 340, H = 120, P = 26, mx = Math.max(...Hh, 1) * 1.1, bw = (W - P - 6) / 12, y = (v) => H - 18 - v / mx * (H - 26);
-    let s = `<rect x="${P + 7 * bw}" y="4" width="${2 * bw}" height="${H - 22}" fill="#e8552f" opacity=".07" rx="4"/><text x="${P + 8 * bw}" y="13" text-anchor="middle" font-size="8" font-weight="800" fill="#e8552f">${L("الإزهار", "flowering")}</text>`;
-    Hh.forEach((v, m) => { s += `<rect class="gbar" style="animation-delay:${m * 0.04}s" x="${P + m * bw + 4}" y="${y(v)}" width="${bw - 8}" height="${Math.max(0, y(0) - y(v))}" rx="3" fill="${m === 7 || m === 8 ? "#e8552f" : "#C9A15C"}" data-tip="${mName(m)} · ${v.toFixed(1)} ${L("يوم فوق 31°", "days above 31°C")}"/><text x="${P + m * bw + bw / 2}" y="${H - 5}" text-anchor="middle" font-size="7.5" fill="#8a7158">${mName(m).slice(0, S().lang === "en" ? 3 : 4)}</text>`; });
+    let s = `<rect x="${P + 7 * bw}" y="4" width="${2 * bw}" height="${H - 22}" fill="#840000" opacity=".07" rx="4"/><text x="${P + 8 * bw}" y="13" text-anchor="middle" font-size="8" font-weight="800" fill="#840000">${L("الإزهار", "flowering")}</text>`;
+    Hh.forEach((v, m) => { s += `<rect class="gbar" style="animation-delay:${m * 0.04}s" x="${P + m * bw + 4}" y="${y(v)}" width="${bw - 8}" height="${Math.max(0, y(0) - y(v))}" rx="3" fill="${m === 7 || m === 8 ? "#840000" : "#C9A15C"}" data-tip="${mName(m)} · ${v.toFixed(1)} ${L("يوم فوق 31°", "days above 31°C")}"/><text x="${P + m * bw + bw / 2}" y="${H - 5}" text-anchor="middle" font-size="7.5" fill="#6b706a">${mName(m).slice(0, S().lang === "en" ? 3 : 4)}</text>`; });
     return `<svg viewBox="0 0 ${W} ${H}" class="chartsvg" role="img" aria-label="${L("أيام الحر", "Hot days")}">${s}</svg>`;
   }
   A.SCREENS.nasa = () => {
@@ -1616,9 +1701,9 @@
       <div class="dock in d1"><div class="who">${salahM(80, "worried")}</div><div class="say tone-warn">${L(`باختصار يا ${esc(pname())}: آخر 3 مواسم (${dry3}) كانت الأجف في 30 سنة، ومطر البذر يتأخر، والحاجة للماء ترتفع. هذا ما ستواجهه في اللعبة.`, `In short, ${esc(pname())}: the last 3 seasons (${dry3}) were the driest in 30 years, the sowing rain comes later and water demand is rising. That's what you'll face in the game.`)}</div></div>
       <div class="cover in d2"><span class="obs">${L("رصد", "Observed")}</span> NASA POWER · ${f1(l.lat)}°, ${f1(l.lon)}° · ${L("خلية ~50 كم", "~50 km cell")} · 1995–2025 (${DATA.seasons.length} ${L("موسمًا", "seasons")})<br>SoilGrids v2.0 (250 m) · NASADEM (30 m) · ${L("الارتفاع", "elevation")} ${Math.round(l.elev)} ${L("م", "m")}</div>
       <div class="kpis in d3">${kpi(`${l.summary.rain_mean}`, L("ملم مطر أكتوبر–ماي", "mm rain Oct–May"), L("المتوسط على 30 موسمًا", "30-season average"))}${kpi(`+${Math.round(tr.et0.per_decade)}`, L("ملم ET0 / عقد", "mm ET0 / decade"), sig(tr.et0.p))}${kpi(`+${Math.round(tr.onset.per_decade)}`, L("يوم تأخر مطر البذر / عقد", "days later sowing rain / decade"), sig(tr.onset.p))}${kpi(`+${tr.tmean.per_decade}°`, L("حرارة / عقد", "temperature / decade"), sig(tr.tmean.p))}${kpi(`${so.paw100}`, L("ملم ماء متاح في التربة", "mm plant-available water"), L("أول متر · SoilGrids", "top metre · SoilGrids"))}${kpi(`${l.slope}%`, L("انحدار الحقل", "field slope"), "NASADEM")}</div>
-      <div class="panel2 chart in d3"><b>${L("مطر كل موسم (أكتوبر–ماي)", "Rain each season (Oct–May)")}</b><div class="legend2"><span><i style="background:#6cc04a"></i>${L("موسم", "Season")}</span><span><i style="background:#e8552f"></i>${L("أجف 3 مواسم", "3 driest seasons")}</span></div>${chartSeasons()}<div class="tipbox" aria-live="polite">${L("المس عمودًا لرؤية القيمة", "Touch a bar to see its value")}</div>
+      <div class="panel2 chart in d3"><b>${L("مطر كل موسم (أكتوبر–ماي)", "Rain each season (Oct–May)")}</b><div class="legend2"><span><i style="background:#9ca047"></i>${L("موسم", "Season")}</span><span><i style="background:#840000"></i>${L("أجف 3 مواسم", "3 driest seasons")}</span></div>${chartSeasons()}<div class="tipbox" aria-live="polite">${L("المس عمودًا لرؤية القيمة", "Touch a bar to see its value")}</div>
         <div class="note">${L(`التغير ${Math.round(tr.rain.per_decade)} ملم/عقد، لكنه غير دال إحصائيًا (p=${tr.rain.p}). السنوات تتقلّب كثيرًا.`, `Change ${Math.round(tr.rain.per_decade)} mm/decade, but not statistically significant (p=${tr.rain.p}). Years swing a lot.`)}</div></div>
-      <div class="panel2 chart in d4"><b>${L("المطر مقابل حاجة التبخر (متوسط شهري)", "Rain vs evaporative demand (monthly average)")}</b><div class="legend2"><span><i style="background:#2f9bd6"></i>${L("مطر", "Rain")}</span><span><i style="background:#e8552f"></i>ET0</span></div>${chartMonths()}<div class="tipbox">${L("المس شهرًا", "Touch a month")}</div>
+      <div class="panel2 chart in d4"><b>${L("المطر مقابل حاجة التبخر (متوسط شهري)", "Rain vs evaporative demand (monthly average)")}</b><div class="legend2"><span><i style="background:#516d77"></i>${L("مطر", "Rain")}</span><span><i style="background:#840000"></i>ET0</span></div>${chartMonths()}<div class="tipbox">${L("المس شهرًا", "Touch a month")}</div>
         <div class="note">${L("عندما يتجاوز الخط الأحمر الأعمدة، يعتمد المحصول على ماء التربة المخزّن.", "When the red line rises above the bars, the crop relies on water stored in the soil.")}</div></div>
       <div class="panel2 chart in d4"><b>${L("أيام الحر فوق 31° (متوسط شهري)", "Days above 31°C (monthly average)")}</b>${chartHot()}<div class="tipbox">${L("المس شهرًا", "Touch a month")}</div>
         <div class="note">${L(`أفريل+ماي: ${tr.hot_flowering.early} ← ${tr.hot_flowering.late} يوم بين 1995–2004 و2015–2024.`, `April+May: ${tr.hot_flowering.early} → ${tr.hot_flowering.late} days between 1995–2004 and 2015–2024.`)} ${sig(tr.hot_flowering.p)}</div></div>
@@ -1626,7 +1711,7 @@
         <div class="trtab">${TR.map(([k, nm, u]) => { const t = tr[k]; return `<div class="trrow"><span class="trn">${nm}<small>${u}</small></span><span dir="ltr" class="trv">${f1(t.early)} → <b>${f1(t.late)}</b></span>${sig(t.p)}</div>`; }).join("")}</div>
         <div class="note">${L("اتجاه Theil–Sen واختبار Mann–Kendall على 30 موسمًا. \"دال\" = p<0.05.", "Theil–Sen slope and Mann–Kendall test over 30 seasons. \"Significant\" = p<0.05.")}</div></div>
       <div class="panel2 in d5"><b>${L("تربتك (SoilGrids)", "Your soil (SoilGrids)")}</b>
-        <div class="texbar"><i style="width:${so.clay}%;background:#e8552f">${L("طين", "Clay")} ${so.clay}%</i><i style="width:${so.silt}%;background:#C9A15C">${L("طمي", "Silt")} ${so.silt}%</i><i style="width:${so.sand}%;background:#ffe9a8;color:#3a2a18">${L("رمل", "Sand")} ${so.sand}%</i></div>
+        <div class="texbar"><i style="width:${so.clay}%;background:#840000">${L("طين", "Clay")} ${so.clay}%</i><i style="width:${so.silt}%;background:#C9A15C">${L("طمي", "Silt")} ${so.silt}%</i><i style="width:${so.sand}%;background:#e8e8bc;color:#2b2a20">${L("رمل", "Sand")} ${so.sand}%</i></div>
         <div class="facts" style="margin-top:8px"><div class="fact">${L("القوام", "Texture")}<b>${so.texture}</b></div><div class="fact">pH<b>${so.ph}</b></div><div class="fact">${L("الكربون العضوي", "Organic carbon")}<b>${so.soc} g/kg</b></div><div class="fact">CEC<b>${so.cec} cmol/kg</b></div></div>
         <div class="note">${L("قيم تقديرية لخلية 250 م، وليست تحليلًا لحقلك. الملوحة غير متوفرة في بياناتنا.", "Estimates for a 250 m cell, not a test of your field. Salinity is not in our data.")}</div></div>
       <div class="panel2 in d5"><b>${L("مؤشر FAO GAEZ v4", "FAO GAEZ v4 benchmark")}</b><p style="margin:4px 0 0;font-size:13.5px;line-height:1.6">${L(`المردود الممكن للقمح المطري (مدخلات عالية): حوالي ${l.gaez_wheat} كغ/هكتار في هذه الخلية.`, `Attainable rainfed wheat yield (high inputs): about ${l.gaez_wheat} kg/ha in this cell.`)}</p></div>
@@ -1676,7 +1761,15 @@
     if (!c || e.pointerType === "touch") return; const r = c.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
     c.classList.add("tilting"); c.style.transform = `perspective(700px) rotateY(${(x * 12).toFixed(1)}deg) rotateX(${(-y * 10).toFixed(1)}deg) translateZ(6px)`; });
 
-  window.FS_GAME = { get LV() { return LV; }, LEVELS, ORDER, startLevel, finish, say, hint, axe, risk, snd, speak, L, cname, lastCrop, loc, farmE, pname, cropStats, pct, salahM, G, QUIPS, esc };
+
+  // ---------------------------------------------------------------- the sunny 3D-farm look is for the game only
+  // body.fs-game switches on game_theme.css while a game screen is showing; the rest of the app keeps its original style.
+  const GAME_LOOK = /^(map|lvl|l\d+x|lvlResult|report)$/;
+  const syncLook = () => document.body.classList.toggle("fs-game", GAME_LOOK.test(A.S.screen || ""));
+  const appEl = document.getElementById("app");
+  if (appEl) new MutationObserver(syncLook).observe(appEl, { childList: true });
+  syncLook();
+  window.FS_GAME = { get LV() { return LV; }, LEVELS, ORDER, startLevel, finish, say, hint, axe, risk, snd, speak, suitability, playCalmMusic, stopCalmMusic, L, cname, lastCrop, loc, farmE, pname, cropStats, pct, salahM, G, QUIPS, esc };
   // migrate old saves that ended on the removed simulation
   if (["sim", "rotations"].includes(S().screen)) S().screen = "hub";
 

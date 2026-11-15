@@ -633,7 +633,7 @@
   }
 
   // ---------------- actions
-  A.ACT.x3mute = () => { const g = GM.G(); g.mute = !g.mute; A.save(); try { speechSynthesis.cancel(); } catch (e) { } const b = $("x3mute"); if (b) b.textContent = g.mute ? "🔇" : "🔊"; };
+  A.ACT.x3mute = () => { const g = GM.G(); g.mute = !g.mute; A.save(); if (g.mute) GM.stopCalmMusic && GM.stopCalmMusic(); else GM.playCalmMusic && GM.playCalmMusic(); try { speechSynthesis.cancel(); } catch (e) { } const b = $("x3mute"); if (b) b.textContent = g.mute ? "🔇" : "🔊"; };
   A.ACT.x3cam = (d) => { if (!RT) return; RT.w.orbGoal.theta += Number(d.d); RT.w.flySpeed = 3; GM.snd("whoosh"); };
   A.ACT.x3zoom = () => { if (!RT) return; const o = RT.w.orbGoal; o.radius = o.radius > 30 ? 22 : 38; o.phi = o.radius > 30 ? 0.98 : 0.85; RT.w.flySpeed = 3; };
   A.ACT.x3hs = (d) => { if (RT && RT.api) RT.api.inspect(+d.i); };
