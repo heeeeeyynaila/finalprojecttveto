@@ -188,6 +188,19 @@
       <g stroke="#e8e8bc" stroke-width="2" opacity=".5" stroke-linecap="round"><path d="M20 740 l60 -8 M100 760 l70 -9 M240 730 l70 -8 M260 770 l90 -10"/></g>
       <g class="hi" stroke="#840000" stroke-width="5" stroke-linecap="round" fill="none"><path d="M318 286 q16 10 18 30"/><path d="M334 268 q24 16 26 46"/></g>
     </svg>
+    <div class="pop d1" style="position:absolute;left:0;right:0;top:clamp(32px,6vh,52px);display:flex;justify-content:center;z-index:6">
+      <div style="display:inline-flex;align-items:center;gap:12px;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);padding:8px 26px 8px 14px;border-radius:999px;box-shadow:0 8px 24px rgba(43,58,63,.14);border:1.5px solid rgba(232,232,188,.9)">
+        <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#ff8a48,#e8552f);display:grid;place-items:center;box-shadow:0 3px 10px rgba(232,85,47,.35)">
+          <svg width="24" height="24" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+            <path d="M7 25 L21 11" stroke="#ffffff" stroke-width="3.8" stroke-linecap="round"/>
+            <path d="M6 26 L9 23" stroke="#ffd9c4" stroke-width="3.8" stroke-linecap="round"/>
+            <path d="M17 7 C22 5 26 8 27 13 C23.5 12 20 13 18 16 L16 14 C16.5 11 16.8 8.5 17 7 Z" fill="#ffffff"/>
+            <rect x="18" y="14" width="4" height="4" rx="1" transform="rotate(-45 18 14)" fill="#ffffff" opacity="0.9"/>
+          </svg>
+        </div>
+        <span style="font-family:'Baloo Bhaijaan 2',system-ui,sans-serif;font-size:32px;font-weight:900;letter-spacing:-0.5px;color:#2b2a20;line-height:1">Tull</span>
+      </div>
+    </div>
     <div style="position:absolute;left:50%;top:clamp(180px,29%,250px);transform:translateX(-50%);max-width:min(340px,88%);display:flex;justify-content:center"><div class="pop d1">${salah(340, "wave")}</div></div>
     <div style="position:absolute;left:0;right:0;bottom:64px;display:flex;flex-direction:column;align-items:center;gap:18px">
       <div class="dots in d4" aria-hidden="true"><i class="on"></i><i style="background:#fbfbef"></i><i style="background:#fbfbef"></i></div>
